@@ -1,0 +1,27 @@
+{
+  "name": "js-test-agent",
+  "version": "0.0.1",
+  "author": "James Lal",
+  "description": "execute client side tests from browser report back to cli",
+  "main": "lib/index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/lightsofapollo/js-test-agent.git"
+  },
+  "keywords": [
+    "test",
+    "client",
+    "browser",
+    "mocha"
+  ],
+  "dependencies" : {
+  },
+  "devDependencies": {
+    "projstrap": "~0.1.0",
+    "mocha": "~1.0"
+  },
+  "license": "MIT",
+  "engine": {
+    "node": ">=0.4"
+  }
+}
