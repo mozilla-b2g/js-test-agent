@@ -1621,7 +1621,6 @@ function HTML(runner) {
   });
 
   runner.on('fail', function(test, err){
-    //HACK -- Uncaught is not working properly
     runner.emit('test end', test);
   });
 
@@ -3410,7 +3409,7 @@ Runner.prototype.run = function(fn){
   });
 
   // uncaught exception
-  process.on('uncaughtException', function(err){
+  process.on('uncaughtException', function(err){    
     self.uncaught(err);
   });
 

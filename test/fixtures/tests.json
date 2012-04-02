@@ -1,0 +1,6 @@
+{
+  "tests": [
+    "/test/fixtures/tests/one-test.js",
+    "/test/fixtures/tests/two-test.js"
+  ]
+}

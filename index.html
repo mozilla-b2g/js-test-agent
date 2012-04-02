@@ -6,9 +6,13 @@
   <script src="/vendor/expect.js" type="text/javascript" charset="utf-8"></script>
   <script src="/vendor/mocha/mocha.js" type="text/javascript" charset="utf-8"></script>
   <script type="text/javascript" charset="utf-8">
+    //Hack for FF to ignore global leaks;
+    var navigator, console, getInterface;
     mocha.setup({ui: 'bdd'});
   </script>
   <link rel="stylesheet" type="text/css" href="/vendor/mocha/mocha.css" />
+	<script type="text/javascript" charset="utf-8">
+	</script>
 </head>
 
 <body onload="mocha.run();">
@@ -24,9 +28,13 @@
 
 <script src="lib/test-agent/loader.js" type="text/javascript" charset="utf-8"></script>
 <script src="test/test-agent/loader-test.js" type="text/javascript" charset="utf-8"></script>
+
+
 <script src="lib/test-agent/sandbox.js" type="text/javascript" charset="utf-8"></script>
 <script src="test/test-agent/sandbox-test.js" type="text/javascript" charset="utf-8"></script>
 
+<script src="lib/test-agent/server.js" type="text/javascript" charset="utf-8"></script>
+<script src="test/test-agent/server-test.js" type="text/javascript" charset="utf-8"></script>
 
 </body>
 </html>
