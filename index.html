@@ -1,0 +1,28 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+  <title>Tests</title>
+  <script src="/vendor/expect.js" type="text/javascript" charset="utf-8"></script>
+  <script src="/vendor/mocha/mocha.js" type="text/javascript" charset="utf-8"></script>
+  <script type="text/javascript" charset="utf-8">
+    mocha.setup({ui: 'bdd'});
+  </script>
+  <link rel="stylesheet" type="text/css" href="/vendor/mocha/mocha.css" />
+</head>
+
+<body onload="mocha.run();">
+
+<div id="mocha">
+</div>
+
+<div id="test">
+</div>
+
+
+<script src="lib/test-agent/loader.js" type="text/javascript" charset="utf-8"></script>
+<script src="test/test-agent/loader-test.js" type="text/javascript" charset="utf-8"></script>
+
+
+</body>
+</html>

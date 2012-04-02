@@ -18,7 +18,8 @@
   },
   "devDependencies": {
     "projstrap": "~0.1.0",
-    "mocha": "~1.0"
+    "mocha": "~1.0",
+    "expect.js": "~0.1"
   },
   "license": "MIT",
   "engine": {
