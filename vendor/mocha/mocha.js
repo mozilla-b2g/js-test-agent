@@ -1621,7 +1621,8 @@ function HTML(runner) {
   });
 
   runner.on('fail', function(test, err){
-    if (err.uncaught) runner.emit('test end', test);
+    //HACK -- Uncaught is not working properly
+    runner.emit('test end', test);
   });
 
   runner.on('test end', function(test){

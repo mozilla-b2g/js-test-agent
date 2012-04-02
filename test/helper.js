@@ -1,7 +1,12 @@
-//Place globals you want to expose
-//to your tests here for example:
+  afterEach(function(){
+    //purge test area after each test
+    var elements = document.getElementById('test').getElementsByTagName('*'),
+        i, element;
 
-/*
-expect = require('expect.js');
-sinon = require('sinon.js');
-*/
+    for(i = 0; i < elements.length; i++){
+      element = elements[i];
+      element.parentNode.removeChild(element);
+    }
+  });
+
+

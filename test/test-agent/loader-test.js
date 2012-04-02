@@ -9,17 +9,6 @@ describe("TestAgent.Loader", function(){
     testArea = document.getElementById('test');
   });
 
-  afterEach(function(){
-    //purge test area after each test
-    var elements = testArea.getElementsByTagName('*'),
-        i, element;
-
-    for(i = 0; i < elements.length; i++){
-      element = elements[i];
-      element.parentNode.removeChild(element);
-    }
-  });
-
   function createIframe(){
 
     beforeEach(function(done){
