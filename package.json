@@ -15,6 +15,7 @@
     "mocha"
   ],
   "dependencies" : {
+    "websocket.io": "~0.1.0"
   },
   "devDependencies": {
     "projstrap": "~0.1.0",

@@ -1,3 +1,5 @@
+require_lib('test-agent/server.js');
+
 describe("TestAgent.Server", function(){
 
   var subject,

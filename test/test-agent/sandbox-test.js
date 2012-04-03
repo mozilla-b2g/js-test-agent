@@ -1,3 +1,5 @@
+require_lib('test-agent/sandbox.js');
+
 describe("TestAgent.Sandbox", function(){
   var subject,
       url = '/test/fixtures/iframe.html';
