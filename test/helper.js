@@ -1,4 +1,7 @@
 afterEach(function(){
+  if(typeof(window) === 'undefined'){
+    return;
+  }
   //purge test area after each test
   var elements = document.getElementById('test').getElementsByTagName('*'),
       i, element;
@@ -9,8 +12,25 @@ afterEach(function(){
   }
 });
 
-window.require_lib = function(url){
-  if(typeof(require) !== 'undefined'){
-    require('/lib/' + url);
+(function(exports){
+
+  var isNode = (typeof(window) === 'undefined');
+
+  if(isNode){
+    exports.expect = require('expect.js');
   }
-};
+
+  exports.require_lib = function(url){
+    if(typeof(require) !== 'undefined'){
+      if(isNode){
+        return require('../lib/' + url);
+      } else {
+        require('/lib/' + url);
+      }
+    }
+  };
+
+}(
+  (typeof(window) === 'undefined')?  global : window
+));
+
