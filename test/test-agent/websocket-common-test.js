@@ -14,12 +14,13 @@ describe("websocket-common", function(){
   describe("WebSocketCommon", function(){
 
     var data = { foo: 'bar', baz: ['1', '2'] },
-        commandString = cmd + ':' + JSON.stringify(data),
+        commandString,
         actual;
 
 
     beforeEach(function(){
       subject = WS;
+      commandString = cmd + subject.IDENTIFIER + JSON.stringify(data);
     });
 
     describe(".stringify", function(){
@@ -63,12 +64,33 @@ describe("websocket-common", function(){
     });
 
     describe("initialization", function(){
+
       it("should set events to a blank object", function(){
         expect(subject.events).to.eql({});
       });
+
+      describe("with events passed", function(){
+
+        var cb1 = function(){},
+            cb2 = function(){};
+
+        beforeEach(function(){
+          subject = new WS.Responder({
+            'client new': cb1,
+            'test all': cb2
+          });
+        });
+
+        it("should add event for each key(event),value(callback) pair", function(){
+          expect(subject.events['client new'][0]).to.be(cb1);
+          expect(subject.events['test all'][0]).to.be(cb2);
+        });
+
+      });
+
     });
 
-    describe(".receive", function(){
+    describe(".respond", function(){
       var data = {works: true},
           event,
           cb;
@@ -80,17 +102,16 @@ describe("websocket-common", function(){
           cb.calledWith = Array.prototype.slice.call(arguments);
         };
 
-        subject.on('command:attack', cb);
-
-        subject.receive(event);
+        subject.on('attack', cb);
+        subject.respond(event, 'extra');
       });
 
-      it("should fire command:attack", function(){
+      it("should fire attack", function(){
         expect(cb.called).to.be(true);
       });
 
       it("should pass data, event as arguments", function(){
-        expect(cb.calledWith).to.eql([data, 'attack']);
+        expect(cb.calledWith).to.eql([data, 'extra']);
       });
     });
 
