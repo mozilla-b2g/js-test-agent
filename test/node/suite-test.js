@@ -2,7 +2,8 @@
 describe("node/suite", function(){
 
   var Suite = require('../../lib/node/suite'),
-      subject, root = __dirname + '/testapp',
+      MatchFiles = require('match-files'),
+      subject, root = __dirname + '/fixtures',
       libPath = 'lib/foo.js',
       testPath = 'test/foo-test.js';
 
@@ -177,6 +178,36 @@ describe("node/suite", function(){
       expect(function(){
         subject.matchesType('fake', 'foo');
       }).to.throwException();
+    });
+
+  });
+
+  describe(".getFiles", function(){
+    var expected, files = [];
+
+    before(function(done){
+      MatchFiles.find(root + '/lib', {}, function(err, found){
+        files = files.concat(found);
+        done();
+      });
+    });
+
+    before(function(done){
+      MatchFiles.find(root + '/test/', {}, function(err, found){
+        //remove file which is not a test
+        var idx = found.indexOf(root + '/test/helper.js');
+        found.splice(idx, 1);
+
+        files = files.concat(found);
+        done();
+      });
+    });
+
+    it("should return all lib and test files", function(done){
+      subject.findFiles(function(err, found){
+        expect(files.sort()).to.eql(found.sort());
+        done();
+      });
     });
 
   });
