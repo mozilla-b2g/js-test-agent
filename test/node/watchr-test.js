@@ -1,6 +1,5 @@
 describe("node/watchr", function(){
   var Watchr = require('../../lib/node/watchr'),
-      changed = [],
       files = [],
       fs = require('fs'),
       subject,
@@ -17,12 +16,6 @@ describe("node/watchr", function(){
   });
 
   beforeEach(function(){
-    callback = function(fileName){
-      console.log('IN CALLBACK');
-      console.log(changed);
-    };
-
-    changed.length = 0;
     subject = new Watchr(files);
   });
 
@@ -84,7 +77,7 @@ describe("node/watchr", function(){
     describe("when changing a file", function(){
       var file;
 
-      it("should notify us when a file has changed", function(done){
+      it("should notify callback when a file has changed", function(done){
         var exec = require('child_process').exec;
 
         file = files[0];
