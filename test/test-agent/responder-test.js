@@ -1,17 +1,17 @@
-var result = require_lib('test-agent/websocket-common.js');
+var result = require_lib('test-agent/responder.js');
 
 if(result){
   var TestAgent = result.TestAgent;
 }
 
-describe("websocket-common", function(){
-  var WS, subject, cmd = 'command';
+describe("test-agent/responder", function(){
+  var Responder, subject, eventName = 'test';
 
   before(function(){
-    WS = TestAgent.WebSocketCommon;
+    Responder = TestAgent.Responder;
   });
 
-  describe("WebSocketCommon", function(){
+  describe("Static Methods", function(){
 
     var data = { foo: 'bar', baz: ['1', '2'] },
         commandString,
@@ -19,17 +19,17 @@ describe("websocket-common", function(){
 
 
     beforeEach(function(){
-      subject = WS;
-      commandString = cmd + subject.IDENTIFIER + JSON.stringify(data);
+      subject = TestAgent.Responder;
+      commandString = JSON.stringify([eventName, data]);
     });
 
     describe(".stringify", function(){
 
       beforeEach(function(){
-        actual = subject.stringify(cmd, data);
+        actual = subject.stringify(eventName, data);
       });
 
-      it("should return string output -> command:json", function(){
+      it("should return json output of [command, data]", function(){
         expect(actual).to.be(commandString);
       });
 
@@ -45,8 +45,8 @@ describe("websocket-common", function(){
         expect(actual).to.be.a(Object);
       });
 
-      it("should have a .command property with comandName", function(){
-        expect(actual.command).to.be(cmd);
+      it("should have a .event property with comandName", function(){
+        expect(actual.event).to.be(eventName);
       });
 
       it("should have a .data property with data", function(){
@@ -57,10 +57,10 @@ describe("websocket-common", function(){
 
   });
 
-  describe("WebSocketCommon.Responder", function(){
+  describe("Responder instance", function(){
 
     beforeEach(function(){
-      subject = new WS.Responder();
+      subject = new Responder();
     });
 
     describe("initialization", function(){
@@ -75,7 +75,7 @@ describe("websocket-common", function(){
             cb2 = function(){};
 
         beforeEach(function(){
-          subject = new WS.Responder({
+          subject = new Responder({
             'client new': cb1,
             'test all': cb2
           });
@@ -96,7 +96,7 @@ describe("websocket-common", function(){
           cb;
 
       beforeEach(function(){
-        event = WS.stringify('attack', data);
+        event = Responder.stringify('attack', data);
         cb = function(){
           cb.called = true;
           cb.calledWith = Array.prototype.slice.call(arguments);
@@ -281,4 +281,5 @@ describe("websocket-common", function(){
 
 
 });
+
 
