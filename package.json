@@ -16,11 +16,11 @@
   ],
   "dependencies" : {
     "websocket.io": "~0.1.0",
+    "mocha": "~1.0",
     "directory-tree-watcher": "~0.0"
   },
   "devDependencies": {
     "match-files": "~0.1.1",
-    "mocha": "~1.0",
     "expect.js": "~0.1"
   },
 

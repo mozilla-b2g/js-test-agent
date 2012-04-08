@@ -53,6 +53,17 @@ describe("test-agent/responder", function(){
         expect(actual.data).to.eql(data);
       });
 
+      describe("when given an invalid string", function(){
+
+        it("should throw an error", function(){
+          var str = 'fooz:bar!'
+          expect(function(){
+            subject.parse(str);
+          }).to.throwError(str);
+        });
+
+      });
+
     });
 
   });
@@ -69,21 +80,23 @@ describe("test-agent/responder", function(){
         expect(subject.events).to.eql({});
       });
 
-      describe("with events passed", function(){
-
-        var cb1 = function(){},
-            cb2 = function(){};
+      describe("when given an object", function(){
+        var calledWith, events;
 
         beforeEach(function(){
-          subject = new Responder({
-            'client new': cb1,
-            'test all': cb2
-          });
+          subject.addEventListener = function(){
+            calledWith = arguments[0];
+          };
+
+          events = {
+            'stuff': function(){}
+          };
+
+          Responder.call(subject, events);
         });
 
-        it("should add event for each key(event),value(callback) pair", function(){
-          expect(subject.events['client new'][0]).to.be(cb1);
-          expect(subject.events['test all'][0]).to.be(cb2);
+        it("should call .addEventListener with events", function(){
+          expect(calledWith).to.be(events);
         });
 
       });
@@ -118,26 +131,47 @@ describe("test-agent/responder", function(){
 
     describe(".addEventListener", function(){
 
-      var cb1, cb2, events;
+      describe("when given an object", function(){
+        var cb1 = function(){},
+            cb2 = function(){};
 
-      beforeEach(function(){
-        cb1 = function(){};
-        cb2 = function(){};
+        beforeEach(function(){
+          subject.addEventListener({
+            'client new': cb1,
+            'test all': cb2
+          });
+        });
 
-        subject.addEventListener('test', cb1);
-        subject.addEventListener('test', cb2);
-        events = subject.events;
+        it("should add event for each key(event),value(callback) pair", function(){
+          expect(subject.events['client new'][0]).to.be(cb1);
+          expect(subject.events['test all'][0]).to.be(cb2);
+        });
+
       });
-      it("should create an array for events.test", function(){
-        expect(subject.events.test).to.be.a(Array);
-      });
 
-      it("should add callback1 to test events.test", function(){
-        expect(events.test[0]).to.be(cb1);
-      });
+      describe("when given a type and callback", function(){
+        var cb1, cb2, events;
 
-      it("should add callback2 to test events.test", function(){
-        expect(events.test[1]).to.be(cb2);
+        beforeEach(function(){
+          cb1 = function(){};
+          cb2 = function(){};
+
+          subject.addEventListener('test', cb1);
+          subject.addEventListener('test', cb2);
+          events = subject.events;
+        });
+
+        it("should create an array for events.test", function(){
+          expect(subject.events.test).to.be.a(Array);
+        });
+
+        it("should add callback1 to test events.test", function(){
+          expect(events.test[0]).to.be(cb1);
+        });
+
+        it("should add callback2 to test events.test", function(){
+          expect(events.test[1]).to.be(cb2);
+        });
       });
 
     });
