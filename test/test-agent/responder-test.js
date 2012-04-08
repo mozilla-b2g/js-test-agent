@@ -37,20 +37,36 @@ describe("test-agent/responder", function(){
 
     describe(".parse", function(){
 
-      beforeEach(function(){
-        actual = subject.parse(commandString);
+      var result;
+
+      function willReturnEvent(){
+        it("should be an object", function(){
+          expect(result).to.be.a(Object);
+        });
+
+        it("should have a .event property with comandName", function(){
+          expect(result.event).to.be(eventName);
+        });
+
+        it("should have a .data property with data", function(){
+          expect(result.data).to.eql(data);
+        });
+      }
+
+      describe("when given a string", function(){
+        beforeEach(function(){
+          result = subject.parse(commandString);
+        });
+
+        willReturnEvent();
       });
 
-      it("should be an object", function(){
-        expect(actual).to.be.a(Object);
-      });
+      describe("when given an array", function(){
+        beforeEach(function(){
+          result = subject.parse([eventName, data]);
+        });
 
-      it("should have a .event property with comandName", function(){
-        expect(actual.event).to.be(eventName);
-      });
-
-      it("should have a .data property with data", function(){
-        expect(actual.data).to.eql(data);
+        willReturnEvent();
       });
 
       describe("when given an invalid string", function(){
