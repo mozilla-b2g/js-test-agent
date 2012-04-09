@@ -3,7 +3,7 @@ var PoolBase = require('../../lib/test-agent/pool-base').TestAgent.PoolBase,
 
 describe("node/websocket-pool", function(){
 
-  var socket, key, sendCalled = [];
+  var socket, key, subject, sendCalled = [];
 
   beforeEach(function(){
     subject = new WebSocketPool();
