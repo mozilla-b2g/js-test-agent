@@ -3,24 +3,13 @@ var PoolBase = require('../../lib/test-agent/pool-base').TestAgent.PoolBase,
 
 describe("node/websocket-pool", function(){
 
-  var socket, key, subject, sendCalled = [];
+  var socket, key, subject, factory = require('./factory/websocket');
 
   beforeEach(function(){
     subject = new WebSocketPool();
-    sendCalled = [];
-    key = 'fooz';
 
-    socket = {
-      req: {
-        headers: {
-          'sec-websocket-key': key
-        }
-      },
-      send: function(){
-        sendCalled.push(Array.prototype.slice.call(arguments));
-      }
-    };
-
+    socket = factory.websocket();
+    key = factory.wsKey;
   });
 
   it("should be a child of PoolBase", function(){
@@ -72,7 +61,7 @@ describe("node/websocket-pool", function(){
     });
 
     it("should call send on each .socket", function(){
-      expect(sendCalled[0][0]).to.be(message);
+      expect(socket.sendCalls[0][0]).to.be(message);
     });
 
   });
