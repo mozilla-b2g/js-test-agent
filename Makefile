@@ -17,7 +17,7 @@ test_config:
 	sh ./tools/create-config.sh $(TEST_CONFIG) $(TEST_DIR) \*-test.js /test
 
 test :
-	./node_modules/mocha/bin/mocha test/helper.js test/node/*.js test/test-agent/responder-test.js
+	./node_modules/mocha/bin/mocha test/helper.js test/node/mocha/*.js test/node/*.js test/test-agent/responder-test.js
 
 
 .PHONY: test_config

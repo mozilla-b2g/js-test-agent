@@ -12,6 +12,7 @@ afterEach(function(){
   }
 });
 
+
 (function(exports){
 
   var isNode = (typeof(window) === 'undefined');
@@ -27,6 +28,40 @@ afterEach(function(){
       } else {
         require('/lib/' + url);
       }
+    }
+  };
+
+  exports.testSupport = {
+    merge: function(){
+      var result = {};
+      Array.prototype.slice.call(arguments).forEach(function(mergeSet){
+        var key;
+
+        for(key in mergeSet){
+          if(mergeSet.hasOwnProperty(key)){
+            result[key] = mergeSet[key];
+          }
+        }
+      });
+
+      return result;
+    },
+
+    factory: function(defaults, constructor){
+      var factory = function(){
+        return new constructor(
+          factory.attributes.apply(null, arguments)
+        );
+      };
+
+      factory.attrs = factory.attributes = function(){
+        var args = Array.prototype.slice.call(arguments);
+        args.unshift(defaults);
+
+        return exports.testSupport.merge.apply(null, args);
+      };
+
+      return factory;
     }
   };
 
