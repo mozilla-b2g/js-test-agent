@@ -55,10 +55,21 @@ afterEach(function(){
       };
 
       factory.attrs = factory.attributes = function(){
-        var args = Array.prototype.slice.call(arguments);
+        var args = Array.prototype.slice.call(arguments), key, attrs;
         args.unshift(defaults);
 
-        return exports.testSupport.merge.apply(null, args);
+        attrs = exports.testSupport.merge.apply(null, args);
+
+        for(key in attrs){
+          if(attrs.hasOwnProperty(key)){
+            if(typeof(attrs[key]) === 'function'){
+              attrs[key] = attrs[key](args);
+            }
+          }
+        }
+
+        return attrs;
+
       };
 
       return factory;
