@@ -18,6 +18,8 @@ describe("node/app/watcher", function(){
       path: __dirname + '/../fixtures/'
     });
 
+    server.responder = new Responder();
+
     subject = new Watcher(suite);
     broadcasted = [];
     subject.enhance(server);

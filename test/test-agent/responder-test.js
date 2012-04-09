@@ -90,6 +90,18 @@ describe("test-agent/responder", function(){
       subject = new Responder();
     });
 
+    describe(".parse", function(){
+      it("should be the same function as static", function(){
+        expect(subject.parse).to.be(Responder.parse);
+      });
+    });
+
+    describe(".stringify", function(){
+      it("should be the same function as static", function(){
+        expect(subject.stringify).to.be(Responder.stringify);
+      });
+    });
+
     describe("initialization", function(){
 
       it("should set events to a blank object", function(){
