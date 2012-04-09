@@ -3,7 +3,10 @@ describe("node/suite", function(){
 
   var Suite = require('../../lib/node/suite'),
       MatchFiles = require('match-files'),
-      subject, root = __dirname + '/fixtures',
+      fsPath = require('path'),
+      subject,
+      root = __dirname + '/././fixtures',
+      normalizedRoot = fsPath.normalize(root),
       libPath = 'lib/foo.js',
       testPath = 'test/foo-test.js';
 
@@ -25,8 +28,12 @@ describe("node/suite", function(){
         });
       });
 
+      it("should normalize .path", function(){
+        expect(subject.path).to.equal(fsPath.normalize(root) + '/');
+      });
+
       it("should have set path and appended a slash", function(){
-        expect(subject.path).to.eql(root + '/');
+        expect(subject.path).to.eql(normalizedRoot + '/');
       });
 
       it("should have set testDir", function(){
@@ -54,7 +61,7 @@ describe("node/suite", function(){
         libDir: val,
         testSuffix: val,
         libSuffix: val,
-        path: root + '/'
+        path: normalizedRoot + '/'
       }, key;
 
       beforeEach(function(){
@@ -108,7 +115,7 @@ describe("node/suite", function(){
 
     it("should return a path relative to the root without a starting slash", function(){
       var expected = 'myFoo/path.js';
-      expect(subject.relativePath(root + '/myFoo/path.js')).to.eql(expected);
+      expect(subject.relativePath(normalizedRoot + '/myFoo/path.js')).to.eql(expected);
     });
 
   });
@@ -186,16 +193,16 @@ describe("node/suite", function(){
     var expected, files = [];
 
     before(function(done){
-      MatchFiles.find(root + '/lib', {}, function(err, found){
+      MatchFiles.find(normalizedRoot + '/lib', {}, function(err, found){
         files = files.concat(found);
         done();
       });
     });
 
     before(function(done){
-      MatchFiles.find(root + '/test/', {}, function(err, found){
+      MatchFiles.find(normalizedRoot + '/test/', {}, function(err, found){
         //remove file which is not a test
-        var idx = found.indexOf(root + '/test/helper.js');
+        var idx = found.indexOf(normalizedRoot + '/test/helper.js');
         found.splice(idx, 1);
 
         files = files.concat(found);
@@ -219,7 +226,7 @@ describe("node/suite", function(){
     shouldReturnPathDetails = function(path, isTest){
 
       beforeEach(function(){
-        results = subject.testFromPath(root + '/' + path);
+        results = subject.testFromPath(normalizedRoot + '/' + path);
       });
 
       it("should have .isTest === " + isTest, function(){
@@ -244,7 +251,7 @@ describe("node/suite", function(){
     describe("when given a path that matches dir but not suffix", function(){
 
       beforeEach(function(){
-        results = subject.testFromPath(root + '/' + 'test/foo.js');
+        results = subject.testFromPath(normalizedRoot + '/' + 'test/foo.js');
       });
 
       it("should set isTest & isLib to false", function(){

@@ -17,7 +17,9 @@ test_config:
 	sh ./tools/create-config.sh $(TEST_CONFIG) $(TEST_DIR) \*-test.js /test
 
 test :
-	./node_modules/mocha/bin/mocha test/helper.js test/node/mocha/*.js test/node/*-test.js test/test-agent/responder-test.js
+	./node_modules/mocha/bin/mocha test/helper.js test/node/mocha/*.js test/node/*-test.js test/test-agent/responder-test.js 
+	@# Watch File Conflicts require this to run in a seperate process...
+	./node_modules/mocha/bin/mocha test/helper.js test/node/app/*-test.js
 
 
 .PHONY: test_config

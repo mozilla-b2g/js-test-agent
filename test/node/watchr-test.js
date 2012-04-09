@@ -77,10 +77,17 @@ describe("node/watchr", function(){
     describe("when changing a file", function(){
       var file;
 
+      beforeEach(function(){
+        file = files[0];
+      });
+
+      afterEach(function(){
+        //clear out file
+        fs.writeFileSync(file, '');
+      });
+
       it("should notify callback when a file has changed", function(done){
         var exec = require('child_process').exec;
-
-        file = files[0];
 
         subject.start(function(fileName){
           expect(fileName).to.be(file);
