@@ -14,11 +14,12 @@
     "browser",
     "mocha"
   ],
+
   "dependencies" : {
     "websocket.io": "~0.1.0",
     "mocha": "~1.0",
     "growl": "*",
-    "directory-tree-watcher": "~0.0"
+    "optimist": "~0.3"
   },
   "devDependencies": {
     "match-files": "~0.1.1",
