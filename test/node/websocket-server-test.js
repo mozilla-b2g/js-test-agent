@@ -44,7 +44,7 @@ describe("node/websocket-server", function(){
       delete result.require;
       expect(result).to.eql({
         server: subject,
-        argv: process.argv,
+        process: { argv: process.argv },
         console: console,
         __file: file,
         __dirname: fsPath.dirname(file)
