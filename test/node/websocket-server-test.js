@@ -24,6 +24,29 @@ describe("node/websocket-server", function(){
 
   });
 
+  describe(".use", function(){
+
+    var Enhancer, data;
+
+    beforeEach(function(){
+      Enhancer = function(data){
+        this.saved = data;
+      };
+      Enhancer.prototype = {
+        enhance: function(server){
+          server.wasEnhanced = this.saved;
+        }
+      };
+
+      subject.use(Enhancer, data);
+    });
+
+    it("should have modified subject", function(){
+      expect(subject.wasEnhanced).to.be(data);
+    });
+
+  });
+
   describe("._createSandbox", function(){
 
     var result,
