@@ -18,6 +18,10 @@ describe("node/mocha/reporter", function(){
     expect(subject.defaultMochaReporter).to.be('Spec');
   });
 
+  it("should be an instance of Responder", function(){
+    expect(subject).to.be.a(Responder);
+  });
+
   describe("initialization", function(){
 
     it("should not have a .proxy", function(){
@@ -72,25 +76,44 @@ describe("node/mocha/reporter", function(){
 
       var respond,
           calledWith = [],
+          sentWith,
+          sentStartEvent = false,
           data = ['start', {total: 20}];
 
       function sendStart(){
         subject.respond(Responder.stringify(data[0], data[1]));
       }
 
+      function sendsStartEvent(){
+        it("should send start event", function(){
+          expect(sentWith).to.be(subject);
+          expect(sentStartEvent).to.be(true);
+        });
+      }
+
       beforeEach(function(){
+        sentWith = null;
+        sentStartEvent = false;
         calledWith = [];
         respond = Proxy.prototype.respond;
         Proxy.prototype.respond = function(){
           calledWith.push(Array.prototype.slice.call(arguments));
           respond.apply(this, arguments);
         };
+
+        subject.on('start', function(runner){
+          sentStartEvent = true;
+          sentWith = runner;
+        });
+
         sendStart();
       });
 
       afterEach(function(){
         Proxy.prototype.respond = respond;
       });
+
+      sendsStartEvent();
 
       it("should create proxy", function(){
         expect(subject.proxy).to.be.ok();
@@ -108,6 +131,8 @@ describe("node/mocha/reporter", function(){
           originalProxy = subject.proxy;
           sendStart();
         });
+
+        sendsStartEvent();
 
         it("should create a new proxy", function(){
           expect(subject.proxy).not.to.be(originalProxy);
