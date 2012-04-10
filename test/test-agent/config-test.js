@@ -1,6 +1,6 @@
-require_lib('test-agent/server.js');
+require_lib('test-agent/config.js');
 
-describe("TestAgent.Server", function(){
+describe("TestAgent.Config", function(){
 
   var subject,
       url = '/test/fixtures/tests.json',
@@ -10,7 +10,7 @@ describe("TestAgent.Server", function(){
       ];
 
   beforeEach(function(){
-    subject = new TestAgent.Server({
+    subject = new TestAgent.Config({
       url: url
     });
   });

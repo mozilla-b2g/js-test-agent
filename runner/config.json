@@ -2,10 +2,10 @@
   "test-suffix": "*-test.js",
   "tests": [
 
+    "/test/test-agent/config-test.js",
     "/test/test-agent/loader-test.js",
     "/test/test-agent/pool-base-test.js",
     "/test/test-agent/responder-test.js",
-    "/test/test-agent/sandbox-test.js",
-    "/test/test-agent/server-test.js"
+    "/test/test-agent/sandbox-test.js"
   ]
 }

@@ -73,7 +73,7 @@
   };
 
 
-  server = new TestAgent.Server({
+  server = new TestAgent.Config({
     url: '/runner/config.json'
   });
 
