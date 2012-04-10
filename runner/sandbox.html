@@ -1,0 +1,31 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+  <title>Tests</title>
+  <script src="/vendor/expect.js" type="text/javascript" charset="utf-8"></script>
+  <script src="/vendor/mocha/mocha.js" type="text/javascript" charset="utf-8"></script>
+  <script src="/lib/test-agent/mocha/json-stream-reporter.js" type="text/javascript" charset="utf-8"></script>
+  <script type="text/javascript" charset="utf-8">
+    //Hack for FF to ignore global leaks;
+    var navigator, console, getInterface;
+    mocha.setup({ui: 'bdd', reporter: TestAgent.Mocha.JsonStreamReporter});
+  </script>
+  <link rel="stylesheet" type="text/css" href="/vendor/mocha/mocha.css" />
+  <script type="text/javascript" charset="utf-8">
+  </script>
+</head>
+
+<body onload="mocha.run();">
+
+<div id="mocha">
+</div>
+
+<div id="test">
+</div>
+
+<script src="/test/helper.js" type="text/javascript" charset="utf-8"></script>
+
+</body>
+</html>
+

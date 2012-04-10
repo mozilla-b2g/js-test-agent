@@ -1,5 +1,5 @@
 RUNNER_DIR=$(PWD)/runner
-TEST_DIR=$(PWD)/test/
+TEST_DIR=$(PWD)/test/test-agent/
 TEST_CONFIG=$(RUNNER_DIR)/config.json
 
 httpd :
@@ -14,7 +14,7 @@ package :
 	cp node_modules/expect.js/expect.js ./vendor/
 
 test_config:
-	sh ./tools/create-config.sh $(TEST_CONFIG) $(TEST_DIR) \*-test.js /test
+	sh ./tools/create-config.sh $(TEST_CONFIG) $(TEST_DIR) \*-test.js /test/test-agent
 
 test :
 	./node_modules/mocha/bin/mocha test/helper.js test/node/mocha/*.js test/node/*-test.js test/test-agent/responder-test.js 
