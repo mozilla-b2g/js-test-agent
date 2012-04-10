@@ -1,18 +1,5 @@
 var Responder = require('../../../lib/test-agent/responder').TestAgent.Responder,
-    WebSocket;
-
-
-WebSocket = function(attrs){
-  var key;
-  for(key in attrs){
-    if(attrs.hasOwnProperty(key)){
-      this[key] = attrs[key];
-    }
-  }
-  Responder.call(this);
-};
-
-WebSocket.prototype = Object.create(Responder.prototype);
+    WebSocket = require('./event-object');
 
 module.exports = exports = {
   wsKey: 0,
