@@ -6,6 +6,8 @@ server.use(Apps.Responder).
        use(Apps.MochaTestEvents).
        use(Apps.RunnerGrowl).
        use(Apps.Watcher, new Suite({
-          path: __dirname
+          path: __dirname,
+          testDir: 'test/test-agent',
+          libDir: 'lib/test-agent'
        }));
 
