@@ -189,12 +189,12 @@ describe("node/suite", function(){
 
   });
 
-  describe(".getFiles", function(){
-    var expected, files = [];
+  describe("file operations", function(){
+    var testFiles, libFiles;
 
     before(function(done){
       MatchFiles.find(normalizedRoot + '/lib', {}, function(err, found){
-        files = files.concat(found);
+        libFiles = found;
         done();
       });
     });
@@ -204,16 +204,35 @@ describe("node/suite", function(){
         //remove file which is not a test
         var idx = found.indexOf(normalizedRoot + '/test/helper.js');
         found.splice(idx, 1);
-
-        files = files.concat(found);
+        testFiles = found;
         done();
       });
     });
 
-    it("should return all lib and test files", function(done){
-      subject.findFiles(function(err, found){
-        expect(files.sort()).to.eql(found.sort());
-        done();
+    describe(".findFiles", function(){
+      it("should return all lib and test files", function(done){
+        subject.findFiles(function(err, found){
+          expect((testFiles.concat(libFiles)).sort()).to.eql(found.sort());
+          done();
+        });
+      });
+    });
+
+    describe(".findTestFiles", function(){
+      it("should return all test files", function(done){
+        subject.findTestFiles(function(err, found){
+          expect(testFiles.sort()).to.eql(found.sort());
+          done();
+        });
+      });
+    });
+
+    describe(".findLibFiles", function(){
+      it("should return all lib files", function(done){
+        subject.findLibFiles(function(err, found){
+          expect(libFiles.sort()).to.eql(found.sort());
+          done();
+        });
       });
     });
 
