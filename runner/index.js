@@ -30,43 +30,36 @@
       currentSandbox,
       loader,
       testQueue = {},
-      Responder = TestAgent.Responder,
-      responder;
+      client,
+      url = ('ws://' + document.location.host.split(':')[0] + ':8789');
 
-  responder = new Responder();
-
-  responder.on('file changed', function(data){
-    createSandbox(function(){
-      this.require(data.testUrl);
-    });
+  client = new TestAgent.WebsocketClient({
+    retry: true,
+    url: url
   });
 
-  function openSocket(){
-    var socket = new (WebSocket || MozWebSocket)('ws://' + document.location.host.split(':')[0] + ':8789');
+  client.on({
 
-    socket.onopen = function(){
+    'open': function(){
       console.log('socket open');
-      socket.send(Responder.stringify('client new', { hit: true }));
+    },
 
-      socket.onmessage = function(json){
-        responder.respond(json.data, socket);
-      };
-    };
-
-    window.sendReport = function(line){
-      socket.send(Responder.stringify('test data', line));
-    };
-
-    socket.onclose = function(){
+    'close': function(){
       console.log('lost client trying to reconnect');
+    },
 
-      setTimeout(function(){
-        openSocket();
-      }, 3000);
-    };
-  }
+    'file changed': function(data){
+      createSandbox(function(){
+        this.require(data.testUrl);
+      });
+    }
+  });
 
-  openSocket();
+  window.sendReport = function(line){
+    client.send('test data', line);
+  };
+
+  client.start();
 
   templates = {
     test: '<li data-url="%s">%s</li>'
