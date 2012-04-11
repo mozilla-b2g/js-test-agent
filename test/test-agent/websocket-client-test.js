@@ -118,6 +118,8 @@ describe("test-agent/websocket-common", function(){
 
   describe(".send", function(){
     var sent, eventData, data = ['client event', {data: 1}];
+    mockNative();
+
     beforeEach(function(){
 
       eventData = Responder.stringify(data[0], data[1]);
@@ -136,6 +138,8 @@ describe("test-agent/websocket-common", function(){
     });
 
   });
+  mockNative();
+
 
   describe("event: message", function(){
     var data = ['server event', {data: true}],
@@ -156,6 +160,7 @@ describe("test-agent/websocket-common", function(){
   });
 
   describe("retries", function(){
+    mockNative();
 
     beforeEach(function(){
       subject.retry = true;
