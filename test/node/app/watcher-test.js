@@ -20,8 +20,11 @@ describe("node/app/watcher", function(){
 
     server.responder = new Responder();
 
-    subject = new Watcher(suite);
+    subject = new Watcher();
     broadcasted = [];
+
+    //needs a suite to work
+    server.suite = suite;
     subject.enhance(server);
   });
 
@@ -53,8 +56,7 @@ describe("node/app/watcher", function(){
 
     it("should broadcast file has changed", function(){
       var data = {
-        testUrl: fsPath.join(subject.basePath, suitePath.testPath),
-        info: suitePath
+        tests: [fsPath.join(subject.basePath, suitePath.testPath)],
       };
 
       expect(broadcasted[0]).to.eql(

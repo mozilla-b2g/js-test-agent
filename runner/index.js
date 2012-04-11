@@ -48,9 +48,12 @@
       console.log('lost client trying to reconnect');
     },
 
-    'file changed': function(data){
+    'run tests': function(data){
       createSandbox(function(){
-        this.require(data.testUrl);
+        var i = 0;
+        for(; i < data.tests.length; i++){
+          this.require(data.tests[i]);
+        }
       });
     }
   });
