@@ -24,10 +24,11 @@
     "websocket.io": "~0.1.0",
     "mocha": "~1.0",
     "growl": "*",
-    "optimist": "~0.3"
+    "optimist": "~0.3",
+    "ws": "~0.4"
+    "match-files": "~0.1.1"
   },
   "devDependencies": {
-    "match-files": "~0.1.1",
     "expect.js": "~0.1"
   },
 
