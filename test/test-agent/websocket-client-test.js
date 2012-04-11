@@ -151,7 +151,7 @@ describe("test-agent/websocket-common", function(){
         eventData = arguments;
       });
 
-      subject.emit('message', Responder.stringify(data[0], data[1]));
+      subject.emit('message', {data: Responder.stringify(data[0], data[1])});
     });
 
     it("should process messages into events", function(){
