@@ -1,6 +1,6 @@
-var Responder = require_lib('node/app/responder');
+var Responder = require_lib('node/server/responder');
 
-describe("node/app/responder", function(){
+describe("node/server/responder", function(){
   var factory = require('../factory/websocket-server'),
       server, subject;
 

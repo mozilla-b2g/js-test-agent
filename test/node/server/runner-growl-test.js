@@ -1,8 +1,8 @@
-var Apps = require_lib('node/app'),
+var Apps = require_lib('node/server'),
     RunnerGrowl = Apps.RunnerGrowl,
     growl = require('growl');
 
-describe("node/app/runner-growl", function(){
+describe("node/server/runner-growl", function(){
   var subject,
       server,
       factory = require('../factory/websocket-server'),

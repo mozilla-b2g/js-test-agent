@@ -1,7 +1,7 @@
-var Enhance = require_lib('node/app/suite'),
+var Enhance = require_lib('node/server/suite'),
     Suite = require_lib('node/suite');
 
-describe("node/app/suite", function(){
+describe("node/server/suite", function(){
   var suite,
       server,
       factory = require('../factory/websocket-server');

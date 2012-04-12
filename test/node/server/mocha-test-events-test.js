@@ -1,11 +1,11 @@
-var Mocha = require_lib('node/app/mocha-test-events'),
-    AppResponder = require_lib('node/app/responder'),
+var Mocha = require_lib('node/server/mocha-test-events'),
+    AppResponder = require_lib('node/server/responder'),
     Reporter = require_lib('node/mocha/reporter'),
     Responder = require_lib('test-agent/responder'),
     //does nothing
     MochaReporter = function(){};
 
-describe("node/app/mocha-test-events", function(){
+describe("node/server/mocha-test-events", function(){
 
   var server,
       subject,

@@ -24,7 +24,7 @@ test :
 		test/test-agent/websocket-client-test.js
 
 	@# Watch File Conflicts require this to run in a seperate process...
-	@./node_modules/mocha/bin/mocha test/helper.js test/node/app/*-test.js
+	@./node_modules/mocha/bin/mocha test/helper.js test/node/server/*-test.js
 
 
 .PHONY: test_config

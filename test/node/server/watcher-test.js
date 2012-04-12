@@ -1,10 +1,10 @@
-var Watcher = require('../../../lib/node/app/watcher'),
+var Watcher = require('../../../lib/node/server/watcher'),
     Suite = require('../../../lib/node/suite'),
     Responder = require('../../../lib/test-agent/responder').TestAgent.Responder,
     fs = require('fs'),
     fsPath = require('path');
 
-describe("node/app/watcher", function(){
+describe("node/server/watcher", function(){
 
   var subject, suite, server = {},
       broadcasted;

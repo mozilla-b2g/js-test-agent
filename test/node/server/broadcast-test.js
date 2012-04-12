@@ -1,7 +1,7 @@
-var Broadcast = require('../../../lib/node/app/broadcast'),
+var Broadcast = require('../../../lib/node/server/broadcast'),
     Responder = require('../../../lib/test-agent/responder').TestAgent.Responder;
 
-describe("node/app/broadcast", function(){
+describe("node/server/broadcast", function(){
 
   var subject, server, connectionSocket,
       factory = require('../factory/websocket');
