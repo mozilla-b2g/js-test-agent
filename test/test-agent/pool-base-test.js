@@ -49,6 +49,10 @@ describe("test-agent/pool", function(){
     it("should set ._items to an empty object", function(){
       expect(subject._items).to.eql({});
     });
+
+    it("should set .length to zero", function(){
+      expect(subject.length).to.be(0);
+    });
   });
 
   describe(".checkObjectValue", function(){
@@ -88,9 +92,34 @@ describe("test-agent/pool", function(){
     beforeEach(function(){
       subject.add(object);
     });
+    
+    describe("when adding the same item twice", function(){
+
+      beforeEach(function(){
+        subject.add(object);
+      });
+
+      it("should not increment", function(){
+        expect(subject.length).to.be(1);
+      });
+    });
+
+    describe("when adding an additional item", function(){
+      beforeEach(function(){
+        subject.add({key: 'foo', value: 'bar'});
+      });
+
+      it("should increment", function(){
+        expect(subject.length).to.be(2);
+      });
+    });
 
     it("should add object into ._items", function(){
       expect(subject._items[object.key]).to.be(object.value);
+    });
+
+    it("should increment .length", function(){
+      expect(subject.length).to.be(1);
     });
   });
 
@@ -99,6 +128,20 @@ describe("test-agent/pool", function(){
       subject.add(object);
       expect(subject.has(object));
       subject.remove(object);
+    });
+
+    describe("when removing an item that is not in the collection", function(){
+      beforeEach(function(){
+        subject.remove(object);
+      });
+
+      it("should not decrement .length", function(){
+        expect(subject.length).to.be(0);
+      });
+    });
+
+    it("should decrement length", function(){
+      expect(subject.length).to.be(0);
     });
 
     it("should remove given object if its in items", function(){
