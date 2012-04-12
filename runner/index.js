@@ -80,7 +80,7 @@
       currentSandbox.destroy();
     }
 
-    currentSandbox = new TestAgent.Sandbox('/runner/sandbox.html');
+    currentSandbox = new TestAgent.Sandbox('/runner/sandbox.html?time=' + String(Date.now()));
     currentSandbox.run(function(){
       loader.targetWindow = currentSandbox.getWindow();
       var require = this.require = loader.require.bind(loader);
