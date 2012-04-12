@@ -174,9 +174,11 @@ describe("test-agent/pool", function(){
       var called;
 
       beforeEach(function(){
-        subject.checkObjectValue(function(object){
+        subject.add(object);
+
+        subject.checkObjectValue = function(object){
           return false;
-        });
+        };
 
         called = false;
         subject.each(function(){
@@ -187,6 +189,7 @@ describe("test-agent/pool", function(){
       it("should not call callback", function(){
         expect(called).to.be(false);
       });
+
 
     });
 
