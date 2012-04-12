@@ -52,6 +52,10 @@ describe("node/suite", function(){
         expect(subject.libSuffix).to.equal('.js');
       });
 
+      it("should have baseUrl", function(){
+        expect(subject.baseUrl).to.be('/');
+      });
+
     });
 
     describe("overriding", function(){
@@ -262,6 +266,10 @@ describe("node/suite", function(){
 
       it("should return .testPath", function(){
         expect(results.testPath).to.eql(testPath);
+      });
+
+      it("should return .testUrl", function(){
+        expect(results.testUrl).to.eql(fsPath.join(subject.baseUrl, testPath));
       });
 
 
