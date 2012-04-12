@@ -2,7 +2,7 @@
 
 var commands = [
       'server',
-      'client'
+      'test'
     ],
     command = process.argv[2] || '<none given>';
 
