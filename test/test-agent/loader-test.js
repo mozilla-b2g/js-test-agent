@@ -67,6 +67,14 @@ describe("TestAgent.Loader", function(){
       expect(subject.targetWindow).to.be(window);
     });
 
+    it("should have .doneCallbacks", function(){
+      expect(subject.doneCallbacks).to.eql([]);
+    });
+
+    it("should set .pending to 0", function(){
+      expect(subject.pending).to.be(0);
+    });
+
     it("should set ._cached to {}", function(){
       expect(subject._cached).to.be.a(Object);
     });
@@ -101,27 +109,114 @@ describe("TestAgent.Loader", function(){
     });
   });
 
+  describe(".done", function(){
+    var doneCalled = false,
+        fn = function(){
+          doneCalled = true;
+        };
+
+
+    beforeEach(function(){
+      doneCalled = false;
+    });
+
+    beforeEach(function(){
+      subject.pending = 10;
+      subject.done(fn);
+    });
+
+    it("should add callback to .doneCallbacks", function(){
+      expect(subject.doneCallbacks[0]).to.be(fn);
+    });
+
+    it("should not fire events", function(){
+      expect(doneCalled).to.be(false);
+    });
+
+  });
+
+  describe("._decrementPending", function(){
+    beforeEach(function(){
+      subject.pending = 2;
+      subject._decrementPending();
+    });
+
+    describe("when there are remaning pending items", function(){
+      it("should decrement pending", function(){
+        expect(subject.pending).to.be(1);
+      });
+    });
+
+    describe("when trying to decrease pending zero", function(){
+      it("should not go into negative numbers", function(){
+        subject._decrementPending();
+        subject._decrementPending();
+        subject._decrementPending();
+
+        expect(subject.pending).to.be(0);
+      });
+    });
+
+    describe("when there are no more pending items", function(){
+      var doneCalled;
+
+      beforeEach(function(){
+        doneCalled = false;
+        subject.done(function(){
+          doneCalled = true;
+        });
+        expect(doneCalled).to.be(false);
+        subject._decrementPending();
+      });
+
+      it("should fire done callbacks", function(){
+        expect(doneCalled).to.be(true);
+      });
+
+      it("should remove callbacks as it fires them", function(){
+        expect(subject.doneCallbacks.length).to.be(0);
+      });
+    });
+
+  });
+
   describe(".require", function(){
     createIframe();
 
-    var url = '/test/file.js';
+    var url = '/test/file.js',
+        requireCallbacksFired = [];
 
     mockTime();
 
     function loadIframe(){
       var urls = Array.prototype.slice.call(arguments);
+      requireCallbacksFired = [];
 
       beforeEach(function(done){
         urls.forEach(function(url){
-          subject.require(url);
+          subject.require(url, function(){
+            requireCallbacksFired.push(arguments);
+          });
         });
-        targetIframe.addEventListener('load', function(){
+
+        //should increment pending
+        expect(subject.pending).to.be(1);
+
+        subject.done(function(){
           done();
         });
       });
     }
     //intentionally twice
     loadIframe(url, url);
+
+    it("should fire one require callback", function(){
+      expect(requireCallbacksFired.length).to.be(1);
+    });
+
+    it("should have decremented pending", function(){
+      expect(subject.pending).to.be(0);
+    });
 
     it("should have marked /test/file.js as cached", function(){
       expect(subject._cached[url]).to.be(true);

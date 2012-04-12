@@ -49,12 +49,8 @@
     },
 
     'run tests': function(data){
-      createSandbox(function(){
-        var i = 0;
-        for(; i < data.tests.length; i++){
-          this.require(data.tests[i]);
-        }
-      });
+      console.log(data);
+      runSandbox.apply(null, data.tests);
     }
   });
 
@@ -91,15 +87,36 @@
   function runSandbox(){
     var url, tests = [];
 
-    for(url in testQueue){
-      if(testQueue.hasOwnProperty(url)){
-        tests.push(url);
+    if(arguments.length > 0){
+      tests = Array.prototype.slice.call(arguments);
+    } else {
+      for(url in testQueue){
+        if(testQueue.hasOwnProperty(url)){
+          tests.push(url);
+        }
       }
     }
 
-
     createSandbox(function(){
-      tests.map(this.require);
+      var self = this;
+      loader.done(function(){
+        window.top.console.log('done!');
+        self.mocha.run(function(){
+          window.top.console.log('mocha done!');
+        });
+      });
+
+      this.require('/vendor/expect.js');
+      this.require('/vendor/mocha/mocha.js', function(){
+        self.require('/lib/test-agent/mocha/json-stream-reporter.js', function(){
+          self.mocha.setup({ui: 'bdd', reporter: self.TestAgent.Mocha.JsonStreamReporter});
+          self.require('/test/helper.js', function(){
+            tests.forEach(function(test){
+              self.require(test);
+            });
+          });
+        });
+      });
     });
 
   }
