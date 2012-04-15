@@ -49,7 +49,6 @@
     },
 
     'run tests': function(data){
-      console.log(data);
       runSandbox.apply(null, data.tests);
     }
   });
@@ -100,9 +99,7 @@
     createSandbox(function(){
       var self = this;
       loader.done(function(){
-        window.top.console.log('done!');
         self.mocha.run(function(){
-          window.top.console.log('mocha done!');
         });
       });
 

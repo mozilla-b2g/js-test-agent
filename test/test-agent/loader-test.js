@@ -230,12 +230,14 @@ describe("TestAgent.Loader", function(){
     it("should have added script to dom", function(){
       var script = getScript();
       expect(script.src).to.contain(url);
+      expect(script.async).to.be(false);
     });
 
     it("should include cache bust query string", function(){
       var script = getScript();
       expect(script.src).to.contain('?time=' + String(this.currentTime));
     });
+
 
     it("should execute script in the context of the iframe", function(){
       expect(iframeContext.TEST_FILE_WAS_LOADED).to.be(true);
