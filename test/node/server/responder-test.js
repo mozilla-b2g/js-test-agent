@@ -18,7 +18,7 @@ describe("node/server/responder", function(){
       calledWith = [];
       //primes server
       socket = server.emitClient();
-      server.responder.respond = function(){
+      server.respond = function(){
         calledWith.push(arguments);
       };
 

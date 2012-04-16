@@ -39,12 +39,12 @@ describe("node/server/mocha-test-events", function(){
     beforeEach(function(){
       expect(subject.reporter.proxy).not.to.be.ok();
 
-      server.responder.on('test runner', function(runner){
+      server.on('test runner', function(runner){
         startCalledWith = runner;
       });
 
       data = ['start', {total: 20}];
-      server.responder.emit('test data', data);
+      server.emit('test data', data);
     });
 
     it("should bubble up start evet on runner to test runner event on server", function(){

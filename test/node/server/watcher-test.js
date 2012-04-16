@@ -6,7 +6,9 @@ var Watcher = require('../../../lib/node/server/watcher'),
 
 describe("node/server/watcher", function(){
 
-  var subject, suite, server = {},
+  var subject, 
+      suite,
+      server,
       queueTests;
 
 
@@ -15,9 +17,9 @@ describe("node/server/watcher", function(){
       path: __dirname + '/../fixtures/'
     });
 
-    server.responder = new Responder();
+    server = new Responder();
 
-    server.responder.on('queue tests', function(message){
+    server.on('queue tests', function(message){
       queueTests.push(message);
     });
 

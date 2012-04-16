@@ -20,7 +20,7 @@ describe("node/server/queue-tests", function(){
     subject.enhance(server);
 
     server.broadcast = function(json){
-      var data = server.responder.parse(json);
+      var data = server.parse(json);
       if(data.event === 'run tests'){
         testsToRun = data.data.tests;
       }
@@ -55,7 +55,7 @@ describe("node/server/queue-tests", function(){
           done();
         };
 
-        server.responder.emit('queue tests');
+        server.emit('queue tests');
       });
 
       it("should send run tests with all available tests", function(){
@@ -77,7 +77,7 @@ describe("node/server/queue-tests", function(){
           done();
         };
 
-        server.responder.emit('queue tests', {files: [ sendFileName ]});
+        server.emit('queue tests', {files: [ sendFileName ]});
       });
 
       it("should send run tests with the ", function(){

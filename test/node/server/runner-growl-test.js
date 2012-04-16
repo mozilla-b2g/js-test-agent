@@ -48,12 +48,12 @@ describe("node/server/runner-growl", function(){
     });
 
     beforeEach(function(){
-      server.responder.on('test runner', function(proxy){
+      server.on('test runner', function(proxy){
         reportProxy = proxy;
       });
 
       //start proxy
-      server.responder.emit('test data', startData);
+      server.emit('test data', startData);
       expect(reportProxy).to.be.ok();
     });
 

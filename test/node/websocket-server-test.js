@@ -14,8 +14,8 @@ describe("node/websocket-server", function(){
       expect(subject.implementation).to.be(require('websocket.io'));
     });
 
-    it("should have a responder", function(){
-      expect(subject.responder).to.be.a(Responder);
+    it("should be a responder", function(){
+      expect(subject).to.be.a(Responder);
     });
 
     it("should have no socket by default", function(){
