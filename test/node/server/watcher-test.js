@@ -7,11 +7,8 @@ var Watcher = require('../../../lib/node/server/watcher'),
 describe("node/server/watcher", function(){
 
   var subject, suite, server = {},
-      broadcasted;
+      queueTests;
 
-  server.broadcast = function(message){
-    broadcasted.push(message);
-  };
 
   beforeEach(function(){
     suite = new Suite({
@@ -20,8 +17,12 @@ describe("node/server/watcher", function(){
 
     server.responder = new Responder();
 
+    server.responder.on('queue tests', function(message){
+      queueTests.push(message);
+    });
+
     subject = new Watcher();
-    broadcasted = [];
+    queueTests = [];
 
     //needs a suite to work
     server.suite = suite;
@@ -47,20 +48,20 @@ describe("node/server/watcher", function(){
       setTimeout(function(){
       fs.writeFileSync(files[0], 'foo!');
         done();
-      }, 150);
+      }, 200);
     });
 
     afterEach(function(){
       fs.writeFileSync(files[0], '');
     });
 
-    it("should broadcast file has changed", function(){
+    it("should emit queue-tests event on server", function(){
       var data = {
-        tests: [fsPath.join(subject.basePath, suitePath.testPath)],
+        files: [files[0]]
       };
 
-      expect(broadcasted[0]).to.eql(
-        Responder.stringify(subject.eventName, data)
+      expect(queueTests[0]).to.eql(
+        data
       );
     });
 
