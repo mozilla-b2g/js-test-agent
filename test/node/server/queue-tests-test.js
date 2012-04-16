@@ -1,8 +1,8 @@
-var Enhance = require_lib('node/server/start-tests'),
+var Enhance = require_lib('node/server/queue-tests'),
     Suite = require_lib('node/suite'),
     fsPath = require('path');
 
-describe("node/server/start-tests", function(){
+describe("node/server/queue-tests", function(){
 
   var server,
       subject,
