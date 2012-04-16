@@ -4,6 +4,16 @@
     var sandbox = worker.sandbox.getWindow(),
         loader = worker.loader;
 
+    function multiReporter(){
+      var reporters = Array.prototype.slice.call(arguments);
+
+      return function(runner){
+        reporters.forEach(function(Reporter){
+          new Reporter(runner);
+        });
+      };
+    }
+
     sandbox.require = loader.require.bind(loader);
 
     loader.done(function(){
@@ -19,7 +29,7 @@
 
     loader.require('/vendor/mocha/mocha.js', function(){
       loader.require('/lib/test-agent/mocha/json-stream-reporter.js', function(){
-        sandbox.mocha.setup({ui: 'bdd', reporter: sandbox.TestAgent.Mocha.JsonStreamReporter});
+        sandbox.mocha.setup({ui: 'bdd', reporter: multiReporter(sandbox.TestAgent.Mocha.JsonStreamReporter, sandbox.mocha.reporters.HTML)});
         loader.require('/test/helper.js', function(){
           tests.forEach(function(test){
             loader.require(test);
