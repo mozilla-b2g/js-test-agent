@@ -55,7 +55,7 @@ describe("node/server/start-tests", function(){
           done();
         };
 
-        server.responder.emit('start tests');
+        server.responder.emit('queue tests');
       });
 
       it("should send run tests with all available tests", function(){
@@ -77,7 +77,7 @@ describe("node/server/start-tests", function(){
           done();
         };
 
-        server.responder.emit('start tests', {files: [ sendFileName ]});
+        server.responder.emit('queue tests', {files: [ sendFileName ]});
       });
 
       it("should send run tests with the ", function(){
