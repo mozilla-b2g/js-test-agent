@@ -1,23 +1,5 @@
 (function(window){
 
-  var FORMAT_REGEX = /%([0-9])?s/g;
-
-  function format(){
-    var i = 0,
-        str,
-        args = Array.prototype.slice.call(arguments),
-        result;
-
-    str = args.shift();
-
-    result = str.replace(FORMAT_REGEX, function(match, pos){
-      var index = parseInt(pos || i++, 10);
-      return args[index];
-    });
-
-    return result;
-  }
-
   function testRunner(worker, tests){
     var sandbox = worker.sandbox.getWindow(),
         loader = worker.loader;
@@ -48,20 +30,16 @@
   }
 
 
-  var doc = window.document,
-      selectors = {
-        loading: '#loading',
-        tests: '#tests',
-        execute: '#execute'
-      },
-      templates,
-      loader,
-      testQueue = {},
-      worker = new TestAgent.BrowserWorker({
+  var worker = new TestAgent.BrowserWorker({
         sandbox: '/runner/sandbox.html',
         testRunner: testRunner
       });
 
+  worker.use(TestAgent.BrowserWorker.Config, {
+    url: '/runner/config.json'
+  });
+
+  worker.use(TestAgent.BrowserWorker.TestUi);
 
   worker.on({
 
@@ -78,50 +56,7 @@
     }
   });
 
+  worker.config();
   worker.start();
-
-  templates = {
-    test: '<li data-url="%s">%s</li>'
-  };
-
-
-  server = new TestAgent.Config({
-    url: '/runner/config.json'
-  });
-
-  server._loadResource(function(){
-    var tests = document.querySelector(selectors.tests),
-        execute = document.querySelector(selectors.execute);
-
-    execute.addEventListener('click', function(){
-      var tests = [], key;
-
-      for(key in testQueue){
-        tests.push(key);
-      }
-      worker.emit('run tests', {tests: tests});
-    });
-
-    server.resources.forEach(function(test){
-      var frag = document.createElement('div');
-      frag.innerHTML = format(templates.test, test, test);
-      tests.appendChild(frag.firstChild);
-    });
-
-    tests.addEventListener('click', function(e){
-      var target = e.target,
-          url = target.getAttribute('data-url');
-
-      if(url){
-        if(testQueue[url]){
-          delete testQueue[url];
-          target.className = target.className.replace(' active', '');
-        } else {
-          testQueue[url] = true;
-          target.className += ' active';
-        }
-      }
-    });
-  });
 
 }(this));
