@@ -56,13 +56,23 @@ describe("TestAgent.Sandbox", function(){
 
   describe(".run", function(){
 
-    var context;
+    var context, destroyCaled;
 
     beforeEach(function(done){
+      destroyCaled = false;
+
+      subject.destroy = function(){
+        destroyCaled = true;
+      };
+
       subject.run(function(){
         context = this;
         done();
       });
+    });
+
+    it("should destroy old sandbox", function(){
+      expect(destroyCaled).to.be(true);
     });
 
     it("should be attached to the dom", function(){
