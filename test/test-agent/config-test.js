@@ -46,13 +46,13 @@ describe("TestAgent.Config", function(){
 
   });
 
-  describe("._loadResource", function(){
+  describe(".load", function(){
 
     var arg;
 
     describe("when successful", function(){
       beforeEach(function(done){
-        subject._loadResource(function(files){
+        subject.load(function(files){
           arg = files;
           done();
         });
