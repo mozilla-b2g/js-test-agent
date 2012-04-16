@@ -21,7 +21,26 @@ afterEach(function(){
     exports.expect = require('expect.js');
   }
 
-  exports.require_lib = function(url){
+  exports.requireBundles = {
+    '*test-agent/browser-worker': [
+      '/lib/test-agent/loader.js',
+      '/lib/test-agent/sandbox.js',
+      '/lib/test-agent/responder.js',
+      '/lib/test-agent/websocket-client.js',
+      '/lib/test-agent/browser-worker.js',
+      '/test/test-agent/factory/browser-worker.js'
+    ]
+  };
+
+  exports.requireLib = exports.require_lib = function(url){
+
+    if(exports.requireBundles[url]){
+      exports.requireBundles[url].forEach(function(url){
+        require(url);
+      });
+      return;
+    }
+
     if(typeof(require) !== 'undefined'){
       if(isNode){
         return require('../lib/' + url);
