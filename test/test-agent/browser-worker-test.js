@@ -197,13 +197,11 @@ describe("test-agent/browser-worker", function(){
       });
 
       it("should emit run tests complete event", function(){
-        console.log(completeEvent[0]);
         expect(completeEvent[0][0]).to.be(obj);
       });
 
       it("should call .testRunner with self and tests", function(){
         var args = runnerArguments[0];
-        console.log(args[0], subject);
         expect(args[0]).to.be(subject);
         expect(args[1]).to.be(tests);
       });
