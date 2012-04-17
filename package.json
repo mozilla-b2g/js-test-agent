@@ -26,7 +26,8 @@
     "growl": "*",
     "optimist": "~0.3",
     "ws": "~0.4",
-    "match-files": "~0.1.1"
+    "match-files": "~0.1.1",
+    "node-static": "~0.5"
   },
   "devDependencies": {
     "expect.js": "~0.1"
