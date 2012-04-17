@@ -13,6 +13,23 @@ package :
 	cp node_modules/mocha/mocha.css ./vendor/mocha/
 	cp node_modules/expect.js/expect.js ./vendor/
 
+	rm -f ./vendor/test-agent-dev.js
+	touch ./vendor/test-agent-dev.js
+
+	cat ./vendor/mocha/mocha.js >> ./vendor/test-agent-dev.js
+	cat ./lib/test-agent/responder.js >> ./vendor/test-agent-dev.js
+	cat ./lib/test-agent/loader.js >> ./vendor/test-agent-dev.js
+	cat ./lib/test-agent/sandbox.js >> ./vendor/test-agent-dev.js
+	cat ./lib/test-agent/config.js >> ./vendor/test-agent-dev.js
+	cat ./lib/test-agent/websocket-client.js >> ./vendor/test-agent-dev.js
+	cat ./lib/test-agent/mocha/json-stream-reporter.js >> ./vendor/test-agent-dev.js
+	cat ./lib/test-agent/browser-worker.js >> ./vendor/test-agent-dev.js
+	cat ./lib/test-agent/browser-worker/mocha-driver.js >> ./vendor/test-agent-dev.js
+	cat ./lib/test-agent/browser-worker/config.js >> ./vendor/test-agent-dev.js
+	cat ./lib/test-agent/browser-worker/test-ui.js >> ./vendor/test-agent-dev.js
+
+
+
 test_config:
 	sh ./tools/create-config.sh $(TEST_CONFIG) $(TEST_DIR) \*-test.js /test/test-agent
 

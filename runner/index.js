@@ -27,7 +27,7 @@
 
     'close': function(){
       console.log('lost client trying to reconnect');
-    }
+    },
 
   });
 
