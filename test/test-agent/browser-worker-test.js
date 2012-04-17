@@ -148,6 +148,10 @@ describe("test-agent/browser-worker", function(){
         expect(callbackData.args[0]).to.be(subject.loader);
       });
 
+      it("should inject require into sandbox", function(){
+        expect(callbackData.context.require).to.be.a(Function);
+      });
+
     });
 
   });
