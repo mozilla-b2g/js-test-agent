@@ -1,6 +1,7 @@
 RUNNER_DIR=$(PWD)/runner
 TEST_DIR=$(PWD)/test/test-agent/
 TEST_CONFIG=$(RUNNER_DIR)/config.json
+DEV_FILE=./vendor/test-agent-dev.js
 
 httpd :
 	node ./tools/httpd.js $(PWD) 8888
@@ -13,21 +14,21 @@ package :
 	cp node_modules/mocha/mocha.css ./vendor/mocha/
 	cp node_modules/expect.js/expect.js ./vendor/
 
-	rm -f ./vendor/test-agent-dev.js
-	touch ./vendor/test-agent-dev.js
+	rm -f $(DEV_FILE)
+	touch $(DEV_FILE)
 
-	cat ./vendor/mocha/mocha.js >> ./vendor/test-agent-dev.js
-	cat ./lib/test-agent/responder.js >> ./vendor/test-agent-dev.js
-	cat ./lib/test-agent/loader.js >> ./vendor/test-agent-dev.js
-	cat ./lib/test-agent/sandbox.js >> ./vendor/test-agent-dev.js
-	cat ./lib/test-agent/config.js >> ./vendor/test-agent-dev.js
-	cat ./lib/test-agent/websocket-client.js >> ./vendor/test-agent-dev.js
-	cat ./lib/test-agent/mocha/json-stream-reporter.js >> ./vendor/test-agent-dev.js
-	cat ./lib/test-agent/browser-worker.js >> ./vendor/test-agent-dev.js
-	cat ./lib/test-agent/browser-worker/mocha-driver.js >> ./vendor/test-agent-dev.js
-	cat ./lib/test-agent/browser-worker/config.js >> ./vendor/test-agent-dev.js
-	cat ./lib/test-agent/browser-worker/test-ui.js >> ./vendor/test-agent-dev.js
-
+	# Bundle /w mocha for now
+	cat ./vendor/mocha/mocha.js >> $(DEV_FILE)
+	cat ./lib/test-agent/responder.js >> $(DEV_FILE)
+	cat ./lib/test-agent/loader.js >> $(DEV_FILE)
+	cat ./lib/test-agent/sandbox.js >> $(DEV_FILE)
+	cat ./lib/test-agent/config.js >> $(DEV_FILE)
+	cat ./lib/test-agent/websocket-client.js >> $(DEV_FILE)
+	cat ./lib/test-agent/mocha/json-stream-reporter.js >> $(DEV_FILE)
+	cat ./lib/test-agent/browser-worker.js >> $(DEV_FILE)
+	cat ./lib/test-agent/browser-worker/mocha-driver.js >> $(DEV_FILE)
+	cat ./lib/test-agent/browser-worker/config.js >> $(DEV_FILE)
+	cat ./lib/test-agent/browser-worker/test-ui.js >> $(DEV_FILE)
 
 
 test_config:
@@ -48,3 +49,4 @@ test :
 .PHONY: package
 .PHONY: httpd
 .PHONY: test
+
