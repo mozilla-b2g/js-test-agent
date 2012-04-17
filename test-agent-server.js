@@ -1,5 +1,7 @@
-var Apps = require(__dirname + '/lib/node/server/index'),
-    Suite = require(__dirname + '/lib/node/suite'),
+//all require paths must be absolute -- use __dirname
+var Agent = require(__dirname + '/lib/node/index'),
+    Apps = Agent.server,
+    Suite = Agent.Suite,
     suite = new Suite({
       path: __dirname,
       testDir: 'test/test-agent',
