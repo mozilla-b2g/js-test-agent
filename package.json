@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "author": "James Lal",
   "description": "execute client side tests from browser report back to cli",
-  "main": "lib/index.js",
+  "main": "lib/node/index.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/lightsofapollo/js-test-agent.git"
