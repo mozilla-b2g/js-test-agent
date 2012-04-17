@@ -3,10 +3,6 @@ TEST_DIR=$(PWD)/test/test-agent/
 TEST_CONFIG=$(RUNNER_DIR)/config.json
 DEV_FILE=./vendor/test-agent-dev.js
 
-httpd :
-	node ./tools/httpd.js $(PWD) 8888
-
-
 package :
 	rm -Rf ./vendor/mocha
 	mkdir -p ./vendor/mocha
