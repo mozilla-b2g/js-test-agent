@@ -3,6 +3,7 @@
   "tests": [
 
     "/test/test-agent/browser-worker/config-test.js",
+    "/test/test-agent/browser-worker/mocha-driver-test.js",
     "/test/test-agent/browser-worker/test-ui-test.js",
     "/test/test-agent/browser-worker-test.js",
     "/test/test-agent/config-test.js",

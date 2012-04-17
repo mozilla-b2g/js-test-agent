@@ -1,4 +1,4 @@
-RUNNER_DIR=$(PWD)/runner
+RUNNER_DIR=$(PWD)/test-agent
 TEST_DIR=$(PWD)/test/test-agent/
 TEST_CONFIG=$(RUNNER_DIR)/config.json
 DEV_FILE=./vendor/test-agent-dev.js
