@@ -21,15 +21,18 @@
       });
     });
 
-    loader.require('/vendor/expect.js');
-
-    sandbox.sendReport = function(line){
-      worker.send('test data', line);
-    };
-
     loader.require('/vendor/mocha/mocha.js', function(){
       loader.require('/lib/test-agent/mocha/json-stream-reporter.js', function(){
-        sandbox.mocha.setup({ui: 'bdd', reporter: multiReporter(sandbox.TestAgent.Mocha.JsonStreamReporter, sandbox.mocha.reporters.HTML)});
+        var jsonReporter = sandbox.TestAgent.Mocha.JsonStreamReporter;
+
+        jsonReporter.console = sandbox.console;
+
+        jsonReporter.send = function(line){
+          worker.send('test data', line);
+        };
+
+        sandbox.mocha.setup({ui: 'bdd', reporter: multiReporter(jsonReporter, sandbox.mocha.reporters.HTML)});
+
         loader.require('/test/helper.js', function(){
           tests.forEach(function(test){
             loader.require(test);
@@ -38,7 +41,6 @@
       });
     });
   }
-
 
   var worker = new TestAgent.BrowserWorker({
         sandbox: '/runner/sandbox.html',
@@ -52,6 +54,10 @@
   worker.use(TestAgent.BrowserWorker.TestUi);
 
   worker.on({
+
+    'sandbox': function() {
+      worker.loader.require('/vendor/expect.js');
+    },
 
     'open': function(){
       console.log('socket open');
