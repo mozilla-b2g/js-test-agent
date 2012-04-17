@@ -1,5 +1,5 @@
 {
-  "name": "js-test-agent",
+  "name": "test-agent",
   "version": "0.0.1",
   "author": "James Lal",
   "description": "execute client side tests from browser report back to cli",
