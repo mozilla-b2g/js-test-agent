@@ -170,22 +170,40 @@ describe("test-agent/browser-worker", function(){
     });
 
     describe("with a working environment", function(){
+
+      var obj = {uniq: true},
+          completeEvent = [];
+
       beforeEach(function(done){
+
+        runnerArguments = [];
+
         subject.createSandbox = function(){
           sandboxed = true;
           createSandbox.apply(this, arguments);
         };
 
-        subject.testRunner = function(){
+        subject.testRunner = function(worker, tests, testsComplete){
           runnerArguments.push(arguments);
+          testsComplete(obj);
           done();
         };
+
+        subject.on('run tests complete', function(){
+          completeEvent.push(arguments);
+        });
 
         subject.runTests(tests);
       });
 
+      it("should emit run tests complete event", function(){
+        console.log(completeEvent[0]);
+        expect(completeEvent[0][0]).to.be(obj);
+      });
+
       it("should call .testRunner with self and tests", function(){
         var args = runnerArguments[0];
+        console.log(args[0], subject);
         expect(args[0]).to.be(subject);
         expect(args[1]).to.be(tests);
       });
