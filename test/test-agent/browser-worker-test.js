@@ -5,7 +5,7 @@ require_lib('test-agent/websocket-client.js');
 require_lib('test-agent/browser-worker.js');
 
 describe("test-agent/browser-worker", function(){
-  
+
   var subject, fn = function(){};
 
   beforeEach(function(){
@@ -45,13 +45,6 @@ describe("test-agent/browser-worker", function(){
       });
     });
 
-    describe("without a test runner", function(){
-      it("should throw an error", function(){
-        expect(function(){
-          new TestAgent.BrowserWorker({sandbox: 'foo'});
-        }).to.throwError(/testRunner/);
-      });
-    });
 
     it("should save .testRunner option to testRunner", function(){
       expect(subject.testRunner).to.be(fn);
@@ -118,7 +111,7 @@ describe("test-agent/browser-worker", function(){
           context: this,
           args: arguments
         };
-        done();        
+        done();
       });
     });
 
@@ -167,24 +160,36 @@ describe("test-agent/browser-worker", function(){
       createSandbox = TestAgent.BrowserWorker.prototype.createSandbox;   
     });
 
-    beforeEach(function(done){
-      subject.createSandbox = function(){
-        sandboxed = true;
-        createSandbox.apply(this, arguments);
-      };
-
-      subject.testRunner = function(){
-        runnerArguments.push(arguments);
-        done();
-      };
-
-      subject.runTests(tests);
+    describe("without a test runner", function(){
+      it("should throw an error", function(){
+        expect(function(){
+          subject.testRunner = null;
+          subject.runTests(tests);
+        }).to.throwError(/testRunner/);
+      });
     });
 
-    it("should call .testRunner with self and tests", function(){
-      var args = runnerArguments[0];
-      expect(args[0]).to.be(subject);
-      expect(args[1]).to.be(tests);
+    describe("with a working environment", function(){
+      beforeEach(function(done){
+        subject.createSandbox = function(){
+          sandboxed = true;
+          createSandbox.apply(this, arguments);
+        };
+
+        subject.testRunner = function(){
+          runnerArguments.push(arguments);
+          done();
+        };
+
+        subject.runTests(tests);
+      });
+
+      it("should call .testRunner with self and tests", function(){
+        var args = runnerArguments[0];
+        expect(args[0]).to.be(subject);
+        expect(args[1]).to.be(tests);
+      });
+
     });
 
   });
