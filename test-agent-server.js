@@ -9,3 +9,4 @@ var Agent = require(__dirname + '/lib/node/index'),
     });
 
 server.use(Apps.Suite, suite);
+server.use(require(__dirname + '/lib/node/server/client-request-proxy'));

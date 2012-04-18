@@ -2,7 +2,8 @@
 
 var commands = [
       'server',
-      'test'
+      'test',
+      'serve-files'
     ],
     command = process.argv[2] || '<none given>';
 
