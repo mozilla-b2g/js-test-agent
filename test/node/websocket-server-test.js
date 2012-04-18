@@ -68,6 +68,7 @@ describe("node/websocket-server", function(){
       expect(result).to.eql({
         server: subject,
         process: { argv: process.argv },
+        TestAgent: requireLib('node/index'),
         console: console,
         __file: file,
         __dirname: fsPath.dirname(file)
