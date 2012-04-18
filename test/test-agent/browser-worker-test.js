@@ -54,6 +54,10 @@ describe("test-agent/browser-worker", function(){
       expect(subject.testRunner).to.be(fn);
     });
 
+    it("should have ._testsProcessor array", function(){
+      expect(subject._testsProcessor).to.be.a(Array);
+    });
+
     it("should use default options for server when none are given", function(){
       expect(subject.url).to.be(subject.defaults.server.url);
       expect(subject.retry).to.be(subject.defaults.server.retry);
@@ -153,6 +157,52 @@ describe("test-agent/browser-worker", function(){
 
   });
 
+  describe(".addTestsProcessor", function(){
+    var fn = function(){};
+
+
+    beforeEach(function(){
+      subject.addTestsProcessor(fn);
+    });
+
+    it("should add function to _testsProcessor", function(){
+      expect(subject._testsProcessor[0]).to.be(fn);
+    });
+
+  });
+
+  describe("._processTests", function(){
+
+    var result, tests = [
+      'one', 'two'
+    ];
+
+    beforeEach(function(){
+
+      subject.addTestsProcessor(function(tests){
+        return tests.map(function(item){
+          return String(item) + '-1';
+        });
+      });
+
+      subject.addTestsProcessor(function(tests){
+        return tests.map(function(item){
+          return String(item) + '-2';
+        });
+      });
+
+      result = subject._processTests(tests);
+    });
+
+    it("should call each reducer and return result", function(){
+      expect(result).to.eql([
+        'one-1-2',
+        'two-1-2'
+      ]);
+    });
+
+  });
+
   describe(".runTests", function(){
 
     var sandboxed = false,
@@ -161,7 +211,7 @@ describe("test-agent/browser-worker", function(){
         createSandbox;
 
     before(function(){
-      createSandbox = TestAgent.BrowserWorker.prototype.createSandbox;   
+      createSandbox = TestAgent.BrowserWorker.prototype.createSandbox;
     });
 
     describe("without a test runner", function(){
@@ -176,6 +226,7 @@ describe("test-agent/browser-worker", function(){
     describe("with a working environment", function(){
 
       var obj = {uniq: true},
+          expectedTests,
           completeEvent = [];
 
       beforeEach(function(done){
@@ -187,6 +238,12 @@ describe("test-agent/browser-worker", function(){
           createSandbox.apply(this, arguments);
         };
 
+        subject.addTestsProcessor(function(tests){
+          return tests.map(function(item){
+            return item + '-1'
+          });
+        });
+
         subject.testRunner = function(worker, tests, testsComplete){
           runnerArguments.push(arguments);
           testsComplete(obj);
@@ -196,6 +253,8 @@ describe("test-agent/browser-worker", function(){
         subject.on('run tests complete', function(){
           completeEvent.push(arguments);
         });
+
+        expectedTests = subject._processTests(tests);
 
         subject.runTests(tests);
       });
@@ -207,7 +266,7 @@ describe("test-agent/browser-worker", function(){
       it("should call .testRunner with self and tests", function(){
         var args = runnerArguments[0];
         expect(args[0]).to.be(subject);
-        expect(args[1]).to.be(tests);
+        expect(args[1]).to.eql(expectedTests);
       });
 
     });
