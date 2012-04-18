@@ -15,6 +15,10 @@ describe("test-agent/browser-worker", function(){
     });
   });
 
+  afterEach(function(){
+    subject.sandbox.destroy();
+  });
+
   describe(".deps", function(){
     var deps;
     beforeEach(function(){

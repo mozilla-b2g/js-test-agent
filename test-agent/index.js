@@ -1,11 +1,11 @@
 (function(window){
 
   var worker = new TestAgent.BrowserWorker({
-        sandbox: '/runner/sandbox.html',
+        sandbox: '/test-agent/sandbox.html',
       });
 
   worker.use(TestAgent.BrowserWorker.Config, {
-    url: '/runner/config.json'
+    url: '/test-agent/config.json'
   });
 
   worker.use(TestAgent.BrowserWorker.MochaDriver, {
@@ -27,7 +27,7 @@
 
     'close': function(){
       console.log('lost client trying to reconnect');
-    },
+    }
 
   });
 

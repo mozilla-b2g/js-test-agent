@@ -2,10 +2,14 @@ require_lib('test-agent/sandbox.js');
 
 describe("TestAgent.Sandbox", function(){
   var subject,
-      url = '/test/fixtures/iframe.html';
+      url = '/test/fixtures/iframe.html',
+      iframeCount = 0;
 
 
   beforeEach(function(){
+    iframeCount = document.getElementsByTagName('iframe').length;
+    expect(iframeCount).to.be(0);
+
     subject = new TestAgent.Sandbox(url);
   });
 
@@ -59,10 +63,12 @@ describe("TestAgent.Sandbox", function(){
     var context, destroyCaled;
 
     beforeEach(function(done){
+      this.timeout(100000000);
       destroyCaled = false;
 
       subject.destroy = function(){
         destroyCaled = true;
+        TestAgent.Sandbox.prototype.destroy.apply(this, arguments);
       };
 
       subject.run(function(){
@@ -111,6 +117,7 @@ describe("TestAgent.Sandbox", function(){
       var el;
 
       beforeEach(function(done){
+        this.timeout(4000);
         subject.run(function(){
           el = subject.getElement();
           subject.destroy();

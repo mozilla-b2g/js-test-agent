@@ -29,6 +29,7 @@ describe("TestAgent.Loader", function(){
   function createIframe(){
 
     beforeEach(function(done){
+      this.timeout(10000);
       var iframe = document.createElement('iframe');
 
       iframe.src = '/test/fixtures/iframe.html?time=' + String(Date.now());
@@ -193,6 +194,7 @@ describe("TestAgent.Loader", function(){
       requireCallbacksFired = [];
 
       beforeEach(function(done){
+        this.timeout(10000);
         urls.forEach(function(url){
           subject.require(url, function(){
             requireCallbacksFired.push(arguments);
