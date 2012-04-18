@@ -271,9 +271,39 @@ describe("node/suite", function(){
       it("should return .testUrl", function(){
         expect(results.testUrl).to.eql(fsPath.join(subject.baseUrl, testPath));
       });
-
-
     };
+
+    describe("in strict mode fase", function(){
+
+      var subject,
+          result,
+          paths = {
+            'lib': fsPath.join(root, 'app', 'appName', 'lib', 'file.js'),
+            'test': fsPath.join(root, 'app', 'appName', 'test', 'file-test.js'),
+          };
+
+      beforeEach(function(){
+        subject = new Suite({
+          path: root,
+          strictMode: false
+        });
+
+      });
+
+      it("should convert lib to test", function(){
+        var result = subject.testFromPath(paths.lib);
+        expect(result.isLib).to.be(true);
+        expect(result.testPath).to.be('app/appName/test/file-test.js');
+        expect(result.testUrl).to.be('/app/appName/test/file-test.js');
+      });
+
+      it("should convert test to lib", function(){
+        var result = subject.testFromPath(paths.test);
+        expect(result.isTest).to.be(true);
+        expect(result.libPath).to.be('app/appName/lib/file.js');
+      });
+
+    });
 
     describe("when given a path that matches dir but not suffix", function(){
 
