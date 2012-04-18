@@ -1,5 +1,14 @@
 #! /usr/bin/env node
 
+var fs = require('fs');
+
+if(process.argv[2] === '--version'){
+  var jsonFile = fs.readFileSync(__dirname + '/../package.json', 'utf8');
+  console.log(JSON.parse(jsonFile).version);
+
+  return;
+};
+
 var commands = [
       'server',
       'test'
