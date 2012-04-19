@@ -4,6 +4,9 @@ TEST_CONFIG=$(RUNNER_DIR)/config.json
 DEV_FILE=./test-agent.js
 
 package :
+	rm -f $(DEV_FILE)
+	touch $(DEV_FILE)
+
 	# Bundle /w mocha for now
 	cat ./vendor/mocha/mocha.js >> $(DEV_FILE)
 	cat ./lib/test-agent/responder.js >> $(DEV_FILE)
@@ -26,10 +29,6 @@ package :
 	cp $(DEV_FILE) ./vendor/test-agent.js
 	# Compat
 	cp $(DEV_FILE) ./vendor/test-agent-dev.js
-
-
-	rm -f $(DEV_FILE)
-	touch $(DEV_FILE)
 
 test_config:
 	sh ./tools/create-config.sh $(TEST_CONFIG) $(TEST_DIR) \*-test.js /test/test-agent
