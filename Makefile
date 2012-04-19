@@ -1,18 +1,9 @@
 RUNNER_DIR=$(PWD)/test-agent
 TEST_DIR=$(PWD)/test/test-agent/
 TEST_CONFIG=$(RUNNER_DIR)/config.json
-DEV_FILE=./vendor/test-agent-dev.js
+DEV_FILE=./test-agent.js
 
 package :
-	rm -Rf ./vendor/mocha
-	mkdir -p ./vendor/mocha
-	cp node_modules/mocha/mocha.js ./vendor/mocha/
-	cp node_modules/mocha/mocha.css ./vendor/mocha/
-	cp node_modules/expect.js/expect.js ./vendor/
-
-	rm -f $(DEV_FILE)
-	touch $(DEV_FILE)
-
 	# Bundle /w mocha for now
 	cat ./vendor/mocha/mocha.js >> $(DEV_FILE)
 	cat ./lib/test-agent/responder.js >> $(DEV_FILE)
@@ -27,8 +18,24 @@ package :
 	cat ./lib/test-agent/browser-worker/test-ui.js >> $(DEV_FILE)
 
 
+	rm -Rf ./vendor/mocha
+	mkdir -p ./vendor/mocha
+	cp node_modules/mocha/mocha.js ./vendor/mocha/
+	cp node_modules/mocha/mocha.css ./vendor/mocha/
+	cp node_modules/expect.js/expect.js ./vendor/
+	cp $(DEV_FILE) ./vendor/test-agent.js
+	# Compat
+	cp $(DEV_FILE) ./vendor/test-agent-dev.js
+
+
+	rm -f $(DEV_FILE)
+	touch $(DEV_FILE)
+
 test_config:
 	sh ./tools/create-config.sh $(TEST_CONFIG) $(TEST_DIR) \*-test.js /test/test-agent
+
+test_server:
+	./bin/js-test-agent server --growl
 
 test :
 	@./node_modules/mocha/bin/mocha \
@@ -42,6 +49,7 @@ test :
 
 
 .PHONY: test_config
+.PHONY: test_server
 .PHONY: package
 .PHONY: httpd
 .PHONY: test
