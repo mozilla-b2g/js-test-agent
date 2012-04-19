@@ -1,8 +1,5 @@
 examples
 test
 tools
-vendor
-test-agent-server.js
 index.html
-test-agent
 Makefile
