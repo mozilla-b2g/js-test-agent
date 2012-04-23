@@ -7,13 +7,12 @@ package :
 	rm -f $(DEV_FILE)
 	touch $(DEV_FILE)
 
-	# Bundle /w mocha for now
-	cat ./vendor/mocha/mocha.js >> $(DEV_FILE)
 	cat ./lib/test-agent/responder.js >> $(DEV_FILE)
 	cat ./lib/test-agent/loader.js >> $(DEV_FILE)
 	cat ./lib/test-agent/sandbox.js >> $(DEV_FILE)
 	cat ./lib/test-agent/config.js >> $(DEV_FILE)
 	cat ./lib/test-agent/websocket-client.js >> $(DEV_FILE)
+	cat ./lib/test-agent/mocha/reporter-base.js >> $(DEV_FILE)
 	cat ./lib/test-agent/mocha/json-stream-reporter.js >> $(DEV_FILE)
 	cat ./lib/test-agent/browser-worker.js >> $(DEV_FILE)
 	cat ./lib/test-agent/browser-worker/mocha-driver.js >> $(DEV_FILE)
