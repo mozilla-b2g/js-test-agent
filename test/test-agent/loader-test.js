@@ -209,6 +209,23 @@ describe("TestAgent.Loader", function(){
         });
       });
     }
+
+    describe("cross domain require", function(){
+      var url = 'https://raw.github.com/LearnBoost/expect.js/master/expect.js';
+
+      beforeEach(function(done){
+        subject.require(url);
+        subject.done(function(){
+          done();
+        });
+      });
+
+      it("should successfully require and fire callbacks", function(){
+        expect(iframeContext.expect).to.be.ok();
+      });
+
+    });
+
     //intentionally twice
     loadIframe(url, url);
 
