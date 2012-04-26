@@ -918,7 +918,15 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
     }
 
     function option(name) {
-      return options[name] || self.defaults[name];
+      if (name in options) {
+        return options[name];
+      }
+
+      if (name in self.defaults) {
+        return self.defaults[name];
+      }
+
+      return undefined;
     }
 
 
