@@ -1,4 +1,6 @@
 (function(exports) {
+  'use strict';
+
   if (typeof(exports.TestAgent) === 'undefined') {
     exports.TestAgent = {};
   }
@@ -516,6 +518,8 @@
 
 //depends on TestAgent.Responder
 (function(exports) {
+  'use strict';
+
   if (typeof(exports.TestAgent) === 'undefined') {
     exports.TestAgent = {};
   }
@@ -660,6 +664,8 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
 (function(window) {
+  'use strict';
+
   if (typeof(window.TestAgent) === 'undefined') {
     window.TestAgent = {};
   }
@@ -667,6 +673,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
   if (typeof(window.TestAgent.Mocha) === 'undefined') {
     window.TestAgent.Mocha = {};
   }
+
 
   Base.slow = 75;
 
@@ -732,6 +739,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 }(this));
 (function(window) {
+  'use strict';
 
   if (typeof(window.TestAgent) === 'undefined') {
     window.TestAgent = {};
@@ -1046,6 +1054,8 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 }(this));
 (function(window) {
+  'use strict';
+
   function MochaDriver(options) {
     var key;
 
@@ -1130,7 +1140,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 }(this));
 (function(window) {
-
+  'use strict';
 
   var Worker = window.TestAgent.BrowserWorker;
 
@@ -1161,6 +1171,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 }(this));
 (function(window) {
+  'use strict';
 
   var FORMAT_REGEX = /%([0-9])?s/g,
       Worker = window.TestAgent.BrowserWorker;
