@@ -1,23 +1,23 @@
-afterEach(function(){
-  if(typeof(window) === 'undefined'){
+afterEach(function() {
+  if (typeof(window) === 'undefined') {
     return;
   }
   //purge test area after each test
   var elements = document.getElementById('test').getElementsByTagName('*'),
       i, element;
 
-  for(i = 0; i < elements.length; i++){
+  for (i = 0; i < elements.length; i++) {
     element = elements[i];
     element.parentNode.removeChild(element);
   }
 });
 
 
-(function(exports){
+(function(exports) {
 
   var isNode = (typeof(window) === 'undefined');
 
-  if(isNode){
+  if (isNode) {
     exports.expect = require('expect.js');
   }
 
@@ -32,17 +32,17 @@ afterEach(function(){
     ]
   };
 
-  exports.requireLib = exports.require_lib = function(url){
+  exports.requireLib = exports.require_lib = function(url) {
 
-    if(exports.requireBundles[url]){
-      exports.requireBundles[url].forEach(function(url){
+    if (exports.requireBundles[url]) {
+      exports.requireBundles[url].forEach(function(url) {
         require(url);
       });
       return;
     }
 
-    if(typeof(require) !== 'undefined'){
-      if(isNode){
+    if (typeof(require) !== 'undefined') {
+      if (isNode) {
         return require('../lib/' + url);
       } else {
         require('/lib/' + url);
@@ -51,13 +51,13 @@ afterEach(function(){
   };
 
   exports.testSupport = {
-    merge: function(){
+    merge: function() {
       var result = {};
-      Array.prototype.slice.call(arguments).forEach(function(mergeSet){
+      Array.prototype.slice.call(arguments).forEach(function(mergeSet) {
         var key;
 
-        for(key in mergeSet){
-          if(mergeSet.hasOwnProperty(key)){
+        for (key in mergeSet) {
+          if (mergeSet.hasOwnProperty(key)) {
             result[key] = mergeSet[key];
           }
         }
@@ -66,22 +66,22 @@ afterEach(function(){
       return result;
     },
 
-    factory: function(defaults, constructor){
-      var factory = function(){
+    factory: function(defaults, constructor) {
+      var factory = function() {
         return new constructor(
           factory.attributes.apply(null, arguments)
         );
       };
 
-      factory.attrs = factory.attributes = function(){
+      factory.attrs = factory.attributes = function() {
         var args = Array.prototype.slice.call(arguments), key, attrs;
         args.unshift(defaults);
 
         attrs = exports.testSupport.merge.apply(null, args);
 
-        for(key in attrs){
-          if(attrs.hasOwnProperty(key)){
-            if(typeof(attrs[key]) === 'function'){
+        for (key in attrs) {
+          if (attrs.hasOwnProperty(key)) {
+            if (typeof(attrs[key]) === 'function') {
               attrs[key] = attrs[key](args);
             }
           }
@@ -96,6 +96,6 @@ afterEach(function(){
   };
 
 }(
-  (typeof(window) === 'undefined')?  global : window
+  (typeof(window) === 'undefined') ? global : window
 ));
 

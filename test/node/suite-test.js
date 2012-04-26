@@ -1,5 +1,5 @@
 
-describe("node/suite", function(){
+describe('node/suite', function() {
 
   var Suite = require('../../lib/node/suite'),
       MatchFiles = require('match-files'),
@@ -10,7 +10,7 @@ describe("node/suite", function(){
       libPath = 'lib/foo.js',
       testPath = 'test/foo-test.js';
 
-  beforeEach(function(){
+  beforeEach(function() {
 
     subject = new Suite({
       path: root
@@ -18,47 +18,47 @@ describe("node/suite", function(){
   });
 
 
-  describe("initialize", function(){
+  describe('initialize', function() {
 
-    describe("defaults", function(){
+    describe('defaults', function() {
 
-      beforeEach(function(){
+      beforeEach(function() {
         subject = new Suite({
           path: root
         });
       });
 
-      it("should normalize .path", function(){
+      it('should normalize .path', function() {
         expect(subject.path).to.equal(fsPath.normalize(root) + '/');
       });
 
-      it("should have set path and appended a slash", function(){
+      it('should have set path and appended a slash', function() {
         expect(subject.path).to.eql(normalizedRoot + '/');
       });
 
-      it("should have set testDir", function(){
+      it('should have set testDir', function() {
         expect(subject.testDir).to.equal('test/');
       });
 
-      it("should have set libDir", function(){
+      it('should have set libDir', function() {
         expect(subject.libDir).to.equal('lib/');
       });
 
-      it("should have set testSuffix", function(){
+      it('should have set testSuffix', function() {
         expect(subject.testSuffix).to.equal('-test.js');
       });
 
-      it("should have set libSuffix", function(){
+      it('should have set libSuffix', function() {
         expect(subject.libSuffix).to.equal('.js');
       });
 
-      it("should have baseUrl", function(){
+      it('should have baseUrl', function() {
         expect(subject.baseUrl).to.be('/');
       });
 
     });
 
-    describe("overriding", function(){
+    describe('overriding', function() {
 
       var val = 'foo', overrides = {
         testDir: val,
@@ -68,14 +68,14 @@ describe("node/suite", function(){
         path: normalizedRoot + '/'
       }, key;
 
-      beforeEach(function(){
+      beforeEach(function() {
         subject = new Suite(overrides);
       });
 
-      for(key in overrides){
-        if(overrides.hasOwnProperty(key)){
-          (function(){
-            it("should allow overriding " + key, function(){
+      for (key in overrides) {
+        if (overrides.hasOwnProperty(key)) {
+          (function() {
+            it('should allow overriding ' + key, function() {
               expect(subject[key]).to.eql(overrides[key]);
             });
           }(key));
@@ -85,9 +85,9 @@ describe("node/suite", function(){
 
   });
 
-  describe("._definePatterns", function(){
+  describe('._definePatterns', function() {
 
-    var r = function(str){
+    var r = function(str) {
       return new RegExp(str);
     };
 
@@ -98,14 +98,14 @@ describe("node/suite", function(){
       libDir: r('^lib/')
     }, ptn;
 
-    it("should have created .patterns object", function(){
+    it('should have created .patterns object', function() {
       expect(subject.patterns).to.be.an('object');
     });
 
-    for(ptn in expected){
-      if(expected.hasOwnProperty(ptn)){
-        (function(ptn){
-          it("should have created a pattern " + ptn + " " + expected[ptn].toString(), function(){
+    for (ptn in expected) {
+      if (expected.hasOwnProperty(ptn)) {
+        (function(ptn) {
+          it('should have created a pattern ' + ptn + ' ' + expected[ptn].toString(), function() {
             expect(subject.patterns[ptn]).to.be.a(RegExp);
             expect(subject.patterns[ptn].toString()).to.be(expected[ptn].toString());
           });
@@ -115,32 +115,32 @@ describe("node/suite", function(){
 
   });
 
-  describe(".relativePath", function(){
+  describe('.relativePath', function() {
 
-    it("should return a path relative to the root without a starting slash", function(){
+    it('should return a path relative to the root without a starting slash', function() {
       var expected = 'myFoo/path.js';
       expect(subject.relativePath(normalizedRoot + '/myFoo/path.js')).to.eql(expected);
     });
 
   });
 
-  describe(".swapPaths", function(){
+  describe('.swapPaths', function() {
 
-    it("should return lib path when converting from lib -> lib", function(){
+    it('should return lib path when converting from lib -> lib', function() {
       expect(subject.swapPaths(libPath, 'lib')).to.eql(libPath);
     });
 
-    it("should return lib path when converting from test -> test", function(){
+    it('should return lib path when converting from test -> test', function() {
       expect(subject.swapPaths(testPath, 'test')).to.eql(testPath);
     });
 
-    it("should return test path when converting lib -> test", function(){
+    it('should return test path when converting lib -> test', function() {
       expect(subject.swapPaths(libPath, 'test')).to.eql(
         testPath
       );
     });
 
-    it("should return lib path when converting test -> lib", function(){
+    it('should return lib path when converting test -> lib', function() {
       expect(subject.swapPaths(testPath, 'lib')).to.eql(
         libPath
       );
@@ -148,7 +148,7 @@ describe("node/suite", function(){
 
   });
 
-  describe(".matchesType", function(){
+  describe('.matchesType', function() {
 
     var matches = {
       lib: {
@@ -168,14 +168,14 @@ describe("node/suite", function(){
 
     //Ok, this is bad.
     //When let is introduced we can use that
-    for(type in matches){
+    for (type in matches) {
 
-      (function(type){
+      (function(type) {
 
-        describe("when matching for " + type, function(){
-          for(path in matches[type]){
-            (function(path, expected){
-              it("should return " + expected + " when given " + path, function(){
+        describe('when matching for ' + type, function() {
+          for (path in matches[type]) {
+            (function(path, expected) {
+              it('should return ' + expected + ' when given ' + path, function() {
                 expect(subject.matchesType(type, path)).to.be(expected);
               });
             }(path, matches[type][path]));
@@ -185,26 +185,26 @@ describe("node/suite", function(){
       }(type));
     }
 
-    it("should throw an error when given an invalid type", function(){
-      expect(function(){
+    it('should throw an error when given an invalid type', function() {
+      expect(function() {
         subject.matchesType('fake', 'foo');
       }).to.throwException();
     });
 
   });
 
-  describe("file operations", function(){
+  describe('file operations', function() {
     var testFiles, libFiles;
 
-    before(function(done){
-      MatchFiles.find(normalizedRoot + '/lib', {}, function(err, found){
+    before(function(done) {
+      MatchFiles.find(normalizedRoot + '/lib', {}, function(err, found) {
         libFiles = found;
         done();
       });
     });
 
-    before(function(done){
-      MatchFiles.find(normalizedRoot + '/test/', {}, function(err, found){
+    before(function(done) {
+      MatchFiles.find(normalizedRoot + '/test/', {}, function(err, found) {
         //remove file which is not a test
         var idx = found.indexOf(normalizedRoot + '/test/helper.js');
         found.splice(idx, 1);
@@ -213,27 +213,27 @@ describe("node/suite", function(){
       });
     });
 
-    describe(".findFiles", function(){
-      it("should return all lib and test files", function(done){
-        subject.findFiles(function(err, found){
+    describe('.findFiles', function() {
+      it('should return all lib and test files', function(done) {
+        subject.findFiles(function(err, found) {
           expect((testFiles.concat(libFiles)).sort()).to.eql(found.sort());
           done();
         });
       });
     });
 
-    describe(".findTestFiles", function(){
-      it("should return all test files", function(done){
-        subject.findTestFiles(function(err, found){
+    describe('.findTestFiles', function() {
+      it('should return all test files', function(done) {
+        subject.findTestFiles(function(err, found) {
           expect(testFiles.sort()).to.eql(found.sort());
           done();
         });
       });
     });
 
-    describe(".findLibFiles", function(){
-      it("should return all lib files", function(done){
-        subject.findLibFiles(function(err, found){
+    describe('.findLibFiles', function() {
+      it('should return all lib files', function(done) {
+        subject.findLibFiles(function(err, found) {
           expect(libFiles.sort()).to.eql(found.sort());
           done();
         });
@@ -242,47 +242,47 @@ describe("node/suite", function(){
 
   });
 
-  describe('.testFromPath', function(){
+  describe('.testFromPath', function() {
 
     var results;
 
-    shouldReturnPathDetails = function(path, isTest){
+    shouldReturnPathDetails = function(path, isTest) {
 
-      beforeEach(function(){
+      beforeEach(function() {
         results = subject.testFromPath(normalizedRoot + '/' + path);
       });
 
-      it("should have .isTest === " + isTest, function(){
+      it('should have .isTest === ' + isTest, function() {
         expect(results.isTest).to.be(isTest);
       });
 
-      it("should have .isLib === " + !isTest, function(){
+      it('should have .isLib === ' + !isTest, function() {
         expect(results.isLib).to.be(!isTest);
       });
 
-      it("should have .libPath", function(){
+      it('should have .libPath', function() {
         expect(results.libPath).to.eql(libPath);
       });
 
-      it("should return .testPath", function(){
+      it('should return .testPath', function() {
         expect(results.testPath).to.eql(testPath);
       });
 
-      it("should return .testUrl", function(){
+      it('should return .testUrl', function() {
         expect(results.testUrl).to.eql(fsPath.join(subject.baseUrl, testPath));
       });
     };
 
-    describe("in strict mode fase", function(){
+    describe('in strict mode fase', function() {
 
       var subject,
           result,
           paths = {
             'lib': fsPath.join(root, 'app', 'appName', 'lib', 'file.js'),
-            'test': fsPath.join(root, 'app', 'appName', 'test', 'file-test.js'),
+            'test': fsPath.join(root, 'app', 'appName', 'test', 'file-test.js')
           };
 
-      beforeEach(function(){
+      beforeEach(function() {
         subject = new Suite({
           path: root,
           strictMode: false
@@ -290,14 +290,14 @@ describe("node/suite", function(){
 
       });
 
-      it("should convert lib to test", function(){
+      it('should convert lib to test', function() {
         var result = subject.testFromPath(paths.lib);
         expect(result.isLib).to.be(true);
         expect(result.testPath).to.be('app/appName/test/file-test.js');
         expect(result.testUrl).to.be('/app/appName/test/file-test.js');
       });
 
-      it("should convert test to lib", function(){
+      it('should convert test to lib', function() {
         var result = subject.testFromPath(paths.test);
         expect(result.isTest).to.be(true);
         expect(result.libPath).to.be('app/appName/lib/file.js');
@@ -305,24 +305,24 @@ describe("node/suite", function(){
 
     });
 
-    describe("when given a path that matches dir but not suffix", function(){
+    describe('when given a path that matches dir but not suffix', function() {
 
-      beforeEach(function(){
+      beforeEach(function() {
         results = subject.testFromPath(normalizedRoot + '/' + 'test/foo.js');
       });
 
-      it("should set isTest & isLib to false", function(){
+      it('should set isTest & isLib to false', function() {
         expect(results.isLib).to.be(false);
         expect(results.isTest).to.be(false);
       });
 
     });
 
-    describe("results after given a test path", function(){
+    describe('results after given a test path', function() {
       shouldReturnPathDetails(testPath, true);
     });
 
-    describe("results after given a lib path", function(){
+    describe('results after given a lib path', function() {
       shouldReturnPathDetails(libPath, false);
     });
 

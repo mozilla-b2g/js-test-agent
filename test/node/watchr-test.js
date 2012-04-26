@@ -1,4 +1,4 @@
-describe("node/watchr", function(){
+describe('node/watchr', function() {
   var Watchr = require('../../lib/node/watchr'),
       files = [],
       fs = require('fs'),
@@ -8,50 +8,50 @@ describe("node/watchr", function(){
       callback;
 
 
-  before(function(done){
-    MatchFiles.find(fixtures, {}, function(err, found){
+  before(function(done) {
+    MatchFiles.find(fixtures, {}, function(err, found) {
       files = found;
       done();
     });
   });
 
-  beforeEach(function(){
+  beforeEach(function() {
     subject = new Watchr(files);
   });
 
-  afterEach(function(){
+  afterEach(function() {
     //clear watchr callbacks
     subject.stop();
   });
 
-  describe("initialization", function(){
+  describe('initialization', function() {
 
-    it("should store a list files", function(){
+    it('should store a list files', function() {
       expect(subject.files).to.eql(files);
     });
 
-    it("should create an object for .watchers", function(){
+    it('should create an object for .watchers', function() {
       expect(subject.watchers).to.eql({});
     });
 
   });
 
 
-  describe(".stop", function(){
+  describe('.stop', function() {
 
     var mockWatcher;
 
-    describe("when there are no watchers", function(){
-      it("should not throw", function(){
+    describe('when there are no watchers', function() {
+      it('should not throw', function() {
         expect(subject.stop());
       });
     });
 
-    describe("when are watchers", function(){
+    describe('when are watchers', function() {
 
-      beforeEach(function(){
+      beforeEach(function() {
         mockWatcher = {
-          stop: function(){
+          stop: function() {
             mockWatcher.isStopped = true;
           }
         };
@@ -60,11 +60,11 @@ describe("node/watchr", function(){
         subject.stop();
       });
 
-      it("should have called stop on the watchers", function(){
+      it('should have called stop on the watchers', function() {
         expect(mockWatcher.isStopped).to.be(true);
       });
 
-      it("should have no more watchers", function(){
+      it('should have no more watchers', function() {
         expect(subject.watchers).to.eql({});
       });
     });
@@ -72,24 +72,24 @@ describe("node/watchr", function(){
   });
 
   //NOTE! When mocha is running in --watch it breaks this test!
-  describe(".watch", function(){
+  describe('.watch', function() {
 
-    describe("when changing a file", function(){
+    describe('when changing a file', function() {
       var file;
 
-      beforeEach(function(){
+      beforeEach(function() {
         file = files[0];
       });
 
-      afterEach(function(){
+      afterEach(function() {
         //clear out file
         fs.writeFileSync(file, '');
       });
 
-      it("should notify callback when a file has changed", function(done){
+      it('should notify callback when a file has changed', function(done) {
         var exec = require('child_process').exec;
 
-        subject.start(function(fileName){
+        subject.start(function(fileName) {
           expect(fileName).to.be(file);
           done();
         });

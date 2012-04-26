@@ -1,4 +1,4 @@
 //to prove ui is working in test helper
-before(function(){
+before(function() {
   window.testHelperWasCalled = true;
 });

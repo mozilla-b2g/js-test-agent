@@ -4,92 +4,92 @@ require_lib('test-agent/sandbox.js');
 require_lib('test-agent/websocket-client.js');
 require_lib('test-agent/browser-worker.js');
 
-describe("test-agent/browser-worker", function(){
+describe('test-agent/browser-worker', function() {
 
-  var subject, fn = function(){};
+  var subject, fn = function() {};
 
-  beforeEach(function(){
+  beforeEach(function() {
     subject = new TestAgent.BrowserWorker({
       sandbox: '/test/fixtures/iframe.html',
       testRunner: fn
     });
   });
 
-  afterEach(function(){
+  afterEach(function() {
     subject.sandbox.destroy();
   });
 
-  describe(".deps", function(){
+  describe('.deps', function() {
     var deps;
-    beforeEach(function(){
+    beforeEach(function() {
       deps = TestAgent.BrowserWorker.prototype.deps;
     });
 
-    it("should have Server set to TestAgent.Server", function(){
+    it('should have Server set to TestAgent.Server', function() {
       expect(deps.Server).to.be(TestAgent.WebsocketClient);
     });
 
-    it("should have Sandbox set to TestAgent.Sanbox", function(){
+    it('should have Sandbox set to TestAgent.Sanbox', function() {
       expect(deps.Sanbox).to.be(TestAgent.Sanbox);
     });
 
-    it("should have Loader set to TestAgent.Loader", function(){
+    it('should have Loader set to TestAgent.Loader', function() {
       expect(deps.Loader).to.be(TestAgent.Loader);
     });
 
   });
 
-  describe("initialization", function(){
+  describe('initialization', function() {
 
-    var fn = function(){};
+    var fn = function() {};
 
-    beforeEach(function(){
+    beforeEach(function() {
       subject = new TestAgent.BrowserWorker({
         testRunner: fn
       });
     });
 
 
-    it("should save .testRunner option to testRunner", function(){
+    it('should save .testRunner option to testRunner', function() {
       expect(subject.testRunner).to.be(fn);
     });
 
-    it("should have ._testsProcessor array", function(){
+    it('should have ._testsProcessor array', function() {
       expect(subject._testsProcessor).to.be.a(Array);
     });
 
-    it("should use default options for server when none are given", function(){
+    it('should use default options for server when none are given', function() {
       expect(subject.url).to.be(subject.defaults.server.url);
       expect(subject.retry).to.be(subject.defaults.server.retry);
     });
 
-    it("should use default options for sandbox when none given", function(){
+    it('should use default options for sandbox when none given', function() {
       expect(subject.sandbox.url).to.be(subject.defaults.sandbox);
     });
 
-    it("should have a .sandbox", function(){
+    it('should have a .sandbox', function() {
       expect(subject.sandbox).to.be.a(TestAgent.Sandbox);
     });
 
-    it("should have a .loader", function(){
+    it('should have a .loader', function() {
       expect(subject.loader).to.be.a(TestAgent.Loader);
     });
 
-    it("should be a websocket client", function(){
+    it('should be a websocket client', function() {
       expect(subject).to.be.a(TestAgent.WebsocketClient);
     });
   });
 
-  describe(".use", function(){
+  describe('.use', function() {
 
     var Enhancer, data;
 
-    beforeEach(function(){
-      Enhancer = function(data){
+    beforeEach(function() {
+      Enhancer = function(data) {
         this.saved = data;
       };
       Enhancer.prototype = {
-        enhance: function(server){
+        enhance: function(server) {
           server.wasEnhanced = this.saved;
         }
       };
@@ -97,24 +97,24 @@ describe("test-agent/browser-worker", function(){
       subject.use(Enhancer, data);
     });
 
-    it("should have modified subject", function(){
+    it('should have modified subject', function() {
       expect(subject.wasEnhanced).to.be(data);
     });
 
   });
 
-  describe(".createSandbox", function(){
+  describe('.createSandbox', function() {
     var sandboxEvent, callbackData;
 
-    beforeEach(function(done){
+    beforeEach(function(done) {
       sandboxEvent = null;
       callbackData = null;
 
-      subject.on('sandbox', function(){
+      subject.on('sandbox', function() {
         sandboxEvent = arguments;
       });
 
-      subject.createSandbox(function(){
+      subject.createSandbox(function() {
         callbackData = {
           context: this,
           args: arguments
@@ -123,33 +123,33 @@ describe("test-agent/browser-worker", function(){
       });
     });
 
-    it("should scope .loader to new iframe window", function(){
+    it('should scope .loader to new iframe window', function() {
       expect(subject.loader.targetWindow === subject.sandbox.getWindow()).to.be.ok();
     });
 
-    describe("event: sandbox", function(){
-      it("should send iframe context as first argument", function(){
+    describe('event: sandbox', function() {
+      it('should send iframe context as first argument', function() {
         expect(sandboxEvent[0] !== window).to.be.ok();
-        expect(sandboxEvent[0].Boolean).to.be.ok(); 
+        expect(sandboxEvent[0].Boolean).to.be.ok();
       });
 
-      it("should pass loader as second argument", function(){
+      it('should pass loader as second argument', function() {
         expect(sandboxEvent[1]).to.be(subject.loader);
       });
     });
 
-    describe("callback", function(){
+    describe('callback', function() {
 
-      it("should be in the context of a new iframe", function(){
+      it('should be in the context of a new iframe', function() {
         expect(callbackData.context !== window).to.be.ok();
-        expect(callbackData.context.Boolean).to.be.ok(); 
+        expect(callbackData.context.Boolean).to.be.ok();
       });
 
-      it("should pass loader as first argument", function(){
+      it('should pass loader as first argument', function() {
         expect(callbackData.args[0]).to.be(subject.loader);
       });
 
-      it("should inject require into sandbox", function(){
+      it('should inject require into sandbox', function() {
         expect(callbackData.context.require).to.be.a(Function);
       });
 
@@ -157,36 +157,36 @@ describe("test-agent/browser-worker", function(){
 
   });
 
-  describe(".addTestsProcessor", function(){
-    var fn = function(){};
+  describe('.addTestsProcessor', function() {
+    var fn = function() {};
 
 
-    beforeEach(function(){
+    beforeEach(function() {
       subject.addTestsProcessor(fn);
     });
 
-    it("should add function to _testsProcessor", function(){
+    it('should add function to _testsProcessor', function() {
       expect(subject._testsProcessor[0]).to.be(fn);
     });
 
   });
 
-  describe("._processTests", function(){
+  describe('._processTests', function() {
 
     var result, tests = [
       'one', 'two'
     ];
 
-    beforeEach(function(){
+    beforeEach(function() {
 
-      subject.addTestsProcessor(function(tests){
-        return tests.map(function(item){
+      subject.addTestsProcessor(function(tests) {
+        return tests.map(function(item) {
           return String(item) + '-1';
         });
       });
 
-      subject.addTestsProcessor(function(tests){
-        return tests.map(function(item){
+      subject.addTestsProcessor(function(tests) {
+        return tests.map(function(item) {
           return String(item) + '-2';
         });
       });
@@ -194,7 +194,7 @@ describe("test-agent/browser-worker", function(){
       result = subject._processTests(tests);
     });
 
-    it("should call each reducer and return result", function(){
+    it('should call each reducer and return result', function() {
       expect(result).to.eql([
         'one-1-2',
         'two-1-2'
@@ -203,54 +203,54 @@ describe("test-agent/browser-worker", function(){
 
   });
 
-  describe(".runTests", function(){
+  describe('.runTests', function() {
 
     var sandboxed = false,
         tests = ['foo'],
         runnerArguments = [],
         createSandbox;
 
-    before(function(){
+    before(function() {
       createSandbox = TestAgent.BrowserWorker.prototype.createSandbox;
     });
 
-    describe("without a test runner", function(){
-      it("should throw an error", function(){
-        expect(function(){
+    describe('without a test runner', function() {
+      it('should throw an error', function() {
+        expect(function() {
           subject.testRunner = null;
           subject.runTests(tests);
         }).to.throwError(/testRunner/);
       });
     });
 
-    describe("with a working environment", function(){
+    describe('with a working environment', function() {
 
       var obj = {uniq: true},
           expectedTests,
           completeEvent = [];
 
-      beforeEach(function(done){
+      beforeEach(function(done) {
 
         runnerArguments = [];
 
-        subject.createSandbox = function(){
+        subject.createSandbox = function() {
           sandboxed = true;
           createSandbox.apply(this, arguments);
         };
 
-        subject.addTestsProcessor(function(tests){
-          return tests.map(function(item){
-            return item + '-1'
+        subject.addTestsProcessor(function(tests) {
+          return tests.map(function(item) {
+            return item + '-1';
           });
         });
 
-        subject.testRunner = function(worker, tests, testsComplete){
+        subject.testRunner = function(worker, tests, testsComplete) {
           runnerArguments.push(arguments);
           testsComplete(obj);
           done();
         };
 
-        subject.on('run tests complete', function(){
+        subject.on('run tests complete', function() {
           completeEvent.push(arguments);
         });
 
@@ -259,11 +259,11 @@ describe("test-agent/browser-worker", function(){
         subject.runTests(tests);
       });
 
-      it("should emit run tests complete event", function(){
+      it('should emit run tests complete event', function() {
         expect(completeEvent[0][0]).to.be(obj);
       });
 
-      it("should call .testRunner with self and tests", function(){
+      it('should call .testRunner with self and tests', function() {
         var args = runnerArguments[0];
         expect(args[0]).to.be(subject);
         expect(args[1]).to.eql(expectedTests);

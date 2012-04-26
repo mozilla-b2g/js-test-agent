@@ -4,22 +4,22 @@ var Watcher = require('../../../lib/node/server/watcher'),
     fs = require('fs'),
     fsPath = require('path');
 
-describe("node/server/watcher", function(){
+describe('node/server/watcher', function() {
 
-  var subject, 
+  var subject,
       suite,
       server,
       queueTests;
 
 
-  beforeEach(function(){
+  beforeEach(function() {
     suite = new Suite({
       path: __dirname + '/../fixtures/'
     });
 
     server = new Responder();
 
-    server.on('queue tests', function(message){
+    server.on('queue tests', function(message) {
       queueTests.push(message);
     });
 
@@ -31,33 +31,33 @@ describe("node/server/watcher", function(){
     subject.enhance(server);
   });
 
-  describe("when a file has changed", function(){
+  describe('when a file has changed', function() {
     var files = [],
         suitePath,
         calledWith;
 
-    beforeEach(function(done){
-      files = suite.findFiles(function(err, found){
+    beforeEach(function(done) {
+      files = suite.findFiles(function(err, found) {
         files = found;
         done();
       });
     });
 
-    beforeEach(function(done){
+    beforeEach(function(done) {
       fs.writeFileSync(files[0], 'foo!');
       suitePath = suite.testFromPath(files[0]);
       //just wait
-      setTimeout(function(){
+      setTimeout(function() {
       fs.writeFileSync(files[0], 'foo!');
         done();
       }, 200);
     });
 
-    afterEach(function(){
+    afterEach(function() {
       fs.writeFileSync(files[0], '');
     });
 
-    it("should emit queue-tests event on server", function(){
+    it('should emit queue-tests event on server', function() {
       var data = {
         files: [files[0]]
       };

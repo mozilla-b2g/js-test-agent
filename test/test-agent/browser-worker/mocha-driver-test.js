@@ -2,7 +2,7 @@ requireLib('*test-agent/browser-worker');
 requireLib('test-agent/mocha/json-stream-reporter.js');
 requireLib('test-agent/browser-worker/mocha-driver.js');
 
-describe("test-agent/browser-worker/mocha-driver", function(){
+describe('test-agent/browser-worker/mocha-driver', function() {
   var subject,
       worker,
       baseUrl = '/test/test-agent/fixtures/mocha-driver/',
@@ -12,17 +12,17 @@ describe("test-agent/browser-worker/mocha-driver", function(){
       origTestRunner;
 
 
-  function createReporter(){
-    return function(){
+  function createReporter() {
+    return function() {
       reporterCalled.push(arguments);
     };
   }
 
-  beforeEach(function(){
+  beforeEach(function() {
     reporterCalled = [];
   });
 
-  beforeEach(function(){
+  beforeEach(function() {
     MochaDriver = TestAgent.BrowserWorker.MochaDriver;
     subject = new TestAgent.BrowserWorker.MochaDriver({
       mochaUrl: '/vendor/mocha/mocha.js',
@@ -34,11 +34,11 @@ describe("test-agent/browser-worker/mocha-driver", function(){
     subject.enhance(worker);
   });
 
-  describe("MochaDriver.createMutliReporter", function(){
+  describe('MochaDriver.createMutliReporter', function() {
 
     var runner;
 
-    beforeEach(function(){
+    beforeEach(function() {
       runner = {};
       var report = MochaDriver.createMutliReporter(
         createReporter(),
@@ -48,53 +48,53 @@ describe("test-agent/browser-worker/mocha-driver", function(){
       new report(runner);
     });
 
-    it("should initialize each reporter in the mutli with a runner when its given", function(){
+    it('should initialize each reporter in the mutli with a runner when its given', function() {
       expect(reporterCalled.length).to.be(2);
-      reporterCalled.forEach(function(call){
+      reporterCalled.forEach(function(call) {
         expect(call[0]).to.be(runner);
       });
     });
 
   });
 
-  describe("initialization", function(){
-    it("should replace .testRunner with enhanced functionality", function(){
+  describe('initialization', function() {
+    it('should replace .testRunner with enhanced functionality', function() {
       expect(worker.testRunner).to.be.a(Function);
       expect(worker.testRunner).not.to.be(origTestRunner);
     });
   });
 
-  describe("event: run tests", function(){
+  describe('event: run tests', function() {
     var data = {tests: ['/test']},
         testsToRun = [];
 
-    beforeEach(function(){
+    beforeEach(function() {
       testsToRun = null;
-      worker.runTests = function(tests){
+      worker.runTests = function(tests) {
         testsToRun = tests;
       };
 
       worker.emit('run tests', data);
     });
 
-    it("should call .runTests", function(){
+    it('should call .runTests', function() {
       expect(testsToRun).to.eql(data.tests);
     });
   });
 
-  describe("in test environment", function(){
+  describe('in test environment', function() {
     var tests = [baseUrl + 'test.js'],
         getReporterCalled = false;
 
-    beforeEach(function(done){
+    beforeEach(function(done) {
       getReporterCalled = false;
       //mock out reporter to default
-      subject.getReporter = function(){
+      subject.getReporter = function() {
         getReporterCalled = true;
         return null;
       };
 
-      worker.on('sandbox', function(){
+      worker.on('sandbox', function() {
         var box = worker.sandbox.getWindow();
 
         box.document.body.innerHTML = '<div id="mocha"></div>';
@@ -102,14 +102,14 @@ describe("test-agent/browser-worker/mocha-driver", function(){
         box.testHelperWasCalled = false;
       });
 
-      worker.on('run tests complete', function(){
+      worker.on('run tests complete', function() {
         done();
       });
 
       worker.runTests(tests);
     });
 
-    it("should load everything into the environment and run tests", function(){
+    it('should load everything into the environment and run tests', function() {
       //this test is merged into one it block for speed
       var context = worker.sandbox.getWindow();
 

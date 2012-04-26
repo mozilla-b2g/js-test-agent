@@ -4,14 +4,14 @@ var WebSocketServer = require_lib('node/websocket-server'),
     Server;
 
 
-Server = function(){
+Server = function() {
   WebSocketServer.apply(this, arguments);
   this.socket = new Responder();
 };
 
 Server.prototype = Object.create(WebSocketServer.prototype);
 
-Server.prototype.emitClient = function(){
+Server.prototype.emitClient = function() {
   this.lastSocket = websocket();
   this.socket.emit('connection', this.lastSocket);
 

@@ -5,11 +5,11 @@ module.exports = exports = {
   wsKey: 0,
 
   websocket: testSupport.factory({
-    sendCalls: function(){
+    sendCalls: function() {
       return [];
     },
 
-    req: function(){
+    req: function() {
       return {
         headers: {
           'sec-websocket-key': exports.wsKey += 1
@@ -17,8 +17,8 @@ module.exports = exports = {
       };
     },
 
-    send: function(attrs){
-      return function(){
+    send: function(attrs) {
+      return function() {
         this.sendCalls.push(Array.prototype.slice.call(arguments));
       };
     }

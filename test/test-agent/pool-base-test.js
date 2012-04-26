@@ -1,11 +1,11 @@
 var PoolBase = require_lib('test-agent/pool-base.js');
 
-if(PoolBase){
+if (PoolBase) {
   var PoolBase = result.TestAgent.PoolBase;
 }
 
 
-describe("test-agent/pool", function(){
+describe('test-agent/pool', function() {
 
 
   var subject,
@@ -17,16 +17,16 @@ describe("test-agent/pool", function(){
       last = {key: 0, value: 0};
 
   factory.object = testSupport.factory({
-    key: function(){
-      return "key - " + String(last.key++);
+    key: function() {
+      return 'key - ' + String(last.key++);
     },
 
-    value: function(){
-      return "value - " + String(last.value++);
+    value: function() {
+      return 'value - ' + String(last.value++);
     }
   }, Object);
 
-  beforeEach(function(){
+  beforeEach(function() {
     object = factory.object();
     PoolBase = PoolBase || TestAgent.PoolBase;
     subject = new PoolBase();
@@ -34,188 +34,188 @@ describe("test-agent/pool", function(){
     wasChecked = false;
     detailsGiven = false;
 
-    subject.objectDetails = function(){
+    subject.objectDetails = function() {
       detailsGiven = true;
       return PoolBase.prototype.objectDetails.apply(this, arguments);
     };
 
-    subject.checkObjectValue = function(){
+    subject.checkObjectValue = function() {
       wasChecked = true;
       return PoolBase.prototype.checkObjectValue.apply(this, arguments);
     };
   });
 
-  describe("initializer", function(){
-    it("should set ._items to an empty object", function(){
+  describe('initializer', function() {
+    it('should set ._items to an empty object', function() {
       expect(subject._items).to.eql({});
     });
 
-    it("should set .length to zero", function(){
+    it('should set .length to zero', function() {
       expect(subject.length).to.be(0);
     });
   });
 
-  describe(".checkObjectValue", function(){
+  describe('.checkObjectValue', function() {
     var result;
-    beforeEach(function(){
+    beforeEach(function() {
       result = subject.checkObjectValue();
     });
 
-    it("should return true", function(){
+    it('should return true', function() {
       expect(subject.checkObjectValue()).to.be(true);
     });
 
-    it("should haven notified test that object was checked", function(){
+    it('should haven notified test that object was checked', function() {
       expect(wasChecked).to.be(true);
     });
   });
 
-  describe(".objectDetails", function(){
+  describe('.objectDetails', function() {
     var object, result;
 
-    beforeEach(function(){
+    beforeEach(function() {
       object = {'zomg': true};
       result = subject.objectDetails(object);
     });
 
-    it("should return given", function(){
+    it('should return given', function() {
       expect(result).to.be(object);
     });
 
-    it("should haven notified test details where given", function(){
+    it('should haven notified test details where given', function() {
       expect(detailsGiven).to.be(true);
     });
   });
 
-  describe(".add", function(){
+  describe('.add', function() {
 
-    beforeEach(function(){
+    beforeEach(function() {
       subject.add(object);
     });
-    
-    describe("when adding the same item twice", function(){
 
-      beforeEach(function(){
+    describe('when adding the same item twice', function() {
+
+      beforeEach(function() {
         subject.add(object);
       });
 
-      it("should not increment", function(){
+      it('should not increment', function() {
         expect(subject.length).to.be(1);
       });
     });
 
-    describe("when adding an additional item", function(){
-      beforeEach(function(){
+    describe('when adding an additional item', function() {
+      beforeEach(function() {
         subject.add({key: 'foo', value: 'bar'});
       });
 
-      it("should increment", function(){
+      it('should increment', function() {
         expect(subject.length).to.be(2);
       });
     });
 
-    it("should add object into ._items", function(){
+    it('should add object into ._items', function() {
       expect(subject._items[object.key]).to.be(object.value);
     });
 
-    it("should increment .length", function(){
+    it('should increment .length', function() {
       expect(subject.length).to.be(1);
     });
   });
 
-  describe(".remove", function(){
-    beforeEach(function(){
+  describe('.remove', function() {
+    beforeEach(function() {
       subject.add(object);
       expect(subject.has(object));
       subject.remove(object);
     });
 
-    describe("when removing an item that is not in the collection", function(){
-      beforeEach(function(){
+    describe('when removing an item that is not in the collection', function() {
+      beforeEach(function() {
         subject.remove(object);
       });
 
-      it("should not decrement .length", function(){
+      it('should not decrement .length', function() {
         expect(subject.length).to.be(0);
       });
     });
 
-    it("should decrement length", function(){
+    it('should decrement length', function() {
       expect(subject.length).to.be(0);
     });
 
-    it("should remove given object if its in items", function(){
+    it('should remove given object if its in items', function() {
       expect(subject.has(object)).to.be(false);
     });
 
-    it("should not fail when given object no in the collection", function(){
+    it('should not fail when given object no in the collection', function() {
       subject.remove({});
     });
   });
 
-  describe(".has", function(){
+  describe('.has', function() {
 
-    beforeEach(function(){
+    beforeEach(function() {
       subject.add(object);
     });
 
-    it("should return true when object has been added", function(){
+    it('should return true when object has been added', function() {
       expect(subject.has(object)).to.be(true);
     });
 
-    it("should return false when object has not been added", function(){
+    it('should return false when object has not been added', function() {
       expect(subject.has({})).to.be(false);
     });
   });
 
-  describe(".each", function(){
+  describe('.each', function() {
 
-    describe("when checkObjectValue returns false", function(){
+    describe('when checkObjectValue returns false', function() {
       var called;
 
-      beforeEach(function(){
+      beforeEach(function() {
         subject.add(object);
 
-        subject.checkObjectValue = function(object){
+        subject.checkObjectValue = function(object) {
           return false;
         };
 
         called = false;
-        subject.each(function(){
+        subject.each(function() {
           called = true;
         });
       });
 
-      it("should not call callback", function(){
+      it('should not call callback', function() {
         expect(called).to.be(false);
       });
 
 
     });
 
-    describe("when multiple elements are in the collection", function(){
+    describe('when multiple elements are in the collection', function() {
 
       var objects, eachCall = [];
 
-      beforeEach(function(){
+      beforeEach(function() {
         objects = [factory.object(), factory.object()];
         subject.add(objects[0]);
         subject.add(objects[1]);
         eachCall = [];
 
-        subject.each(function(){
+        subject.each(function() {
           eachCall.push(Array.prototype.slice.call(arguments));
         });
       });
 
-      it("should call each object with value, key", function(){
+      it('should call each object with value, key', function() {
         expect(eachCall[0][0]).to.be(objects[0].value);
         expect(eachCall[0][1]).to.be(objects[0].key);
 
         expect(eachCall[1][0]).to.be(objects[1].value);
         expect(eachCall[1][1]).to.be(objects[1].key);
       });
-      
+
     });
 
   });

@@ -1,31 +1,31 @@
 var Responder = require_lib('node/server/responder');
 
-describe("node/server/responder", function(){
+describe('node/server/responder', function() {
   var factory = require('../factory/websocket-server'),
       server, subject;
 
-  beforeEach(function(){
+  beforeEach(function() {
     server = factory.websocketServer();
     subject = new Responder();
 
     subject.enhance(server);
   });
 
-  describe("when server recieves a message", function(){
+  describe('when server recieves a message', function() {
     var socket, calledWith, data = ['test', {event: true}];
 
-    beforeEach(function(){
+    beforeEach(function() {
       calledWith = [];
       //primes server
       socket = server.emitClient();
-      server.respond = function(){
+      server.respond = function() {
         calledWith.push(arguments);
       };
 
       socket.emit('message', data);
     });
 
-    it("should respond to message from socket", function(){
+    it('should respond to message from socket', function() {
       expect(calledWith[0]).to.eql([data, socket]);
     });
 

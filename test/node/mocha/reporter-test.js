@@ -2,77 +2,77 @@ var Responder = require_lib('test-agent/responder').TestAgent.Responder,
     Reporter = require_lib('node/mocha/reporter'),
     Proxy = require_lib('node/mocha/runner-stream-proxy');
 
-describe("node/mocha/reporter", function(){
+describe('node/mocha/reporter', function() {
 
   var subject,
       report,
       mochaReporter;
 
-  beforeEach(function(){
+  beforeEach(function() {
     report = Responder;
     subject = new Reporter();
     mochaReporter = require('mocha').reporters[subject.defaultMochaReporter];
   });
 
-  it("should use .Spec as default reporter", function(){
+  it('should use .Spec as default reporter', function() {
     expect(subject.defaultMochaReporter).to.be('Spec');
   });
 
-  it("should be an instance of Responder", function(){
+  it('should be an instance of Responder', function() {
     expect(subject).to.be.a(Responder);
   });
 
-  describe("initialization", function(){
+  describe('initialization', function() {
 
-    it("should not have a .proxy", function(){
+    it('should not have a .proxy', function() {
       expect(subject.proxy).not.to.be.ok();
     });
 
-    describe("without a reporter", function(){
-      it("should use the default (Spec)", function(){
+    describe('without a reporter', function() {
+      it('should use the default (Spec)', function() {
         expect(subject.reporterClass).to.be(mochaReporter);
       });
     });
 
-    describe("with a reporter", function(){
+    describe('with a reporter', function() {
       var reporterClass = require('mocha').reporters.List;
 
-      beforeEach(function(){
+      beforeEach(function() {
         subject = new Reporter({
           reporterClass: reporterClass
         });
       });
 
-      it("should use given reporter", function(){
+      it('should use given reporter', function() {
         expect(subject.reporterClass).to.be(reporterClass);
       });
 
     });
   });
 
-  describe(".createRunner", function(){
-    beforeEach(function(){
+  describe('.createRunner', function() {
+    beforeEach(function() {
       subject.createRunner();
     });
 
-    it("should create .runner", function(){
+    it('should create .runner', function() {
       expect(subject.runner).to.be.a(Responder);
     });
 
-    it("should create the proxy", function(){
+    it('should create the proxy', function() {
       expect(subject.proxy).to.be.a(Responder);
       expect(subject.proxy.runner).to.be(subject.runner);
     });
 
-    it("should create the .reporter", function(){
+    it('should create the .reporter', function() {
       expect(subject.reporter).to.be.a(mochaReporter);
       expect(subject.reporter.runner).to.be(subject.runner);
     });
   });
 
-  describe(".respond", function(){
+  describe('.respond', function() {
 
-    describe("when start event is sent", function(){
+    describe('when start event is sent', function() {
 
       var respond,
           calledWith = [],
@@ -80,28 +80,28 @@ describe("node/mocha/reporter", function(){
           sentStartEvent = false,
           data = ['start', {total: 20}];
 
-      function sendStart(){
+      function sendStart() {
         subject.respond(Responder.stringify(data[0], data[1]));
       }
 
-      function sendsStartEvent(){
-        it("should send start event", function(){
+      function sendsStartEvent() {
+        it('should send start event', function() {
           expect(sentWith).to.be(subject);
           expect(sentStartEvent).to.be(true);
         });
       }
 
-      beforeEach(function(){
+      beforeEach(function() {
         sentWith = null;
         sentStartEvent = false;
         calledWith = [];
         respond = Proxy.prototype.respond;
-        Proxy.prototype.respond = function(){
+        Proxy.prototype.respond = function() {
           calledWith.push(Array.prototype.slice.call(arguments));
           respond.apply(this, arguments);
         };
 
-        subject.on('start', function(runner){
+        subject.on('start', function(runner) {
           sentStartEvent = true;
           sentWith = runner;
         });
@@ -109,32 +109,32 @@ describe("node/mocha/reporter", function(){
         sendStart();
       });
 
-      afterEach(function(){
+      afterEach(function() {
         Proxy.prototype.respond = respond;
       });
 
       sendsStartEvent();
 
-      it("should create proxy", function(){
+      it('should create proxy', function() {
         expect(subject.proxy).to.be.ok();
       });
 
-      it("should call proxy", function(){
+      it('should call proxy', function() {
         subject.respond(data);
 
         expect(calledWith[0][0]).to.eql(data);
       });
 
-      describe("the second time start is sent", function(){
+      describe('the second time start is sent', function() {
         var originalProxy;
-        beforeEach(function(){
+        beforeEach(function() {
           originalProxy = subject.proxy;
           sendStart();
         });
 
         sendsStartEvent();
 
-        it("should create a new proxy", function(){
+        it('should create a new proxy', function() {
           expect(subject.proxy).not.to.be(originalProxy);
         });
 

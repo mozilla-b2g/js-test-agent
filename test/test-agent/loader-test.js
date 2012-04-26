@@ -1,34 +1,34 @@
 require_lib('test-agent/loader.js');
 
-describe("TestAgent.Loader", function(){
+describe('TestAgent.Loader', function() {
 
   var targetIframe, subject, iframeContext,
       testArea;
 
 
-  beforeEach(function(){
+  beforeEach(function() {
     subject = new TestAgent.Loader();
     testArea = document.getElementById('test');
   });
 
-  function mockTime(){
+  function mockTime() {
     var now = Date.now;
 
-    beforeEach(function(){
+    beforeEach(function() {
       var time = this.currentTime = Date.now();
-      Date.now = function(){
+      Date.now = function() {
         return time;
       };
     });
 
-    afterEach(function(){
+    afterEach(function() {
       Date.now = now;
     });
   }
 
-  function createIframe(){
+  function createIframe() {
 
-    beforeEach(function(done){
+    beforeEach(function(done) {
       this.timeout(10000);
       var iframe = document.createElement('iframe');
 
@@ -37,7 +37,7 @@ describe("TestAgent.Loader", function(){
       //interesting to note this must come before the listener...
       testArea.appendChild(iframe);
 
-      iframe.contentWindow.addEventListener('DOMContentLoaded', function(){
+      iframe.contentWindow.addEventListener('DOMContentLoaded', function() {
         done();
       });
 
@@ -46,110 +46,110 @@ describe("TestAgent.Loader", function(){
     });
   }
 
-  function getScript(){
+  function getScript() {
     return iframeContext.document.querySelector('script:last-child');
   }
 
-  describe("initializer", function(){
+  describe('initializer', function() {
 
-    beforeEach(function(){
+    beforeEach(function() {
       subject = new TestAgent.Loader({
         prefix: 'foo/',
         bustCache: false
       });
     });
 
-    it("should set options from config", function(){
+    it('should set options from config', function() {
       expect(subject.prefix).to.be('foo/');
       expect(subject.bustCache).to.be(false);
     });
 
-    it("should have set the targetWindow to the global window by default", function(){
+    it('should have set the targetWindow to the global window by default', function() {
       expect(subject.targetWindow).to.be(window);
     });
 
-    it("should have .doneCallbacks", function(){
+    it('should have .doneCallbacks', function() {
       expect(subject.doneCallbacks).to.eql([]);
     });
 
-    it("should set .pending to 0", function(){
+    it('should set .pending to 0', function() {
       expect(subject.pending).to.be(0);
     });
 
-    it("should set ._cached to {}", function(){
+    it('should set ._cached to {}', function() {
       expect(subject._cached).to.be.a(Object);
     });
 
   });
 
-  describe(".targetWindow", function(){
+  describe('.targetWindow', function() {
 
-    describe("getting", function(){
+    describe('getting', function() {
 
-      it("should be window by default", function(){
+      it('should be window by default', function() {
         expect(subject.targetWindow).to.be(window);
       });
 
     });
 
-    describe("setting", function(){
+    describe('setting', function() {
       var iframeWindow;
 
-      beforeEach(function(){
+      beforeEach(function() {
         subject._cached = {foo: true};
         subject.targetWindow = iframeWindow = {};
       });
 
-      it("should clear cache", function(){
+      it('should clear cache', function() {
         expect(subject._cached).to.eql({});
       });
 
-      it("should set .targetWindow", function(){
+      it('should set .targetWindow', function() {
         expect(subject.targetWindow === iframeWindow).to.be(true);
       });
     });
   });
 
-  describe(".done", function(){
+  describe('.done', function() {
     var doneCalled = false,
-        fn = function(){
+        fn = function() {
           doneCalled = true;
         };
 
 
-    beforeEach(function(){
+    beforeEach(function() {
       doneCalled = false;
     });
 
-    beforeEach(function(){
+    beforeEach(function() {
       subject.pending = 10;
       subject.done(fn);
     });
 
-    it("should add callback to .doneCallbacks", function(){
+    it('should add callback to .doneCallbacks', function() {
       expect(subject.doneCallbacks[0]).to.be(fn);
     });
 
-    it("should not fire events", function(){
+    it('should not fire events', function() {
       expect(doneCalled).to.be(false);
     });
 
   });
 
-  describe("._decrementPending", function(){
-    beforeEach(function(){
+  describe('._decrementPending', function() {
+    beforeEach(function() {
       subject.pending = 2;
       subject._decrementPending();
     });
 
-    describe("when there are remaning pending items", function(){
-      it("should decrement pending", function(){
+    describe('when there are remaning pending items', function() {
+      it('should decrement pending', function() {
         expect(subject.pending).to.be(1);
       });
     });
 
-    describe("when trying to decrease pending zero", function(){
-      it("should not go into negative numbers", function(){
+    describe('when trying to decrease pending zero', function() {
+      it('should not go into negative numbers', function() {
         subject._decrementPending();
         subject._decrementPending();
         subject._decrementPending();
@@ -158,30 +158,30 @@ describe("TestAgent.Loader", function(){
       });
     });
 
-    describe("when there are no more pending items", function(){
+    describe('when there are no more pending items', function() {
       var doneCalled;
 
-      beforeEach(function(){
+      beforeEach(function() {
         doneCalled = false;
-        subject.done(function(){
+        subject.done(function() {
           doneCalled = true;
         });
         expect(doneCalled).to.be(false);
         subject._decrementPending();
       });
 
-      it("should fire done callbacks", function(){
+      it('should fire done callbacks', function() {
         expect(doneCalled).to.be(true);
       });
 
-      it("should remove callbacks as it fires them", function(){
+      it('should remove callbacks as it fires them', function() {
         expect(subject.doneCallbacks.length).to.be(0);
       });
     });
 
   });
 
-  describe(".require", function(){
+  describe('.require', function() {
     createIframe();
 
     var url = '/test/file.js',
@@ -189,14 +189,14 @@ describe("TestAgent.Loader", function(){
 
     mockTime();
 
-    function loadIframe(){
+    function loadIframe() {
       var urls = Array.prototype.slice.call(arguments);
       requireCallbacksFired = [];
 
-      beforeEach(function(done){
+      beforeEach(function(done) {
         this.timeout(10000);
-        urls.forEach(function(url){
-          subject.require(url, function(){
+        urls.forEach(function(url) {
+          subject.require(url, function() {
             requireCallbacksFired.push(arguments);
           });
         });
@@ -204,23 +204,23 @@ describe("TestAgent.Loader", function(){
         //should increment pending
         expect(subject.pending).to.be(1);
 
-        subject.done(function(){
+        subject.done(function() {
           done();
         });
       });
     }
 
-    describe("cross domain require", function(){
+    describe('cross domain require', function() {
       var url = 'https://raw.github.com/LearnBoost/expect.js/master/expect.js';
 
-      beforeEach(function(done){
+      beforeEach(function(done) {
         subject.require(url);
-        subject.done(function(){
+        subject.done(function() {
           done();
         });
       });
 
-      it("should successfully require and fire callbacks", function(){
+      it('should successfully require and fire callbacks', function() {
         expect(iframeContext.expect).to.be.ok();
       });
 
@@ -229,40 +229,40 @@ describe("TestAgent.Loader", function(){
     //intentionally twice
     loadIframe(url, url);
 
-    it("should fire one require callback", function(){
+    it('should fire one require callback', function() {
       expect(requireCallbacksFired.length).to.be(1);
     });
 
-    it("should have decremented pending", function(){
+    it('should have decremented pending', function() {
       expect(subject.pending).to.be(0);
     });
 
-    it("should have marked /test/file.js as cached", function(){
+    it('should have marked /test/file.js as cached', function() {
       expect(subject._cached[url]).to.be(true);
     });
 
-    it("should have only been included once", function(){
-      var scripts = iframeContext.document.querySelectorAll('script[src^="' + url +'"]');
+    it('should have only been included once', function() {
+      var scripts = iframeContext.document.querySelectorAll('script[src^="' + url + '"]');
       expect(scripts.length).to.be(1);
     });
 
-    it("should have added script to dom", function(){
+    it('should have added script to dom', function() {
       var script = getScript();
       expect(script.src).to.contain(url);
       expect(script.async).to.be(false);
     });
 
-    it("should include cache bust query string", function(){
+    it('should include cache bust query string', function() {
       var script = getScript();
       expect(script.src).to.contain('?time=' + String(this.currentTime));
     });
 
 
-    it("should execute script in the context of the iframe", function(){
+    it('should execute script in the context of the iframe', function() {
       expect(iframeContext.TEST_FILE_WAS_LOADED).to.be(true);
     });
 
-    it("should be using iframe window context (in this test)", function(){
+    it('should be using iframe window context (in this test)', function() {
       //unsual case where we need to use '===' over the to.be matcher
       expect(subject.targetWindow === targetIframe.contentWindow).to.be(true);
     });
