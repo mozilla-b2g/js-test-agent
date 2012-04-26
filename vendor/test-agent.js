@@ -1,17 +1,17 @@
-(function(exports){
-  if(typeof(exports.TestAgent) === 'undefined'){
+(function(exports) {
+  if (typeof(exports.TestAgent) === 'undefined') {
     exports.TestAgent = {};
   }
 
   /**
    * Constructor
    *
-   * @param {Object} list of events to add onto responder
+   * @param {Object} list of events to add onto responder.
    */
-  var Responder = exports.TestAgent.Responder = function(events){
+  var Responder = exports.TestAgent.Responder = function Responder(events) {
     this.events = {};
 
-    if(typeof(events) !== 'undefined'){
+    if (typeof(events) !== 'undefined') {
       this.addEventListener(events);
     }
   };
@@ -20,25 +20,25 @@
    * Stringifies request to websocket
    *
    *
-   * @param {String} command command name
-   * @param {Object} data object to be sent over the wire
-   * @return {String} json object
+   * @param {String} command command name.
+   * @param {Object} data object to be sent over the wire.
+   * @return {String} json object.
    */
-  Responder.stringify = function(command, data){
+  Responder.stringify = function stringify(command, data) {
     return JSON.stringify([command, data]);
   };
 
   /**
    * Parses request from WebSocket.
    *
-   * @param {String} json json string to translate
+   * @param {String} json json string to translate.
    * @return {Object} object where .data is json data and .command is command name.
    */
-  Responder.parse = function(json){
+  Responder.parse = function parse(json) {
     var data;
     try {
-      data = (json.forEach)? json : JSON.parse(json);
-    } catch(e){
+      data = (json.forEach) ? json : JSON.parse(json);
+    } catch (e) {
       throw new Error("Could not parse json: '" + json + '"');
     }
 
@@ -61,10 +61,10 @@
      * Recieves json string event and dispatches an event.
      *
      * @param {String} json
-     * @param {Object} params... option number of params to pass to emit
-     * @return {Object} result of WebSocketCommon.parse
+     * @param {Object} params... option number of params to pass to emit.
+     * @return {Object} result of WebSocketCommon.parse.
      */
-    respond: function(json){
+    respond: function respond(json) {
       var event = Responder.parse(json),
           args = Array.prototype.slice.call(arguments).slice(1);
 
@@ -82,15 +82,15 @@
      * Adds an event listener to this object.
      *
      *
-     * @param {String} type event name
+     * @param {String} type event name.
      * @param {String} callback
      */
-    addEventListener: function(type, callback){
+    addEventListener: function addEventListener(type, callback) {
       var event;
 
-      if(typeof(callback) === 'undefined' && typeof(type) === 'object'){
-        for(event in type){
-          if(type.hasOwnProperty(event)){
+      if (typeof(callback) === 'undefined' && typeof(type) === 'object') {
+        for (event in type) {
+          if (type.hasOwnProperty(event)) {
             this.addEventListener(event, type[event]);
           }
         }
@@ -98,7 +98,7 @@
         return this;
       }
 
-      if(!(type in this.events)){
+      if (!(type in this.events)) {
         this.events[type] = [];
       }
 
@@ -116,16 +116,16 @@
      * @param {String} eventName
      * @param {Arg...}
      */
-    emit: function(){
+    emit: function emit() {
       var args = Array.prototype.slice.call(arguments),
           event = args.shift(),
           eventList,
           self = this;
 
-      if(event in this.events){
+      if (event in this.events) {
         eventList = this.events[event];
 
-        eventList.forEach(function(callback){
+        eventList.forEach(function(callback) {
           callback.apply(self, args);
         });
       }
@@ -139,8 +139,8 @@
      *
      * @param {String} event
      */
-    removeAllEventListeners: function(name){
-      if(name in this.events){
+    removeAllEventListeners: function removeAllEventListeners(name) {
+      if (name in this.events) {
         //reuse array
         this.events[name].length = 0;
       }
@@ -153,20 +153,20 @@
      * and callback function.
      *
      *
-     * @param {String} eventName event name
+     * @param {String} eventName event name.
      * @param {Function} callback
      */
-    removeEventListener: function(name, callback){
+    removeEventListener: function removeEventListener(name, callback) {
       var i, length, events;
 
-      if(!(name in this.events)){
+      if (!(name in this.events)) {
         return false;
       }
 
       events = this.events[name];
 
-      for(i = 0, length = events.length; i < length; i++){
-        if(events[i] && events[i] === callback){
+      for (i = 0, length = events.length; i < length; i++) {
+        if (events[i] && events[i] === callback) {
           events.splice(i, 1);
           return true;
         }
@@ -180,30 +180,30 @@
   Responder.prototype.on = Responder.prototype.addEventListener;
 
 }(
-  (typeof(window) === 'undefined')? module.exports : window
+  (typeof(window) === 'undefined') ? module.exports : window
 ));
 
-(function(window){
+(function(window) {
 
   'use strict';
 
-  if(typeof(window.TestAgent) === 'undefined'){
+  if (typeof(window.TestAgent) === 'undefined') {
     window.TestAgent = {};
   }
 
-  var Loader = window.TestAgent.Loader = function(options){
+  var Loader = window.TestAgent.Loader = function Loader(options) {
     var key;
 
     this._cached = {};
     this.doneCallbacks = [];
     this.pending = 0;
 
-    if(typeof(options) === 'undefined'){
+    if (typeof(options) === 'undefined') {
       options = {};
     }
 
-    for(key in options){
-      if(options.hasOwnProperty(key)){
+    for (key in options) {
+      if (options.hasOwnProperty(key)) {
         this[key] = options[key];
       }
     }
@@ -245,11 +245,11 @@
      */
     _cached: null,
 
-    get targetWindow(){
+    get targetWindow() {
       return this._targetWindow;
     },
 
-    set targetWindow(value){
+    set targetWindow(value) {
       this._targetWindow = value;
       this._cached = {};
     },
@@ -257,19 +257,19 @@
     /**
      * _decrements pending and fires done callbacks
      */
-    _decrementPending: function(){
-      if(this.pending > 0){
+    _decrementPending: function _decrementPending() {
+      if (this.pending > 0) {
         this.pending--;
       }
 
-      if(this.pending <= 0){
+      if (this.pending <= 0) {
         this._fireCallbacks();
       }
     },
 
-    _fireCallbacks: function(){
+    _fireCallbacks: function _fireCallbacks() {
       var callback;
-      while((callback = this.doneCallbacks.shift())){
+      while ((callback = this.doneCallbacks.shift())) {
         callback();
       }
     },
@@ -280,7 +280,7 @@
      *
      * @param {Function} callback
      */
-    done: function(callback){
+    done: function done(callback) {
       this.doneCallbacks.push(callback);
       return this;
     },
@@ -293,19 +293,19 @@
      * @param {String} url
      * @param {String} callback
      */
-    require: function(url, callback){
+    require: function require(url, callback) {
       var prefix = this.prefix,
           suffix = '',
           self = this,
           element,
           document = this.targetWindow.document;
 
-      if(url in this._cached){
+      if (url in this._cached) {
         //url is cached we are good
         return;
       }
 
-      if(this.bustCache){
+      if (this.bustCache) {
         suffix = '?time=' + String(Date.now()) + '&rand=' + String(Math.random() * 1000);
       }
 
@@ -318,8 +318,8 @@
       element.src = url;
       element.async = false;
       element.type = 'text/javascript';
-      element.onload = function(){
-        if(callback){
+      element.onload = function scriptOnLoad() {
+        if (callback) {
           callback();
         }
         self._decrementPending();
@@ -333,15 +333,15 @@
   };
 
 }(this));
-(function(window){
+(function(window) {
 
   'use strict';
 
-  if(typeof(window.TestAgent) === 'undefined'){
+  if (typeof(window.TestAgent) === 'undefined') {
     window.TestAgent = {};
   }
 
-  var Sandbox = window.TestAgent.Sandbox = function(url){
+  var Sandbox = window.TestAgent.Sandbox = function Sandbox(url) {
     this.url = url;
   };
 
@@ -360,7 +360,7 @@
     /**
      * URL for the iframe sandbox.
      *
-     * @return String
+     * @return String.
      */
     url: null,
 
@@ -368,18 +368,18 @@
      * Returns iframe element.
      *
      *
-     * @return DOMElement
+     * @return DOMElement.
      */
-    getElement: function(){
+    getElement: function getElement() {
       var iframe;
-      if(!this._element){
+      if (!this._element) {
         iframe = this._element = window.document.createElement('iframe');
         iframe.src = this.url + '?time=' + String(Date.now());
       }
       return this._element;
     },
 
-    run: function(callback){
+    run: function run(callback) {
       //cleanup old sandboxes
       this.destroy();
 
@@ -388,16 +388,16 @@
 
       //this must come before the listener
       window.document.body.appendChild(element);
-      element.contentWindow.addEventListener('DOMContentLoaded', function(){
+      element.contentWindow.addEventListener('DOMContentLoaded', function() {
         self.ready = true;
         callback.call(this);
       });
     },
 
-    destroy: function(){
+    destroy: function destroy() {
       var el;
 
-      if(!this.ready){
+      if (!this.ready) {
         return false;
       }
 
@@ -411,8 +411,8 @@
       return true;
     },
 
-    getWindow: function(){
-      if(!this.ready){
+    getWindow: function getWindow() {
+      if (!this.ready) {
         return false;
       }
 
@@ -422,19 +422,19 @@
   };
 
 }(this));
-(function(window){
+(function(window) {
 
   'use strict';
 
-  if(typeof(window.TestAgent) === 'undefined'){
+  if (typeof(window.TestAgent) === 'undefined') {
     window.TestAgent = {};
   }
 
-  var Server = window.TestAgent.Config = function(options){
+  var Server = window.TestAgent.Config = function Config(options) {
     var key;
 
-    for(key in options){
-       if(options.hasOwnProperty(key)){
+    for (key in options) {
+       if (options.hasOwnProperty(key)) {
         this[key] = options[key];
        }
     }
@@ -471,12 +471,12 @@
     /**
      * Parse XHR response
      *
-     * @param Object xhr xhr object
+     * @param Object xhr xhr object.
      */
-    _parseResponse: function(xhr){
+    _parseResponse: function _parseResponse(xhr) {
       var response;
 
-      if(xhr.responseText){
+      if (xhr.responseText) {
         response = JSON.parse(xhr.responseText);
         //only return files for now...
         return response;
@@ -491,15 +491,15 @@
      * Loads list of files from url
      *
      */
-    load: function(callback){
+    load: function load(callback) {
       var xhr = new XMLHttpRequest(),
           self = this,
           response;
 
       xhr.open('GET', this.url, true);
-      xhr.onreadystatechange = function(){
-        if(xhr.readyState === 4){
-          if(xhr.status === 200 || xhr.status === 0){
+      xhr.onreadystatechange = function onReadyStateChange() {
+        if (xhr.readyState === 4) {
+          if (xhr.status === 200 || xhr.status === 0) {
             response = self._parseResponse(xhr);
 
             self.ready = true;
@@ -507,7 +507,7 @@
 
             callback.call(this, response);
           } else {
-            throw new Error('Could not fetch tests from "' + self.url  + '"');
+            throw new Error('Could not fetch tests from "' + self.url + '"');
           }
         } else {
         }
@@ -523,15 +523,15 @@
 }(this));
 
 //depends on TestAgent.Responder
-(function(exports){
-  if(typeof(exports.TestAgent) === 'undefined'){
+(function(exports) {
+  if (typeof(exports.TestAgent) === 'undefined') {
     exports.TestAgent = {};
   }
 
   var Native, Responder;
 
   //Hack Arounds for node
-  if(typeof(window) === 'undefined'){
+  if (typeof(window) === 'undefined') {
     Native = require('ws');
     Responder = require('./responder').TestAgent.Responder;
   }
@@ -559,10 +559,10 @@
    *
    * @param {Object} options
    */
-  var Client = exports.TestAgent.WebsocketClient = function(options){
+  var Client = exports.TestAgent.WebsocketClient = function WebsocketClient(options) {
     var key;
-    for(key in options){
-      if(options.hasOwnProperty(key)){
+    for (key in options) {
+      if (options.hasOwnProperty(key)) {
         this[key] = options[key];
       }
     }
@@ -573,7 +573,7 @@
     this.on('open', this._clearRetries.bind(this));
   };
 
-  Client.RetryError = function(){
+  Client.RetryError = function RetryError() {
     Error.apply(this, arguments);
   };
 
@@ -590,16 +590,16 @@
   Client.prototype.retryLimit = Infinity;
   Client.prototype.retryTimeout = 3000;
 
-  Client.prototype.start = function(){
+  Client.prototype.start = function start() {
     var i, event;
 
-    if(this.retry && this.retries >= this.retryLimit){
+    if (this.retry && this.retries >= this.retryLimit) {
       throw new Client.RetryError('Retry limit has been reach retried ' + String(this.retries) + ' times');
     }
 
     this.socket = new this.Native(this.url);
 
-    for(i = 0; i < this.proxyEvents.length; i++){
+    for (i = 0; i < this.proxyEvents.length; i++) {
       event = this.proxyEvents[i];
       this.socket.addEventListener(event, this._proxyEvent.bind(this, event));
     }
@@ -613,41 +613,41 @@
    * @param {String} event
    * @param {String} data
    */
-  Client.prototype.send = function(event, data){
+  Client.prototype.send = function send(event, data) {
     this.socket.send(this.stringify(event, data));
   };
 
-  Client.prototype._incrementRetry = function(){
-    if(this.retry){
+  Client.prototype._incrementRetry = function _incrementRetry() {
+    if (this.retry) {
       this.retries++;
       setTimeout(this.start.bind(this), this.retryTimeout);
     }
   };
 
-  Client.prototype._processMessage = function(message){
-    if(message.data){
+  Client.prototype._processMessage = function _processMessage(message) {
+    if (message.data) {
       message = message.data;
     }
     this.respond(message, this);
   };
 
-  Client.prototype._clearRetries = function(){
+  Client.prototype._clearRetries = function _clearRetries() {
     this.retries = 0;
   };
 
-  Client.prototype._proxyEvent = function(){
+  Client.prototype._proxyEvent = function _proxyEvent() {
     this.emit.apply(this, arguments);
   };
 
 }(
-  (typeof(window) === 'undefined')? module.exports : window
+  (typeof(window) === 'undefined') ? module.exports : window
 ));
-(function(window){
-  if(typeof(window.TestAgent) === 'undefined'){
+(function(window) {
+  if (typeof(window.TestAgent) === 'undefined') {
     window.TestAgent = {};
   }
 
-  if(typeof(window.TestAgent.Mocha) === 'undefined'){
+  if (typeof(window.TestAgent.Mocha) === 'undefined') {
     window.TestAgent.Mocha = {};
   }
 
@@ -656,27 +656,27 @@
   //Credit: mocha - https://github.com/visionmedia/mocha/blob/master/lib/reporters/base.js#L194
   function Base(runner) {
     var self = this
-      , stats = this.stats = { suites: 0, tests: 0, passes: 0, pending: 0, failures: 0 }
+, stats = this.stats = { suites: 0, tests: 0, passes: 0, pending: 0, failures: 0 }
       , failures = this.failures = [];
 
     if (!runner) return;
     this.runner = runner;
 
-    runner.on('start', function(){
+    runner.on('start', function onStart() {
       stats.start = new Date;
     });
 
-    runner.on('suite', function(suite){
+    runner.on('suite', function onSuite(suite) {
       stats.suites = stats.suites || 0;
       suite.root || stats.suites++;
     });
 
-    runner.on('test end', function(test){
+    runner.on('test end', function onTestEnd(test) {
       stats.tests = stats.tests || 0;
       stats.tests++;
     });
 
-    runner.on('pass', function(test){
+    runner.on('pass', function onPass(test) {
       stats.passes = stats.passes || 0;
 
       var medium = Base.slow / 2;
@@ -689,19 +689,19 @@
       stats.passes++;
     });
 
-    runner.on('fail', function(test, err){
+    runner.on('fail', function onFail(test, err) {
       stats.failures = stats.failures || 0;
       stats.failures++;
       test.err = err;
       failures.push(test);
     });
 
-    runner.on('end', function(){
+    runner.on('end', function onEnd() {
       stats.end = new Date;
       stats.duration = new Date - stats.start;
     });
 
-    runner.on('pending', function(){
+    runner.on('pending', function onPending() {
       stats.pending++;
     });
   }
@@ -709,13 +709,13 @@
   window.TestAgent.Mocha.ReporterBase = Base;
 
 }(this));
-(function(window){
+(function(window) {
 
-  if(typeof(window.TestAgent) === 'undefined'){
+  if (typeof(window.TestAgent) === 'undefined') {
     window.TestAgent = {};
   }
 
-  if(typeof(window.TestAgent.Mocha) === 'undefined'){
+  if (typeof(window.TestAgent.Mocha) === 'undefined') {
     window.TestAgent.Mocha = {};
   }
 
@@ -724,7 +724,7 @@
       log = console.log.bind(console);
 
   MochaReporter.console = window.console;
-  MochaReporter.send = function(){};
+  MochaReporter.send = function mochaReporterSend() {};
 
   //TODO -- Buffer console.log calls
 
@@ -738,68 +738,68 @@
         suiteTitle,
         currentTest;
 
-    MochaReporter.console.log = function(){
+    MochaReporter.console.log = function consoleLogShim() {
       //real console log
       log.apply(this, arguments);
 
       //for server
 
-      var stack, messages = Array.prototype.slice.call(arguments).map(function(item){
-        if(!item){
+      var stack, messages = Array.prototype.slice.call(arguments).map(function(item) {
+        if (!item) {
           return item;
         }
-        return (item.toString)? item.toString() : item;
+        return (item.toString) ? item.toString() : item;
       });
 
       try {
         throw new Error();
-      } catch (e){
+      } catch (e) {
         stack = e.stack;
       }
 
       //re-orgnaize the stack to exlude the above
-      stack = stack.split("\n").map(function(e){
+      stack = stack.split('\n').map(function(e) {
         return e.trim().replace(/^at /, '');
       });
 
       stack.splice(0, 1);
-      stack = stack.join("\n");
+      stack = stack.join('\n');
 
       //this is temp
       MochaReporter.send(JSON.stringify(['log', {messages: messages, stack: stack}]));
     };
 
-    runner.on('suite', function(suite){
+    runner.on('suite', function onSuite(suite) {
       indentation++;
-      MochaReporter.send(JSON.stringify(['suite', jsonExport(suite, { indentation: indentation }) ]));
+      MochaReporter.send(JSON.stringify(['suite', jsonExport(suite, { indentation: indentation })]));
     });
 
-    runner.on('suite end', function(suite){
-      MochaReporter.send(JSON.stringify(['suite end', jsonExport(suite, { indentation: indentation }) ]));
+    runner.on('suite end', function onSuiteEnd(suite) {
+      MochaReporter.send(JSON.stringify(['suite end', jsonExport(suite, { indentation: indentation })]));
       indentation--;
     });
 
-    runner.on('test', function(test){
-      MochaReporter.send(JSON.stringify(['test', jsonExport(test) ]));
+    runner.on('test', function onTest(test) {
+      MochaReporter.send(JSON.stringify(['test', jsonExport(test)]));
     });
 
-    runner.on('test end', function(test){
-      MochaReporter.send(JSON.stringify(['test end', jsonExport(test) ]));
+    runner.on('test end', function onTestEnd(test) {
+      MochaReporter.send(JSON.stringify(['test end', jsonExport(test)]));
     });
 
-    runner.on('start', function(){
-      MochaReporter.send( JSON.stringify(['start', { total: total }]) );
+    runner.on('start', function onStart() {
+      MochaReporter.send(JSON.stringify(['start', { total: total }]));
     });
 
-    runner.on('pass', function(test){
+    runner.on('pass', function onPass(test) {
       MochaReporter.send(JSON.stringify(['pass', jsonExport(test)]));
     });
 
-    runner.on('fail', function(test, err){
+    runner.on('fail', function onFail(test, err) {
       MochaReporter.send(JSON.stringify(['fail', jsonExport(test, {err: jsonErrorExport(err) })]));
     });
 
-    runner.on('end', function(){
+    runner.on('end', function onEnd() {
       MochaReporter.send(JSON.stringify(['end', self.stats]));
     });
   }
@@ -813,7 +813,7 @@
     'state'
   ];
 
-  function jsonErrorExport(err){
+  function jsonErrorExport(err) {
     var result = {};
 
     result.stack = err.stack;
@@ -829,12 +829,12 @@
   function jsonExport(object, additional) {
     var result = {}, key;
 
-    exportKeys.forEach(function(key){
+    exportKeys.forEach(function(key) {
       var value;
-      if(key in object){
+      if (key in object) {
         value = object[key];
 
-        if(typeof(value) === 'function'){
+        if (typeof(value) === 'function') {
           result[key] = object[key]();
         } else {
           result[key] = value;
@@ -842,9 +842,9 @@
       }
     });
 
-    if(typeof(additional) !== 'undefined'){
-      for(key in additional){
-        if(additional.hasOwnProperty(key)){
+    if (typeof(additional) !== 'undefined') {
+      for (key in additional) {
+        if (additional.hasOwnProperty(key)) {
           result[key] = additional[key];
         }
       }
@@ -857,15 +857,15 @@
 
 }(this));
 
-(function(window){
+(function(window) {
 
-  if(typeof(window.TestAgent) === 'undefined'){
+  if (typeof(window.TestAgent) === 'undefined') {
     window.TestAgent = {};
   }
 
-  TestAgent.BrowserWorker = function(options){
+  TestAgent.BrowserWorker = function BrowserWorker(options) {
 
-    if(typeof(options) === 'undefined'){
+    if (typeof(options) === 'undefined') {
       options = {};
     }
 
@@ -914,12 +914,12 @@
    *
    * @param {Function} callback
    */
-  proto.createSandbox = function(callback){
+  proto.createSandbox = function createSandbox(callback) {
     var self = this;
-    this.sandbox.run(function(){
+    this.sandbox.run(function onSandboxRun() {
       self.loader.targetWindow = this;
-      if(callback){
-        if(!('require' in this)){
+      if (callback) {
+        if (!('require' in this)) {
           this.require = self.loader.require.bind(self.loader);
         }
         callback.call(this, self.loader);
@@ -928,7 +928,7 @@
     });
   };
 
-  proto._emitTestComplete = function(){
+  proto._emitTestComplete = function _emitTestComplete() {
     var args = Array.prototype.slice.call(arguments);
     args.unshift('run tests complete');
     this.emit.apply(this, args);
@@ -945,7 +945,7 @@
    * @param {Function} callback
    * @chainable
    */
-  proto.addTestsProcessor = function(callback){
+  proto.addTestsProcessor = function addTestsProcessor(callback) {
     this._testsProcessor.push(callback);
   };
 
@@ -956,13 +956,13 @@
    *
    * @param {Array} tests
    */
-  proto._processTests = function(tests){
+  proto._processTests = function _processTests(tests) {
     var result = tests,
         reducers = this._testsProcessor,
         length = reducers.length,
         i = 0;
 
-    for(; i < length; i++){
+    for (; i < length; i++) {
       result = reducers[i](result);
     }
 
@@ -974,15 +974,15 @@
    *
    * @param {Array} tests
    */
-  proto.runTests = function(tests){
+  proto.runTests = function runTests(tests) {
     var self = this,
         done = this._emitTestComplete.bind(this);
 
-    if(!this.testRunner){
-      throw new Error("Worker must be provided a .testRunner method");
+    if (!this.testRunner) {
+      throw new Error('Worker must be provided a .testRunner method');
     }
 
-    this.createSandbox(function(){
+    this.createSandbox(function createSandbox() {
       self.testRunner(self, self._processTests(tests), done);
     });
   };
@@ -991,7 +991,7 @@
    * Enhances worker with functionality from class.
    *
    *    Enhancement = function(options){}
-   *    Enhancement.prototype.enhance = function(server){
+   *    Enhancement.prototype.enhance = function enhance(server){
    *      //do stuff
    *    }
    *
@@ -1003,33 +1003,33 @@
    * @param {Object} options
    * @chainable
    */
-  proto.use = function(enhancement, options){
+  proto.use = function use(enhancement, options) {
     new enhancement(options).enhance(this);
 
     return this;
   };
 
 }(this));
-(function(window){
-  function MochaDriver (options) {
+(function(window) {
+  function MochaDriver(options) {
     var key;
 
-    if(typeof(options) === 'undefined'){
+    if (typeof(options) === 'undefined') {
       options = {};
     }
 
-    for(key in options){
-      if(options.hasOwnProperty(key)){
+    for (key in options) {
+      if (options.hasOwnProperty(key)) {
         this[key] = options[key];
       }
     }
   }
 
-  MochaDriver.createMutliReporter = function(){
+  MochaDriver.createMutliReporter = function createMultiReporter() {
     var reporters = Array.prototype.slice.call(arguments);
 
-    return function(runner){
-      reporters.forEach(function(Report){
+    return function(runner) {
+      reporters.forEach(function(Report) {
         new Report(runner);
       });
     };
@@ -1040,23 +1040,23 @@
     testHelperUrl: './test/helper.js',
     mochaUrl: './vendor/mocha/mocha.js',
 
-    enhance: function(worker){
+    enhance: function enhance(worker) {
       this.worker = worker;
       worker.testRunner = this._testRunner.bind(this);
       worker.on('run tests', this._onRunTests.bind(this));
     },
 
-    _onRunTests: function(data){
+    _onRunTests: function _onRunTests(data) {
       this.worker.runTests(data.tests || []);
     },
 
-    getReporter: function(box){
+    getReporter: function getReporter(box) {
       var stream = TestAgent.Mocha.JsonStreamReporter,
           self = this;
 
       stream.console = box.console;
 
-      stream.send = function(line){
+      stream.send = function send(line) {
         self.worker.send('test data', line);
       };
 
@@ -1066,15 +1066,15 @@
       );
     },
 
-    _testRunner: function(worker, tests, done){
+    _testRunner: function _testRunner(worker, tests, done) {
       var box = worker.sandbox.getWindow(),
           self = this;
 
-      worker.loader.done(function(){
+      worker.loader.done(function onDone() {
         box.mocha.run(done);
       });
 
-      box.require(this.mochaUrl, function(){
+      box.require(this.mochaUrl, function onRequireMocha() {
         //setup mocha
         box.mocha.setup({
           ui: self.ui,
@@ -1084,7 +1084,7 @@
 
       box.require(this.testHelperUrl);
 
-      tests.forEach(function(test){
+      tests.forEach(function(test) {
         box.require(test);
       });
     }
@@ -1094,14 +1094,14 @@
   window.TestAgent.BrowserWorker.MochaDriver = MochaDriver;
 
 }(this));
-(function(window){
+(function(window) {
 
 
   var Worker = window.TestAgent.BrowserWorker;
 
 
-  Worker.Config = function(options){
-    if(typeof(options) === 'undefined'){
+  Worker.Config = function Config(options) {
+    if (typeof(options) === 'undefined') {
       options = {};
     }
 
@@ -1109,14 +1109,14 @@
   };
 
   Worker.Config.prototype = {
-    enhance: function(worker){
+    enhance: function enhance(worker) {
       worker.config = this._config.bind(this, worker, this.config);
     },
 
-    _config: function(worker, config, callback){
-      config.load(function(data){
+    _config: function _config(worker, config, callback) {
+      config.load(function(data) {
         worker.emit('config', data);
-        if(callback){
+        if (callback) {
           callback(data);
         }
       });
@@ -1125,11 +1125,11 @@
   };
 
 }(this));
-(function(window){
+(function(window) {
 
   var FORMAT_REGEX = /%([0-9])?s/g;
 
-  function format(){
+  function format() {
     var i = 0,
         str,
         args = Array.prototype.slice.call(arguments),
@@ -1137,7 +1137,7 @@
 
     str = args.shift();
 
-    result = str.replace(FORMAT_REGEX, function(match, pos){
+    result = str.replace(FORMAT_REGEX, function(match, pos) {
       var index = parseInt(pos || i++, 10);
       return args[index];
     });
@@ -1145,7 +1145,7 @@
     return result;
   }
 
-  function fragment(){
+  function fragment() {
     var string = format.apply(this, arguments),
         element = document.createElement('div');
 
@@ -1153,10 +1153,10 @@
     return element.firstChild;
   }
 
-  var TestUi = window.TestAgent.BrowserWorker.TestUi = function(options){
+  var TestUi = window.TestAgent.BrowserWorker.TestUi = function TestUi(options) {
     var selector;
 
-    if(typeof(options) === 'undefined'){
+    if (typeof(options) === 'undefined') {
       options = {};
     }
 
@@ -1173,12 +1173,12 @@
       testRun: '<button class="run-tests">Execute</button>'
     },
 
-    enhance: function(worker){
+    enhance: function enhance(worker) {
       this.worker = worker;
       this.worker.on('config', this.onConfig.bind(this));
     },
 
-    onConfig: function(data){
+    onConfig: function onConfig(data) {
       //purge elements
       var elements = this.element.getElementsByTagName('*'),
           element,
@@ -1186,14 +1186,14 @@
           i = 0,
           parent;
 
-      for(; i < elements.length; i++){
+      for (; i < elements.length; i++) {
         element = elements[i];
         element.parentNode.removeChild(element);
       }
 
       parent = fragment(templates.testList);
 
-      data.tests.forEach(function(test){
+      data.tests.forEach(function(test) {
         parent.appendChild(fragment(
           templates.testItem,
           test,
@@ -1210,18 +1210,18 @@
       this.initDomEvents();
     },
 
-    initDomEvents: function(){
+    initDomEvents: function initDomEvents() {
       var ul = this.element.querySelector('ul'),
           button = this.element.querySelector('button'),
           self = this,
           activeClass = ' active';
 
-      ul.addEventListener('click', function(e){
+      ul.addEventListener('click', function(e) {
         var target = e.target,
             url = target.getAttribute('data-url');
 
-        if(url){
-          if(self.queue[url]){
+        if (url) {
+          if (self.queue[url]) {
             target.className = target.className.replace(activeClass, '');
             delete self.queue[url];
           } else {
@@ -1231,11 +1231,11 @@
         }
       });
 
-      button.addEventListener('click', function(){
+      button.addEventListener('click', function onTestClick() {
         var tests = [], key;
 
-        for(key in self.queue){
-          if(self.queue.hasOwnProperty(key)){
+        for (key in self.queue) {
+          if (self.queue.hasOwnProperty(key)) {
             tests.push(key);
           }
         }
