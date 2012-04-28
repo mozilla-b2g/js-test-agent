@@ -6,8 +6,17 @@ describe('node/server/runner-growl', function() {
   var subject,
       server,
       factory = require('../factory/websocket-server'),
-      reporter, elipse;
+      reporter, elipse,
+      messages = [];
 
+  function mockNotify() {
+    beforeEach(function() {
+      messages.length = 0;
+      subject.notify = function() {
+        messages.push(arguments);
+      }
+    });
+  }
 
   beforeEach(function() {
     subject = new RunnerGrowl();
@@ -34,18 +43,29 @@ describe('node/server/runner-growl', function() {
     });
   });
 
+  describe('when server emits .error', function() {
+    var data = { line: 10, filename: 'file', message: 'error' };
+    mockNotify();
+
+    beforeEach(function() {
+      server.emit('error', data);
+    });
+
+    it('should notify as error', function() {
+      var notice = messages[0];
+      expect(notice[0]).to.contain(data.filename);
+      expect(notice[1].image).to.be(subject.images.fail);
+      expect(notice[1].title).to.match(/syntax/i);
+    });
+
+  });
+
   describe('when runner emits .end', function() {
     var reportProxy,
-        messages = [],
         startDetails = {total: 10},
         startData = ['start', startDetails];
 
-    beforeEach(function() {
-      messages = [];
-      subject.notify = function() {
-        messages.push(arguments);
-      }
-    });
+    mockNotify();
 
     beforeEach(function() {
       server.on('test runner', function(proxy) {
