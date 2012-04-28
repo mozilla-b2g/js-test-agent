@@ -229,8 +229,8 @@ describe('TestAgent.Loader', function() {
     //intentionally twice
     loadIframe(url, url);
 
-    it('should fire one require callback', function() {
-      expect(requireCallbacksFired.length).to.be(1);
+    it('should fire both require callbacks', function() {
+      expect(requireCallbacksFired.length).to.be(2);
     });
 
     it('should have decremented pending', function() {
