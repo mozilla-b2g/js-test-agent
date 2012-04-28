@@ -25,9 +25,6 @@ package :
 	cp node_modules/mocha/mocha.js ./vendor/mocha/
 	cp node_modules/mocha/mocha.css ./vendor/mocha/
 	cp node_modules/expect.js/expect.js ./vendor/
-	cp $(DEV_FILE) ./vendor/test-agent.js
-	# Compat
-	cp $(DEV_FILE) ./vendor/test-agent-dev.js
 
 test_config:
 	sh ./tools/create-config.sh $(TEST_CONFIG) $(TEST_DIR) \*-test.js /test/test-agent

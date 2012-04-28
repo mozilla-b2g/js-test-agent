@@ -9,7 +9,7 @@
   });
 
   worker.use(TestAgent.BrowserWorker.MochaDriver, {
-    mochaUrl: '/vendor/mocha/mocha.js',
+    mochaUrl: '/mocha/mocha.js',
     testHelperUrl: '/test/helper.js'
   });
 
