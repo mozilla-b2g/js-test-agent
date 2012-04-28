@@ -67,7 +67,6 @@ describe('test-agent/browser-worker/test-ui', function() {
 
       it('should create error ui and show it', function() {
         var content = subject.errorElement.innerHTML;
-        console.log(content);
         expect(content).to.contain('some');
         expect(content).to.contain('foobar');
         expect(content).to.contain('20');
