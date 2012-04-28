@@ -1,7 +1,7 @@
-(function(window){
+(function(window) {
 
   var worker = new TestAgent.BrowserWorker({
-        sandbox: '/test-agent/sandbox.html',
+        sandbox: '/test-agent/sandbox.html'
       });
 
   worker.use(TestAgent.BrowserWorker.Config, {
@@ -21,11 +21,11 @@
       worker.loader.require('/vendor/expect.js');
     },
 
-    'open': function(){
+    'open': function() {
       console.log('socket open');
     },
 
-    'close': function(){
+    'close': function() {
       console.log('lost client trying to reconnect');
     }
 
