@@ -2,7 +2,7 @@
 
   var worker;
 
-  new TestAgent.BrowserWorker({
+  worker = new TestAgent.BrowserWorker({
     sandbox: '/test-agent/sandbox.html'
   });
 
