@@ -103,9 +103,25 @@ describe('test-agent/browser-worker', function() {
 
   });
 
+  describe('on sandbox error', function() {
+    var fakeErrorEvent = {}, calledWith;
+
+    beforeEach(function(done) {
+      subject.on('sandbox error', function() {
+        calledWith = arguments;
+        done();
+      });
+      subject.sandbox.emit('error', fakeErrorEvent);
+    });
+
+    it('should receive \'sandbox error\' event', function() {
+      expect(calledWith).to.eql([fakeErrorEvent]);
+    });
+
+  });
+
   describe('.createSandbox', function() {
-    var sandboxEvent, callbackData,
-        iframeMock;
+    var sandboxEvent, callbackData, iframe;
 
     beforeEach(function(done) {
       sandboxEvent = null;
