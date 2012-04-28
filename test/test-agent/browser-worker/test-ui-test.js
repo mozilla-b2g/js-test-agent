@@ -26,6 +26,12 @@ describe('test-agent/browser-worker/test-ui', function() {
     it("should have set .element to selector's element", function() {
       expect(subject.element).to.be(document.getElementById('test-ui-test'));
     });
+
+    it('should hide errorElement', function() {
+      var className = subject.errorElement.className;
+      expect(className).to.contain(subject.HIDDEN);
+      expect(className).to.contain('error');
+    });
   });
 
   describe('event: config', function() {
@@ -44,6 +50,44 @@ describe('test-agent/browser-worker/test-ui', function() {
       }
 
       expect(element.querySelector('button')).to.be.ok();
+    });
+  });
+
+  describe('syntax error handling', function() {
+    var data = {
+      filename: 'some?time=thing',
+      lineno: 20,
+      message: 'foobar'
+    };
+
+    describe('on error', function() {
+      beforeEach(function() {
+        worker.emit('sandbox error', data);
+      });
+
+      it('should create error ui and show it', function() {
+        var content = subject.errorElement.innerHTML;
+        console.log(content);
+        expect(content).to.contain('some');
+        expect(content).to.contain('foobar');
+        expect(content).to.contain('20');
+        expect(subject.errorElement.className).not.to.contain(
+          subject.HIDDEN
+        );
+      });
+
+      describe('after re-running', function() {
+        beforeEach(function() {
+          worker.emit('sandbox');
+        });
+
+        it('should hide error', function() {
+          expect(subject.errorElement.className).to.contain(
+            subject.HIDDEN
+          );
+        });
+      });
+
     });
   });
 
