@@ -780,9 +780,13 @@
     window.document.body.appendChild(element);
     iframeWindow = element.contentWindow;
 
-    iframeWindow.addEventListener('error', function(e) {
-      self.emit('error', e);
-    }, true);
+    iframeWindow.onerror = function(message, file, line) {
+      self.emit('error', {
+        message: message,
+        filename: file,
+        lineno: line,
+      });
+    };
 
     iframeWindow.addEventListener('DOMContentLoaded', function() {
       self.ready = true;
@@ -1620,25 +1624,67 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
     selector = options.selector || '#test-agent-ui';
     this.element = options.element || document.querySelector(selector);
+    this.errorElement = document.createElement('div');
+    this.errorElement.className = 'error ' + this.HIDDEN;
+    this.element.appendChild(this.errorElement);
     this.queue = {};
   };
 
 
   TestUi.prototype = {
+    HIDDEN: 'hidden',
+
     templates: {
-      testList: '<ul class="test-agent"></ul>',
+      testList: '<ul class="test-list"></ul>',
       testItem: '<li data-url="%s">%s</li>',
-      testRun: '<button class="run-tests">Execute</button>'
+      testRun: '<button class="run-tests">Execute</button>',
+      error: [
+        '<h1>Critical Error</h1>',
+        '<p><span class="error">%0s</span> in file ',
+        '<span class="file">',
+        '<a href="%1s">%1s</a>',
+         '</span> line #',
+        '<span class="line">%2s</span>'
+      ].join('')
     },
 
     enhance: function enhance(worker) {
       this.worker = worker;
       this.worker.on('config', this.onConfig.bind(this));
+      this.worker.on('sandbox', this.onSandbox.bind(this));
+      this.worker.on('sandbox error', this.onSandboxError.bind(this));
+    },
+
+    onSandbox: function onSandbox() {
+      var error = this.errorElement;
+      if (error) {
+        if (error.className.indexOf(this.HIDDEN) === -1) {
+          error.className += ' ' + this.HIDDEN;
+        }
+      }
+    },
+
+    onSandboxError: function onSandboxError(data) {
+      var element = this.element,
+          error = this.errorElement,
+          message = data.message,
+          file = data.filename,
+          line = data.lineno;
+
+      file = file.split('?time=')[0];
+      error.className = error.className.replace(' hidden', '');
+
+      error.innerHTML = format(
+        this.templates.error,
+        message,
+        file,
+        line
+      );
     },
 
     onConfig: function onConfig(data) {
       //purge elements
-      var elements = this.element.getElementsByTagName('*'),
+      var elements = this.element.getElementsByTagName('test-list'),
           element,
           templates = this.templates,
           i = 0,

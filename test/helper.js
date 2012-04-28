@@ -23,9 +23,9 @@ afterEach(function() {
 
   exports.requireBundles = {
     '*test-agent/browser-worker': [
+      '/lib/test-agent/responder.js',
       '/lib/test-agent/loader.js',
       '/lib/test-agent/sandbox.js',
-      '/lib/test-agent/responder.js',
       '/lib/test-agent/websocket-client.js',
       '/lib/test-agent/browser-worker.js',
       '/test/test-agent/factory/browser-worker.js'
