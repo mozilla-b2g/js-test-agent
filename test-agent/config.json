@@ -11,6 +11,7 @@
     "/test/test-agent/pool-base-test.js",
     "/test/test-agent/responder-test.js",
     "/test/test-agent/sandbox-test.js",
+    "/test/test-agent/inspect-test.js",
     "/test/test-agent/websocket-client-test.js"
   ]
 }
