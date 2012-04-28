@@ -60,7 +60,7 @@ describe('TestAgent.Sandbox', function() {
 
   describe('.run', function() {
 
-    var context, destroyCaled;
+    var context, destroyCaled, result;
 
     beforeEach(function(done) {
       this.timeout(100000000);
@@ -71,7 +71,7 @@ describe('TestAgent.Sandbox', function() {
         TestAgent.Sandbox.prototype.destroy.apply(this, arguments);
       };
 
-      subject.run(function() {
+      result = subject.run(function() {
         context = this;
         done();
       });
@@ -79,6 +79,10 @@ describe('TestAgent.Sandbox', function() {
 
     it('should destroy old sandbox', function() {
       expect(destroyCaled).to.be(true);
+    });
+
+    it('should return the iframe window', function() {
+      expect(result).to.be(context);
     });
 
     it('should be attached to the dom', function() {
@@ -123,7 +127,6 @@ describe('TestAgent.Sandbox', function() {
           subject.destroy();
           done();
         });
-
 
       });
 
