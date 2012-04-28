@@ -17,6 +17,7 @@ package :
 	cat ./lib/test-agent/mocha/json-stream-reporter.js >> $(DEV_FILE)
 	cat ./lib/test-agent/browser-worker.js >> $(DEV_FILE)
 	cat ./lib/test-agent/browser-worker/mocha-driver.js >> $(DEV_FILE)
+	cat ./lib/test-agent/browser-worker/error-reporting.js >> $(DEV_FILE)
 	cat ./lib/test-agent/browser-worker/config.js >> $(DEV_FILE)
 	cat ./lib/test-agent/browser-worker/test-ui.js >> $(DEV_FILE)
 
