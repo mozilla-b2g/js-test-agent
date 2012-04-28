@@ -1,8 +1,10 @@
 (function(window) {
 
-  var worker = new TestAgent.BrowserWorker({
-        sandbox: '/test-agent/sandbox.html'
-      });
+  var worker;
+
+  new TestAgent.BrowserWorker({
+    sandbox: '/test-agent/sandbox.html'
+  });
 
   worker.use(TestAgent.BrowserWorker.Config, {
     url: '/test-agent/config.json'
@@ -13,6 +15,7 @@
     testHelperUrl: '/test/helper.js'
   });
 
+  worker.use(TestAgent.BrowserWorker.TestUi);
   worker.use(TestAgent.BrowserWorker.TestUi);
 
   worker.on({
