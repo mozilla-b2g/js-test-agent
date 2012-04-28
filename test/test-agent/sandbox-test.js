@@ -1,3 +1,4 @@
+require_lib('test-agent/responder.js');
 require_lib('test-agent/sandbox.js');
 
 describe('TestAgent.Sandbox', function() {
@@ -21,6 +22,10 @@ describe('TestAgent.Sandbox', function() {
 
     it('should set .url to first argument', function() {
       expect(subject.url).to.be(url);
+    });
+
+    it('should be a Responder', function() {
+      expect(subject).to.be.a(TestAgent.Responder);
     });
 
   });
@@ -60,16 +65,22 @@ describe('TestAgent.Sandbox', function() {
 
   describe('.run', function() {
 
-    var context, destroyCaled, result;
+    var context, destroyCaled, result,
+        readyCalled = false;
 
     beforeEach(function(done) {
       this.timeout(100000000);
       destroyCaled = false;
+      readyCalled = null;
 
       subject.destroy = function() {
         destroyCaled = true;
         TestAgent.Sandbox.prototype.destroy.apply(this, arguments);
       };
+
+      subject.on('ready', function(iframe) {
+        readyCalled = iframe;
+      });
 
       result = subject.run(function() {
         context = this;
@@ -93,8 +104,53 @@ describe('TestAgent.Sandbox', function() {
       expect(context === subject.getElement().contentWindow).to.be(true);
     });
 
+    it('should emit ready event with iframe as first argument', function() {
+      expect(readyCalled).to.be(context);
+    });
+
     it('should be ready', function() {
       expect(subject.ready).to.be(true);
+    });
+
+  });
+
+  describe('event: error', function() {
+
+    var context, errors = [];
+
+    function stack(pending, done) {
+      return {
+        pop: function pop() {
+          pending--;
+          if (pending === 0) {
+            done();
+          }
+        }
+      };
+    }
+
+    beforeEach(function(done) {
+      this.timeout(4000);
+      var pending = stack(2, done);
+      context = null;
+      errors.length = 0;
+
+      subject.url = '/test/fixtures/iframe-error.html';
+      subject.run(function() {
+        context = this;
+        pending.pop();
+      });
+
+      subject.on('error', function(e) {
+        context = this;
+        errors.push(e);
+        pending.pop();
+      });
+    });
+
+    it('should emit iframe errors', function() {
+      expect(errors.length).to.be(1);
+      expect(errors[0].type).to.be('error');
     });
 
   });

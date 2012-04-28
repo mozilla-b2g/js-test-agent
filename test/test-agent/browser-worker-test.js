@@ -104,7 +104,8 @@ describe('test-agent/browser-worker', function() {
   });
 
   describe('.createSandbox', function() {
-    var sandboxEvent, callbackData;
+    var sandboxEvent, callbackData,
+        iframeMock;
 
     beforeEach(function(done) {
       sandboxEvent = null;
@@ -124,7 +125,10 @@ describe('test-agent/browser-worker', function() {
     });
 
     it('should scope .loader to new iframe window', function() {
-      expect(subject.loader.targetWindow === subject.sandbox.getWindow()).to.be.ok();
+      var loader = subject.loader,
+          sandbox = subject.sandbox;
+
+      expect(loader.targetWindow === sandbox.getWindow()).to.be.ok();
     });
 
     describe('event: sandbox', function() {
