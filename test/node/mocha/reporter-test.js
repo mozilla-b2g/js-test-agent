@@ -35,18 +35,24 @@ describe('node/mocha/reporter', function() {
     });
 
     describe('with a reporter', function() {
-      var reporterClass = require('mocha').reporters.List;
 
       beforeEach(function() {
         subject = new Reporter({
-          reporterClass: reporterClass
+          reporterClass: mochaReporter
         });
       });
 
       it('should use given reporter', function() {
-        expect(subject.reporterClass).to.be(reporterClass);
+        expect(subject.reporterClass).to.be(mochaReporter);
       });
 
+    });
+  });
+
+  describe('.getMochaReporter', function() {
+    it('should return reporter', function() {
+      subject.createRunner();
+      expect(subject.getMochaReporter()).to.be.a(mochaReporter);
     });
   });
 

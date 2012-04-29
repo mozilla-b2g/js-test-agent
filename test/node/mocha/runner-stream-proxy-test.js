@@ -37,10 +37,22 @@ describe('node/mocha/runner-stream-proxy', function() {
   });
 
   describe('.Suite', function() {
+    var subject;
+
+    beforeEach(function() {
+      subject = factory.suite({ title: 'foo', fullTitle: 'foo' });
+    });
+
     it('should provide mirror for given properties', function() {
-      var subject = factory.suite({ title: 'foo' });
       expect(subject.title).to.be('foo');
     });
+
+    describe('.fullTitle', function() {
+      it('should be a function', function() {
+        expect(subject.fullTitle()).to.be('foo');
+      });
+    });
+
   });
 
   beforeEach(function() {
@@ -119,7 +131,8 @@ describe('node/mocha/runner-stream-proxy', function() {
     });
 
     it('should stage .parent', function() {
-      expect(subject.parent).to.eql(suite);
+      expect(subject.parent).to.be.a(RunnerProxy.Suite);
+      expect(subject.parent.fullTitle()).to.eql(suite.fullTitle);
     });
 
     it('should emit an event', function() {
