@@ -13,6 +13,10 @@ module.exports = exports = {
       return [];
     },
 
+    open: function(){
+      return true;
+    },
+
     req: function() {
       return {
         headers: {
