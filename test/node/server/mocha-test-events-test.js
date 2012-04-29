@@ -44,9 +44,21 @@ describe('node/server/mocha-test-events', function() {
     });
 
     describe('on end', function() {
+      var firedEnd, calledWith;
       beforeEach(function() {
+        calledWith = null;
+        firedEnd = false;
         subject.savedError = 'foo';
-        subject.reporter.emit('end');
+        server.on('test runner end', function() {
+          firedEnd = true;
+          calledWith = arguments;
+        });
+        subject.reporter.emit('end', 'foo', 'bar');
+      });
+
+      it('should fire test runner end', function() {
+        expect(firedEnd).to.be(true);
+        expect(calledWith).to.eql(['foo', 'bar']);
       });
 
       it('should clear savedError', function() {
