@@ -1546,10 +1546,10 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         });
       });
 
-      box.require(this.testHelperUrl);
-
-      tests.forEach(function(test) {
-        box.require(test);
+      box.require(this.testHelperUrl, function(){
+        tests.forEach(function(test) {
+          box.require(test);
+        });
       });
     }
 
