@@ -211,23 +211,28 @@ describe('test-agent/responder', function() {
     });
 
     describe('.once', function() {
-      var timesCalled;
+      var timesCalled, calledWith;
 
       function onceCb() {
         timesCalled += 1;
+        calledWith = arguments;
       }
 
       beforeEach(function() {
         timesCalled = 0;
         subject.once('onceEvent', onceCb);
 
-        subject.emit('onceEvent');
-        subject.emit('onceEvent');
-        subject.emit('onceEvent');
+        subject.emit('onceEvent', '1', '2');
+        subject.emit('onceEvent', '3', '4');
+        subject.emit('onceEvent', '5', '6');
       });
 
       it('should only hear one event fired', function() {
         expect(timesCalled).to.be(1);
+      });
+
+      it('should pass arguments', function() {
+        expect(calledWith).to.eql(['1', '2']);
       });
 
       it('should remove event after firing', function() {
