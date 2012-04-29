@@ -126,13 +126,23 @@ describe('node/server/mocha-test-events', function() {
 
     function emitsSyntaxError() {
 
+      describe('suite', function() {
+        beforeEach(function() {
+          event = events[0];
+        });
+
+        it('should be a suite', function() {
+          expect(event[0]).to.be('suite');
+        });
+      });
+
       describe('test event', function() {
         beforeEach(function() {
-          event = events[0][1];
+          event = events[1][1];
         });
 
         it('should emit fail event', function() {
-          expect(events[0][0]).to.be('test');
+          expect(events[1][0]).to.be('test');
         });
 
         hasTitle();
@@ -140,13 +150,13 @@ describe('node/server/mocha-test-events', function() {
 
       describe('test failed event', function() {
         beforeEach(function() {
-          event = events[1][1];
+          event = events[2][1];
         });
 
         hasTitle();
 
         it('should emit fail event', function() {
-          expect(events[1][0]).to.be('fail');
+          expect(events[2][0]).to.be('fail');
         });
 
         it('should be failed', function() {
@@ -171,17 +181,27 @@ describe('node/server/mocha-test-events', function() {
 
       describe('test end event', function() {
         beforeEach(function() {
-          event = events[2][1];
+          event = events[3][1];
         });
 
         it('should emit fail event', function() {
-          expect(events[2][0]).to.be('test end');
+          expect(events[3][0]).to.be('test end');
         });
 
         hasTitle();
 
         it('should be failed', function() {
           expect(event.state).to.be('failed');
+        });
+      });
+
+      describe('suite end', function() {
+        beforeEach(function() {
+          event = events[4];
+        });
+
+        it('should be a suite', function() {
+          expect(event[0]).to.be('suite end');
         });
       });
     }
