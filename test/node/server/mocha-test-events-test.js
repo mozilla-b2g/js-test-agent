@@ -47,13 +47,106 @@ describe('node/server/mocha-test-events', function() {
       server.emit('test data', data);
     });
 
-    it('should bubble up start evet on runner to test runner event on server', function() {
+    it('should bubble up start event on runner', function() {
       expect(startCalledWith).to.be(subject.reporter);
     });
 
     it('should start proxy on runner', function() {
       expect(subject.reporter.proxy).to.be.ok();
     });
+  });
+
+  describe('on error event', function() {
+    var data,
+        event,
+        events = [];
+
+    data = {
+      filename: 'file.js',
+      lineno: 20,
+      message: 'critical err'
+    };
+
+    beforeEach(function() {
+      data.length = 0;
+      server.emit('error', data);
+
+      subject.reporter.respond = function(line) {
+        events.push(line);
+      };
+
+      subject.reporter.emit('start');
+    });
+
+    function hasTitle() {
+      it('should have title', function() {
+        expect(event.title).to.be(subject.syntaxErrorTitle);
+      });
+
+      it('should have fullTitle', function() {
+        expect(event.fullTitle).to.be(subject.syntaxErrorTitle);
+      });
+    }
+
+    describe('test event', function() {
+      beforeEach(function() {
+        event = events[0][1];
+      });
+
+      it('should emit fail event', function() {
+        expect(events[0][0]).to.be('test');
+      });
+
+      hasTitle();
+    });
+
+    describe('test failed event', function() {
+      beforeEach(function() {
+        event = events[1][1];
+      });
+
+      hasTitle();
+
+      it('should emit fail event', function() {
+        expect(events[1][0]).to.be('fail');
+      });
+
+      it('should be failed', function() {
+        expect(event.state).to.be('failed');
+      });
+
+      it('should have err.message', function() {
+        var err = event.err;
+        expect(err.message).to.contain(data.filename);
+        expect(err.message).to.contain(data.message);
+        expect(err.message).to.contain(data.lineno);
+      });
+
+      it('should have err.stack', function() {
+        var err = event.err;
+        expect(err.stack).to.contain(data.filename);
+        expect(err.stack).to.contain(data.message);
+        expect(err.stack).to.contain(data.lineno);
+      });
+
+    });
+
+    describe('test end event', function() {
+      beforeEach(function() {
+        event = events[2][1];
+      });
+
+      it('should emit fail event', function() {
+        expect(events[2][0]).to.be('test end');
+      });
+
+      hasTitle();
+
+      it('should be failed', function() {
+        expect(event.state).to.be('failed');
+      });
+    });
 
   });
+
 });
