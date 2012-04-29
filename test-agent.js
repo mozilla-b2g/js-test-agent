@@ -783,8 +783,9 @@
     iframeWindow.onerror = function(message, file, line) {
       self.emit('error', {
         message: message,
-        filename: file,
-        lineno: line,
+        //remove cache busting string
+        filename: file.split('?time=')[0],
+        lineno: line
       });
     };
 
@@ -1560,6 +1561,30 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
   var Worker = window.TestAgent.BrowserWorker;
 
 
+  function ErrorReporting() {
+
+  };
+
+  ErrorReporting.prototype = {
+    enhance: function enhance(worker) {
+      worker.on('sandbox error', this.onSandboxError.bind(this, worker));
+    },
+
+    onSandboxError: function onSandboxError(worker, data) {
+      worker.send('error', data);
+    }
+  };
+
+  Worker.ErrorReporting = ErrorReporting;
+
+}(this));
+
+(function(window) {
+  'use strict';
+
+  var Worker = window.TestAgent.BrowserWorker;
+
+
   Worker.Config = function Config(options) {
     if (typeof(options) === 'undefined') {
       options = {};
@@ -1671,7 +1696,6 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
           file = data.filename,
           line = data.lineno;
 
-      file = file.split('?time=')[0];
       error.className = error.className.replace(' hidden', '');
 
       error.innerHTML = format(

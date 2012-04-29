@@ -16,7 +16,7 @@
   });
 
   worker.use(TestAgent.BrowserWorker.TestUi);
-  worker.use(TestAgent.BrowserWorker.TestUi);
+  worker.use(TestAgent.BrowserWorker.ErrorReporting);
 
   worker.on({
 
