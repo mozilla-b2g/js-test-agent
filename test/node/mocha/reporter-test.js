@@ -72,16 +72,46 @@ describe('node/mocha/reporter', function() {
 
   describe('.respond', function() {
 
-    describe('when start event is sent', function() {
+    var calledWith = [],
+        sentWith,
+        respond = Proxy.prototype.respond,
+        sentStartEvent = false,
+        endData = ['end', {}],
+        startData = ['start', {total: 20}];
 
-      var respond,
-          calledWith = [],
-          sentWith,
-          sentStartEvent = false,
-          data = ['start', {total: 20}];
+    afterEach(function() {
+      Proxy.prototype.respond = respond;
+    });
+
+    beforeEach(function() {
+      var respond;
+      sentWith = null;
+      calledWith = [];
+      respond = Proxy.prototype.respond;
+      Proxy.prototype.respond = function() {
+        calledWith.push(Array.prototype.slice.call(arguments));
+        respond.apply(this, arguments);
+      };
+    });
+
+    describe('when end event is responded to', function() {
+
+      it('should emit end event', function(done) {
+        subject.on('end', function() {
+          done();
+        });
+
+        subject.respond(startData);
+        subject.respond(endData);
+      });
+
+    });
+
+    describe('when start event is responded to', function() {
+
 
       function sendStart() {
-        subject.respond(Responder.stringify(data[0], data[1]));
+        subject.respond(startData);
       }
 
       function sendsStartEvent() {
@@ -92,14 +122,7 @@ describe('node/mocha/reporter', function() {
       }
 
       beforeEach(function() {
-        sentWith = null;
         sentStartEvent = false;
-        calledWith = [];
-        respond = Proxy.prototype.respond;
-        Proxy.prototype.respond = function() {
-          calledWith.push(Array.prototype.slice.call(arguments));
-          respond.apply(this, arguments);
-        };
 
         subject.on('start', function(runner) {
           sentStartEvent = true;
@@ -109,10 +132,6 @@ describe('node/mocha/reporter', function() {
         sendStart();
       });
 
-      afterEach(function() {
-        Proxy.prototype.respond = respond;
-      });
-
       sendsStartEvent();
 
       it('should create proxy', function() {
@@ -120,9 +139,9 @@ describe('node/mocha/reporter', function() {
       });
 
       it('should call proxy', function() {
-        subject.respond(data);
+        subject.respond(startData);
 
-        expect(calledWith[0][0]).to.eql(data);
+        expect(calledWith[0][0]).to.eql(startData);
       });
 
       describe('the second time start is sent', function() {
