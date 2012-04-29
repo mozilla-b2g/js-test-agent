@@ -2,6 +2,7 @@ RUNNER_DIR=$(PWD)/test-agent
 TEST_DIR=$(PWD)/test/test-agent/
 TEST_CONFIG=$(RUNNER_DIR)/config.json
 DEV_FILE=./test-agent.js
+REPORTER=Spec
 
 package :
 	rm -f $(DEV_FILE)
@@ -28,14 +29,19 @@ package :
 	cp node_modules/mocha/mocha.css ./vendor/mocha/
 	cp node_modules/expect.js/expect.js ./vendor/
 
-test_config:
+test-config:
 	sh ./tools/create-config.sh $(TEST_CONFIG) $(TEST_DIR) \*-test.js /test/test-agent
 
-test_server:
+test-server:
 	./bin/js-test-agent server --growl
 
-test :
-	@./node_modules/mocha/bin/mocha \
+test : test-browser test-node
+
+test-browser:
+	./bin/js-test-agent test --reporter $(REPORTER)
+
+test-node :
+	@./node_modules/mocha/bin/mocha --reporter $(REPORTER) \
 		test/helper.js test/node/mocha/*.js \
 		test/node/*-test.js  \
 		test/test-agent/responder-test.js \
@@ -45,8 +51,8 @@ test :
 	@./node_modules/mocha/bin/mocha test/helper.js test/node/server/*-test.js
 
 
-.PHONY: test_config
-.PHONY: test_server
+.PHONY: test-config
+.PHONY: test-server
 .PHONY: package
 .PHONY: httpd
 .PHONY: test
