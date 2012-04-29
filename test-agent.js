@@ -684,9 +684,12 @@
           document = this.targetWindow.document;
 
       if (url in this._cached) {
-        //url is cached we are good
         if (callback) {
-          callback();
+          if (this.pending) {
+            this.done(callback);
+          } else {
+            callback();
+          }
         }
         return;
       }

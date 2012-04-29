@@ -209,7 +209,6 @@ describe('TestAgent.Loader', function() {
         });
       });
     }
-
     describe('cross domain require', function() {
       var url = 'https://raw.github.com/LearnBoost/expect.js/master/expect.js';
 
@@ -228,6 +227,30 @@ describe('TestAgent.Loader', function() {
 
     //intentionally twice
     loadIframe(url, url);
+
+    describe('when require(ing) a cached file', function() {
+      describe('when there are pending items', function() {
+        var cb = function(){};
+
+        beforeEach(function() {
+          subject.pending = 1;
+          subject.require(url, cb);
+        });
+
+        it('should add callback as a done callback', function() {
+          expect(subject.doneCallbacks[0]).to.be(cb);
+        });
+
+      });
+
+      describe('when there are no pending items', function() {
+        it('should fire callback', function(done) {
+          subject.require(url, function(){
+            done();
+          });
+        });
+      });
+    });
 
     it('should fire both require callbacks', function() {
       expect(requireCallbacksFired.length).to.be(2);

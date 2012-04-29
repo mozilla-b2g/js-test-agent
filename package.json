@@ -1,6 +1,6 @@
 {
   "name": "test-agent",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "author": "James Lal",
   "description": "execute client side tests from browser report back to cli",
   "main": "lib/node/index.js",

@@ -45,7 +45,12 @@ describe('node/server/mocha-test-events', function() {
 
     describe('on end', function() {
       beforeEach(function() {
+        subject.savedError = 'foo';
         subject.reporter.emit('end');
+      });
+
+      it('should clear savedError', function() {
+        expect(subject.savedError).to.be(undefined);
       });
 
       it('should not be running', function() {
