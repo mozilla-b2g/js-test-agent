@@ -1,3 +1,10 @@
+# 0.2.0
+  - TestAgent.Responder now has .once (per event emitter spec)
+
+# 0.1.2
+  - calling require on cached script url will now
+    correctly fire after (or if) the script has been loaded.
+
 # 0.1.1
 
 - Syntax errors that occur during the run will now also cause
