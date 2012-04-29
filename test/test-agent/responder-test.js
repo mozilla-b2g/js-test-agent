@@ -210,6 +210,32 @@ describe('test-agent/responder', function() {
       });
     });
 
+    describe('.once', function() {
+      var timesCalled;
+
+      function onceCb() {
+        timesCalled += 1;
+      }
+
+      beforeEach(function() {
+        timesCalled = 0;
+        subject.once('onceEvent', onceCb);
+
+        subject.emit('onceEvent');
+        subject.emit('onceEvent');
+        subject.emit('onceEvent');
+      });
+
+      it('should only hear one event fired', function() {
+        expect(timesCalled).to.be(1);
+      });
+
+      it('should remove event after firing', function() {
+        expect(subject.events.onceEvent.length).to.be(0);
+      });
+
+    });
+
     describe('.emit', function() {
 
       var calledArguments, calledScope, timesCalled,
