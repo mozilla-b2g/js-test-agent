@@ -1,5 +1,13 @@
 # 0.2.0
   - TestAgent.Responder now has .once (per event emitter spec)
+  - Fixed XUnit reporter support
+  - Added event mirroring support you can now send a message 
+    to the server and all events of those types will be forwarded or
+    mirrored to your client websocket.
+  - Added base node/client as a building block for new commands
+  - improved test-agent test. It now offers an option of reporters and
+    will show reports in stdout with correct exit status on
+    error/success.
 
 # 0.1.2
   - calling require on cached script url will now
