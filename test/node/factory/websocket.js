@@ -9,6 +9,10 @@ module.exports = exports = {
       return [];
     },
 
+    sent: function() {
+      return [];
+    },
+
     req: function() {
       return {
         headers: {
@@ -18,8 +22,12 @@ module.exports = exports = {
     },
 
     send: function(attrs) {
-      return function() {
+      return function(data) {
         this.sendCalls.push(Array.prototype.slice.call(arguments));
+        try {
+          this.sent.push(Responder.parse(data));
+        } catch(e) {
+        }
       };
     }
   }, WebSocket)
