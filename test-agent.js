@@ -728,7 +728,7 @@
       element = document.createElement('script');
       element.src = url;
       element.async = false;
-      element.type = 'text/javascript';
+      element.type = 'text/javascript;version=1.8';
       element.onload = function scriptOnLoad() {
         if (callback) {
           callback();
