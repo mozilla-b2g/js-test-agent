@@ -9,6 +9,7 @@ package :
 	touch $(DEV_FILE)
 
 	cat ./lib/test-agent/inspect.js >> $(DEV_FILE)
+	cat ./lib/test-agent/export-error.js >> $(DEV_FILE)
 	cat ./lib/test-agent/responder.js >> $(DEV_FILE)
 	cat ./lib/test-agent/loader.js >> $(DEV_FILE)
 	cat ./lib/test-agent/sandbox.js >> $(DEV_FILE)
