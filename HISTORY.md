@@ -1,3 +1,7 @@
+# 0.3.0
+  - Cleaner firefox stacktraces
+  - New option to change type of required scripts.
+
 # 0.2.0
   - TestAgent.Responder now has .once (per event emitter spec)
   - Fixed XUnit reporter support

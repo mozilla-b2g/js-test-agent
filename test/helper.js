@@ -50,6 +50,42 @@ afterEach(function() {
     }
   };
 
+  exports.cross = {
+
+    nsFind: function(obj, string) {
+      var result = obj,
+          part,
+          parts = string.split('.');
+
+      while ((part = parts.shift())) {
+        if (result[part]) {
+          result = result[part];
+        } else {
+          throw new Error('Cannot find ' + string + ' in object ');
+        }
+      }
+      return result;
+    },
+
+    require: function(path, component, cb) {
+
+      if (!path.match(/.js$/)) {
+        path += '.js';
+      }
+
+      path = '../lib/' + path;
+
+      if (isNode) {
+        cb(this.nsFind(require(path), component));
+      } else {
+        exports.require(path, function() {
+          cb(this.nsFind(exports, component));
+        }.bind(this));
+      }
+    }
+  };
+
+
   exports.testSupport = {
     merge: function() {
       var result = {};
