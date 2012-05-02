@@ -209,6 +209,7 @@ describe('TestAgent.Loader', function() {
         });
       });
     }
+
     describe('cross domain require', function() {
       var url = 'https://raw.github.com/LearnBoost/expect.js/master/expect.js';
 
@@ -273,6 +274,7 @@ describe('TestAgent.Loader', function() {
       var script = getScript();
       expect(script.src).to.contain(url);
       expect(script.async).to.be(false);
+      expect(script.type).to.be(subject.type);
     });
 
     it('should include cache bust query string', function() {
