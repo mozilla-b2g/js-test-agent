@@ -116,6 +116,26 @@ describe('test-agent/websocket-common', function() {
     proxysEvent('message');
   });
 
+  describe('.close', function() {
+    var closed = false;
+
+    mockNative();
+
+    beforeEach(function() {
+      closed = false;
+      subject.start();
+      subject.socket.close = function() {
+        closed = true;
+      };
+
+      subject.close();
+    });
+
+    it('should close socket', function() {
+      expect(closed).to.be(true);
+    });
+  });
+
   describe('.send', function() {
     var sent, eventData, data = ['client event', {data: 1}];
     mockNative();

@@ -1,3 +1,6 @@
+# 0.3.1
+  - Add missing WebsocketClient.close method
+
 # 0.3.0
   - Cleaner firefox stacktraces
   - New option to change type of required scripts.
