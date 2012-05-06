@@ -71,6 +71,20 @@ describe('test-agent/browser-worker/post-message', function() {
 
   });
 
+  describe('worker.start', function() {
+
+    beforeEach(function() {
+      worker.start();
+    });
+
+    it('should send message', function() {
+      expect(messages).to.eql([
+        ['worker start']
+      ]);
+    });
+
+  });
+
   describe('receiving window message', function() {
 
     it('should setup listener', function() {

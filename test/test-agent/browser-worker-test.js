@@ -107,15 +107,10 @@ describe('test-agent/browser-worker', function() {
   });
 
   describe('.start', function() {
-    var sent = [],
-        emitted = false;
+    var emitted = false;
 
     beforeEach(function() {
       emitted = false;
-      sent.length = 0;
-      subject.send = function() {
-        sent.push(arguments);
-      }
       subject.on('worker start', function() {
         emitted = true;
       });
@@ -124,12 +119,6 @@ describe('test-agent/browser-worker', function() {
 
     it('should emit worker start event', function() {
       expect(emitted).to.be(true);
-    });
-
-    it('should send worker start event', function() {
-      expect(sent).to.eql([
-        ['worker start']
-      ]);
     });
 
   });
