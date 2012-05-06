@@ -1,6 +1,7 @@
-var Responder = require_lib('test-agent/responder').TestAgent.Responder,
-    Reporter = require_lib('node/mocha/reporter'),
-    Proxy = require_lib('node/mocha/runner-stream-proxy');
+var Responder = requireLib('test-agent/responder').TestAgent.Responder,
+    Reporter = requireLib('node/mocha/reporter'),
+    Handler = requireLib('node/mocha/concurrent-reporting-events'),
+    Proxy = requireLib('node/mocha/runner-stream-proxy');
 
 describe('node/mocha/reporter', function() {
 
@@ -62,7 +63,7 @@ describe('node/mocha/reporter', function() {
     });
 
     it('should create .runner', function() {
-      expect(subject.runner).to.be.a(Responder);
+      expect(subject.runner).to.be.a(Handler);
     });
 
     it('should create the proxy', function() {

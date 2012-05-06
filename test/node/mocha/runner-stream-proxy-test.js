@@ -8,12 +8,14 @@ describe('node/mocha/runner-stream-proxy', function() {
   factory.test = testSupport.factory({
     fullTitle: 'Parent: Foo Bar',
     title: 'Foo bar',
-    state: 'passed'
+    state: 'passed',
+    testAgentEnvId: null
   }, RunnerProxy.Test);
 
   factory.suite = testSupport.factory({
     title: 'title',
-    fullTitle: 'full '
+    fullTitle: 'full',
+    testAgentEnvId: null
   }, RunnerProxy.Suite);
 
   function lastEvent() {
@@ -21,6 +23,33 @@ describe('node/mocha/runner-stream-proxy', function() {
       return false;
     }
     return eventsFired[eventsFired.length - 1];
+  }
+
+  function prependsTestAgentEnv(type) {
+    describe('with testAgentEnvId', function() {
+      var subject,
+          attrs;
+
+      beforeEach(function() {
+        attrs = factory[type].attrs();
+        subject = factory[type]({
+          testAgentEnvId: 'ie7'
+        });
+        console.log(subject.testAgentEnvId);
+      });
+
+      it('should prefix title', function() {
+        if (attrs.title) {
+          expect(subject.title).to.be('[ie7] ' + attrs.title);
+        }
+      });
+
+      it('should prefix fullTitle', function() {
+        console.log(subject.fullTitle, '<-- full title');
+        var fullTitle = subject.fullTitle();
+        expect(fullTitle).to.be('[ie7] ' + attrs.fullTitle);
+      });
+    });
   }
 
   describe('.Test', function() {
@@ -34,10 +63,14 @@ describe('node/mocha/runner-stream-proxy', function() {
       expect(subject.fullTitle()).to.equal(title);
     });
 
+    prependsTestAgentEnv('test');
+
   });
 
   describe('.Suite', function() {
     var subject;
+
+    prependsTestAgentEnv('suite');
 
     beforeEach(function() {
       subject = factory.suite({ title: 'foo', fullTitle: 'foo' });
