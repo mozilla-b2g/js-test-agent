@@ -107,13 +107,31 @@ describe('test-agent/browser-worker', function() {
   });
 
   describe('.start', function() {
-    it('should emit worker start event', function(done) {
-      subject.on('worker start', function() {
-        done();
-      });
+    var sent = [],
+        emitted = false;
 
+    beforeEach(function() {
+      emitted = false;
+      sent.length = 0;
+      subject.send = function() {
+        sent.push(arguments);
+      }
+      subject.on('worker start', function() {
+        emitted = true;
+      });
       subject.start();
     });
+
+    it('should emit worker start event', function() {
+      expect(emitted).to.be(true);
+    });
+
+    it('should send worker start event', function() {
+      expect(sent).to.eql([
+        ['worker start']
+      ]);
+    });
+
   });
 
   describe('.createSandbox', function() {
@@ -243,10 +261,12 @@ describe('test-agent/browser-worker', function() {
 
       var obj = {uniq: true},
           expectedTests,
+          sent = [],
           completeEvent = [];
 
       beforeEach(function(done) {
 
+        sent.length = 0;
         runnerArguments = [];
 
         subject.createSandbox = function() {
@@ -266,6 +286,10 @@ describe('test-agent/browser-worker', function() {
           done();
         };
 
+        subject.send = function() {
+          sent.push(arguments);
+        }
+
         subject.on('run tests complete', function() {
           completeEvent.push(arguments);
         });
@@ -277,6 +301,10 @@ describe('test-agent/browser-worker', function() {
 
       it('should emit run tests complete event', function() {
         expect(completeEvent[0][0]).to.be(obj);
+      });
+
+      it('should send run tests complete', function() {
+        expect(sent[0][0]).to.eql('run tests complete');
       });
 
       it('should call .testRunner with self and tests', function() {

@@ -35,7 +35,6 @@ describe('node/mocha/runner-stream-proxy', function() {
         subject = factory[type]({
           testAgentEnvId: 'ie7'
         });
-        console.log(subject.testAgentEnvId);
       });
 
       it('should prefix title', function() {
@@ -45,7 +44,6 @@ describe('node/mocha/runner-stream-proxy', function() {
       });
 
       it('should prefix fullTitle', function() {
-        console.log(subject.fullTitle, '<-- full title');
         var fullTitle = subject.fullTitle();
         expect(fullTitle).to.be('[ie7] ' + attrs.fullTitle);
       });
