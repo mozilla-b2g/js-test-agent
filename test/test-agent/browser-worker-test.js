@@ -25,10 +25,6 @@ describe('test-agent/browser-worker', function() {
       deps = TestAgent.BrowserWorker.prototype.deps;
     });
 
-    it('should have Server set to TestAgent.Server', function() {
-      expect(deps.Server).to.be(TestAgent.WebsocketClient);
-    });
-
     it('should have Sandbox set to TestAgent.Sanbox', function() {
       expect(deps.Sanbox).to.be(TestAgent.Sanbox);
     });
@@ -58,15 +54,6 @@ describe('test-agent/browser-worker', function() {
       expect(subject._testsProcessor).to.be.a(Array);
     });
 
-    it('should use default options for server when none are given', function() {
-      expect(subject.url).to.be(subject.defaults.server.url);
-      expect(subject.retry).to.be(subject.defaults.server.retry);
-    });
-
-    it('should use default options for sandbox when none given', function() {
-      expect(subject.sandbox.url).to.be(subject.defaults.sandbox);
-    });
-
     it('should have a .sandbox', function() {
       expect(subject.sandbox).to.be.a(TestAgent.Sandbox);
     });
@@ -75,8 +62,8 @@ describe('test-agent/browser-worker', function() {
       expect(subject.loader).to.be.a(TestAgent.Loader);
     });
 
-    it('should be a websocket client', function() {
-      expect(subject).to.be.a(TestAgent.WebsocketClient);
+    it('should be a responder', function() {
+      expect(subject).to.be.a(TestAgent.Responder);
     });
   });
 
@@ -117,7 +104,16 @@ describe('test-agent/browser-worker', function() {
     it('should receive \'sandbox error\' event', function() {
       expect(calledWith).to.eql([fakeErrorEvent]);
     });
+  });
 
+  describe('.start', function() {
+    it('should emit worker start event', function(done) {
+      subject.on('worker start', function() {
+        done();
+      });
+
+      subject.start();
+    });
   });
 
   describe('.createSandbox', function() {
