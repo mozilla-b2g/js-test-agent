@@ -46,7 +46,18 @@ describe('node/mocha/reporter', function() {
       it('should use given reporter', function() {
         expect(subject.reporterClass).to.be(mochaReporter);
       });
+    });
 
+  });
+
+  describe('.addEnv', function() {
+    beforeEach(function() {
+      subject.addEnv('one');
+      subject.addEnv(['two', 'three']);
+    });
+
+    it('should have envs for one, two and three', function() {
+      expect(subject.envs).to.eql(['one', 'two', 'three']);
     });
   });
 
@@ -59,11 +70,21 @@ describe('node/mocha/reporter', function() {
 
   describe('.createRunner', function() {
     beforeEach(function() {
+      subject.addEnv('current');
       subject.createRunner();
+      subject.addEnv('next');
     });
 
     it('should create .runner', function() {
       expect(subject.runner).to.be.a(Handler);
+    });
+
+    it('should clear envs', function() {
+      expect(subject.envs).to.eql(['next']);
+    });
+
+    it('should pass current env to runner', function() {
+      expect(subject.runner.envs).to.eql(['current']);
     });
 
     it('should create the proxy', function() {
@@ -145,25 +166,26 @@ describe('node/mocha/reporter', function() {
         expect(subject.proxy).to.be.ok();
       });
 
+      it('should create reporter', function() {
+        expect(subject.reporter).to.be.ok();
+      });
+
       it('should call proxy', function() {
         subject.respond(startData);
 
         expect(calledWith[0][0]).to.eql(startData);
       });
 
-      describe('the second time start is sent', function() {
-        var originalProxy;
+      describe('when runner end event is sent', function() {
         beforeEach(function() {
-          originalProxy = subject.proxy;
-          sendStart();
+          subject.runner.emit('end');
         });
 
-        sendsStartEvent();
-
-        it('should create a new proxy', function() {
-          expect(subject.proxy).not.to.be(originalProxy);
+        it('should clear previous runner, reporter and proxy', function() {
+          expect(subject.reporter).not.to.be.ok();
+          expect(subject.runner).not.to.be.ok();
+          expect(subject.proxy).not.to.be.ok();
         });
-
       });
 
     });

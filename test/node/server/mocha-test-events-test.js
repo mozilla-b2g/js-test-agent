@@ -33,6 +33,17 @@ describe('node/server/mocha-test-events', function() {
     });
   });
 
+  describe('event: add test env', function() {
+    beforeEach(function() {
+      server.emit('add test env', ['one']);
+      server.emit('add test env', ['two']);
+    });
+
+    it('should add env to reporter', function() {
+      expect(subject.reporter.envs).to.eql(['one', 'two']);
+    });
+  });
+
   describe('on start', function() {
     beforeEach(function() {
       expect(subject.isRunning).to.be(false);
