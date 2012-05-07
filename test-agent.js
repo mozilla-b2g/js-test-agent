@@ -1132,6 +1132,13 @@
     this.socket.send(this.stringify(event, data));
   };
 
+  /**
+   * Closes connection to the server
+   */
+  Client.prototype.close = function close(event, data) {
+    this.socket.close();
+  };
+
   Client.prototype._incrementRetry = function _incrementRetry() {
     if (this.retry) {
       this.retries++;
@@ -1364,6 +1371,10 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
     });
 
     runner.on('end', function onEnd() {
+      if (MochaReporter.testAgentEnvId) {
+        self.stats.testAgentEnvId = MochaReporter.testAgentEnvId;
+      }
+
       MochaReporter.send(JSON.stringify(['end', self.stats]));
     });
   }
@@ -1400,6 +1411,11 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         }
       }
     }
+
+    if (MochaReporter.testAgentEnvId) {
+      result.testAgentEnvId = MochaReporter.testAgentEnvId;
+    }
+
     return result;
   }
 
@@ -1419,52 +1435,40 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
     var self = this,
         dep = this.deps;
 
+    TestAgent.Responder.call(this);
+
     if (typeof(options) === 'undefined') {
       options = {};
     }
-
-    function option(name) {
-      if (name in options) {
-        return options[name];
-      }
-
-      if (name in self.defaults) {
-        return self.defaults[name];
-      }
-
-      return undefined;
-    }
-
-
-    this.deps.Server.call(this, option('server'));
-    this.sandbox = new dep.Sandbox(option('sandbox'));
-    this.loader = new dep.Loader(option('loader'));
+    this.sandbox = new dep.Sandbox(options.sandbox);
+    this.loader = new dep.Loader(options.loader);
+    this.env = options.env || null;
 
     this._testsProcessor = [];
     this.testRunner = options.testRunner;
     //event proxy
     this.sandbox.on('error', this.emit.bind(this, 'sandbox error'));
+
+    this.on('set env', function(env) {
+      self.env = env;
+    });
+
+    this.on('run tests', function(data) {
+      self.runTests(data.tests || []);
+    });
   };
 
   //inheritance
   TestAgent.BrowserWorker.prototype = Object.create(
-      TestAgent.WebsocketClient.prototype
+      TestAgent.Responder.prototype
   );
 
   var proto = TestAgent.BrowserWorker.prototype;
 
   proto.deps = {
-    Server: TestAgent.WebsocketClient,
     Sandbox: TestAgent.Sandbox,
     Loader: TestAgent.Loader,
     ConfigLoader: TestAgent.Config
-  };
-
-  proto.defaults = {
-    server: {
-      retry: true,
-      url: 'ws://' + document.location.host.split(':')[0] + ':8789'
-    }
   };
 
   /**
@@ -1492,6 +1496,11 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
     var args = Array.prototype.slice.call(arguments);
     args.unshift('run tests complete');
     this.emit.apply(this, args);
+
+    if (this.send) {
+      this.send.apply(this, args);
+    }
+
   };
 
   /**
@@ -1569,6 +1578,348 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
     return this;
   };
 
+  /**
+   * Emits 'start worker' event as a hook
+   * for other plugins.
+   */
+  proto.start = function start() {
+    this.emit('worker start');
+  };
+
+}(this));
+(function(window) {
+  /**
+   * Creates websocket enhancement.
+   *
+   * @constructor
+   * @param {Object} options see WebsocketClient for options.
+   */
+  function Websocket(options) {
+    if (typeof(options) === 'undefined') {
+      options = {};
+    }
+
+    options.url = options.url || this.defaults.url;
+    options.retry = options.retry || this.defaults.retry;
+
+    this.socket = new TestAgent.WebsocketClient(
+      options
+    );
+  }
+
+  Websocket.prototype = {
+
+    defaults: {
+      retry: true,
+      url: 'ws://' + document.location.host.split(':')[0] + ':8789'
+    },
+
+    /**
+     * Enhances worker to respond to
+     * websocket events. Adds a send method
+     * to communicate with the websocket server.
+     *
+     * @param {TestAgent.BrowserWorker} worker browser worker.
+     */
+    enhance: function(worker) {
+      var socket = this.socket,
+          originalEmit = socket.emit,
+          originalSend = worker.send;
+
+      if (originalSend) {
+        worker.send = function() {
+          socket.send.apply(socket, arguments);
+          return originalSend.apply(worker, arguments);
+        }
+      } else {
+        worker.send = socket.send.bind(socket);
+      }
+
+      socket.emit = function() {
+        worker.emit.apply(worker, arguments);
+        return originalEmit.apply(socket, arguments);
+      };
+
+      worker.on('worker start', socket.start.bind(socket));
+    }
+
+  };
+
+  TestAgent.BrowserWorker.Websocket = Websocket;
+
+}(this));
+(function(window) {
+
+  function PostMessage(options) {
+    var key;
+    if (typeof(options) === 'undefined') {
+      options = {};
+    }
+
+    for (key in options) {
+      if (options.hasOwnProperty(key)) {
+        this[key] = options[key];
+      }
+    }
+  }
+
+  PostMessage.prototype = {
+
+    window: window,
+
+    allowedDomains: '*',
+
+    targetWindow: window.parent,
+
+    enhance: function enhance(worker) {
+      var originalSend = worker.send,
+          self = this,
+          onMessage = this.onMessage.bind(this, worker);
+
+      if (originalSend) {
+        worker.send = function() {
+          self.postMessage.apply(self, arguments);
+          return originalSend.apply(worker, arguments);
+        }
+      } else {
+        worker.send = self.postMessage.bind(self);
+      }
+
+      worker.on('worker start', function() {
+        worker.send('worker start', {
+          type: 'post-message',
+          domain: window.location.href
+        });
+      });
+
+      this.window.addEventListener('message', onMessage);
+    },
+
+    onMessage: function onMessage(worker, event) {
+      var data = event.data;
+      if (data) {
+        if (typeof(data) === 'string') {
+          data = JSON.parse(data);
+        }
+        worker.respond(data);
+      }
+    },
+
+    postMessage: function postMessage() {
+      if (this.targetWindow === this.window) {
+        //prevent sending messages to myself!
+        return;
+      }
+
+      var args = Array.prototype.slice.call(arguments);
+      args = JSON.stringify(args);
+      this.targetWindow.postMessage(args, this.allowedDomains);
+    }
+
+  };
+
+  window.TestAgent.BrowserWorker.PostMessage = PostMessage;
+
+}(this));
+(function(window) {
+
+  function Driver(options) {
+    var key;
+    if (typeof(options) === 'undefined') {
+      options = {};
+    }
+
+    this.testMap = {};
+    this.testEnvs = {};
+    this.testGroups = {};
+    this.domains = {};
+
+    for (key in options) {
+      if (options.hasOwnProperty(key)) {
+        this[key] = options[key];
+      }
+    }
+  }
+
+  Driver.prototype = {
+
+    allowedDomains: '*',
+
+    window: window,
+
+    forwardEvents: ['test data', 'error', 'add test env'],
+
+    listenToWorker: 'post-message',
+
+    enhance: function(worker) {
+      var self = this,
+          onMessage;
+
+      onMessage = this.onMessage.bind(this, worker);
+      this.worker = worker;
+
+      worker.on('worker start', function(data) {
+        if (data && data.type == self.listenToWorker) {
+          self._startDomainTests(self.currentDomain);
+        }
+      });
+
+      worker.on('run tests complete', function() {
+        self._loadNextDomain();
+      });
+
+      worker.runTests = this.runTests.bind(this);
+
+      this.window.addEventListener('message', onMessage);
+    },
+
+    onMessage: function(worker, event) {
+      var eventType, data = event.data;
+      if (data) {
+        if (typeof(data) === 'string') {
+          data = JSON.parse(event.data);
+        }
+        //figure out what event this is
+        eventType = data[0];
+        worker.respond(data);
+        if (this.forwardEvents.indexOf(eventType) !== -1) {
+          if (worker.send) {
+            worker.send.apply(worker, data);
+          }
+        }
+      }
+    },
+
+    /**
+     * Sends message to a given iframe.
+     *
+     * @param {HTMLElement} iframe raw iframe element.
+     * @param {String} event name.
+     * @param {Object} data data to send.
+     */
+    send: function(iframe, event, data) {
+      var send = JSON.stringify([event, data]);
+      iframe.contentWindow.postMessage(send, this.allowedDomains);
+    },
+
+    /**
+     * Creates an iframe for a domain appends it to body
+     * and returns element.
+     *
+     * @param {String} src url source to load iframe from.
+     * @return {HTMLElement} iframe element.
+     */
+    createIframe: function(src) {
+      var iframe = document.createElement('iframe');
+      iframe.src = src + '?time' + String(Date.now());
+      document.body.appendChild(iframe);
+
+      return iframe;
+    },
+
+    /**
+     * Removes iframe from the dom.
+     *
+     * @param {HTMLElement} iframe raw iframe element.
+     */
+    removeIframe: function(iframe) {
+      if (iframe && iframe.parentNode) {
+        iframe.parentNode.removeChild(iframe);
+      }
+    },
+
+    /**
+     * Creates new iframe and register's it under
+     * .domains
+     *
+     *
+     * Removes current iframe and its
+     * associated tests if a current domain
+     * is set.
+     */
+    _loadNextDomain: function() {
+      var iframe;
+      //if we have a current domain
+      //remove it it should be finished now.
+      if (this.currentDomain) {
+        this.removeIframe(
+          this.domains[this.currentDomain]
+        );
+        delete this.testGroups[this.currentDomain];
+      }
+
+      var nextDomain = Object.keys(this.testGroups).shift();
+      if (nextDomain) {
+        this.currentDomain = nextDomain;
+        iframe = this.createIframe(nextDomain);
+        this.domains[this.currentDomain] = iframe;
+      } else {
+        this.currentDomain = null;
+      }
+    },
+
+    /**
+     * Sends run tests event to domain.
+     *
+     * @param {String} domain url.
+     */
+    _startDomainTests: function(domain) {
+      var iframe, tests, group;
+
+      if (domain in this.domains) {
+        iframe = this.domains[domain];
+        group = this.testGroups[domain];
+
+        this.send(iframe, 'set env', group.env);
+        this.send(iframe, 'run tests', { tests: group.tests });
+      }
+    },
+
+    /**
+     * Maps each test in the list
+     * into a test group based on the results
+     * of groupTestsByDomain.
+     *
+     * @param {Array} tests list of tests.
+     */
+    _createTestGroups: function(tests) {
+      var i = 0, len = tests.length,
+          group;
+
+      this.testGroups = {};
+      this.testEnvs = {};
+      this.testMap = {};
+
+      for (i; i < len; i++) {
+        group = this.groupTestsByDomain(tests[i]);
+        if (group.domain && group.test) {
+          if (!(group.domain in this.testGroups)) {
+            this.testGroups[group.domain] = {
+              env: group.env,
+              tests: []
+            };
+          }
+          this.testGroups[group.domain].tests.push(group.test);
+          this.testEnvs[group.env] = true;
+        }
+      }
+    },
+
+    /**
+     * Runs a group of tests.
+     *
+     * @param {Array} tests list of tests to run.
+     */
+    runTests: function(tests) {
+      this._createTestGroups(tests);
+      this.worker.send('add test env', Object.keys(this.testEnvs));
+      this._loadNextDomain();
+    }
+
+  };
+
+  window.TestAgent.BrowserWorker.MultiDomainDriver = Driver;
+
 }(this));
 (function(window) {
   'use strict';
@@ -1605,11 +1956,6 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
     enhance: function enhance(worker) {
       this.worker = worker;
       worker.testRunner = this._testRunner.bind(this);
-      worker.on('run tests', this._onRunTests.bind(this));
-    },
-
-    _onRunTests: function _onRunTests(data) {
-      this.worker.runTests(data.tests || []);
     },
 
     getReporter: function getReporter(box) {
@@ -1621,6 +1967,10 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
       stream.send = function send(line) {
         self.worker.send('test data', line);
       };
+
+      if (this.worker.env) {
+        TestAgent.Mocha.JsonStreamReporter.testAgentEnvId = this.worker.env;
+      }
 
       return MochaDriver.createMutliReporter(
         TestAgent.Mocha.JsonStreamReporter,

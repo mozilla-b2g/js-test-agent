@@ -6,6 +6,8 @@
     sandbox: '/test-agent/sandbox.html'
   });
 
+  worker.use(TestAgent.BrowserWorker.Websocket);
+
   worker.use(TestAgent.BrowserWorker.Config, {
     url: '/test-agent/config.json'
   });
