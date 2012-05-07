@@ -64,30 +64,40 @@ describe('test-agent/browser-worker/mocha-driver', function() {
     });
   });
 
-  describe('event: run tests', function() {
-    var data = {tests: ['/test']},
-        testsToRun = [];
+  describe('.getReporter', function() {
 
-    beforeEach(function() {
-      testsToRun = null;
-      worker.runTests = function(tests) {
-        testsToRun = tests;
-      };
+    describe('when env is set on worker', function() {
+      var result;
 
-      worker.emit('run tests', data);
+      beforeEach(function() {
+        worker.env = 'chrome';
+        result = subject.getReporter({
+          console: function(){},
+          mocha: {
+            reporters: {
+              HTML: function() {}
+            }
+          }
+        });
+      });
+
+      it('should set testAgentEnvId on JsonStreamReporter', function() {
+        expect(TestAgent.Mocha.JsonStreamReporter.testAgentEnvId).to.be('chrome');
+      });
+
     });
 
-    it('should call .runTests', function() {
-      expect(testsToRun).to.eql(data.tests);
-    });
   });
 
   describe('in test environment', function() {
     var tests = [baseUrl + 'test.js'],
-        getReporterCalled = false;
+        getReporterCalled = false,
+        sent = [];
 
     beforeEach(function(done) {
       getReporterCalled = false;
+      sent.length = 0;
+
       //mock out reporter to default
       subject.getReporter = function() {
         getReporterCalled = true;

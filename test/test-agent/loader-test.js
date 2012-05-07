@@ -214,6 +214,8 @@ describe('TestAgent.Loader', function() {
       var url = 'https://raw.github.com/LearnBoost/expect.js/master/expect.js';
 
       beforeEach(function(done) {
+        //when your on a slow hotel connection :p
+        this.timeout(10000);
         subject.require(url);
         subject.done(function() {
           done();

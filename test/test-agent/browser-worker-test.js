@@ -41,10 +41,14 @@ describe('test-agent/browser-worker', function() {
 
     beforeEach(function() {
       subject = new TestAgent.BrowserWorker({
-        testRunner: fn
+        testRunner: fn,
+        env: 'chrome'
       });
     });
 
+    it('should set env', function() {
+      expect(subject.env).to.be('chrome');
+    });
 
     it('should save .testRunner option to testRunner', function() {
       expect(subject.testRunner).to.be(fn);
@@ -88,6 +92,32 @@ describe('test-agent/browser-worker', function() {
       expect(subject.wasEnhanced).to.be(data);
     });
 
+  });
+
+  describe('event: set env', function() {
+    beforeEach(function() {
+      subject.emit('set env', 'foo');
+    });
+
+    it('should set env ', function() {
+      expect(subject.env).to.be('foo');
+    });
+  });
+
+  describe('event: run tests', function() {
+    var calledWith, tests = ['a.js'];
+    beforeEach(function() {
+      calledWith = null;
+      subject.runTests = function(tests) {
+        calledWith = tests;
+      }
+
+      subject.emit('run tests', { tests: tests });
+    });
+
+    it('should call runTests', function() {
+      expect(calledWith).to.eql(tests);
+    });
   });
 
   describe('on sandbox error', function() {

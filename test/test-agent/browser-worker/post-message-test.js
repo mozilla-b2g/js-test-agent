@@ -8,11 +8,11 @@ describe('test-agent/browser-worker/post-message', function() {
       worker,
       allowedDomain,
       setupListener,
-      window = { uniq: true },
+      win = { uniq: true },
       windowListener,
       targetWindow = {
         postMessage: function(message, allowed) {
-          messages.push(message);
+          messages.push(JSON.parse(message));
           allowedDomain = allowed;
         }
       };
@@ -27,7 +27,7 @@ describe('test-agent/browser-worker/post-message', function() {
   beforeEach(function() {
     setupListener = false;
 
-    window.addEventListener = function(type, callback) {
+    win.addEventListener = function(type, callback) {
       if (type === 'message') {
         setupListener = true;
         windowListener = callback;
@@ -38,7 +38,7 @@ describe('test-agent/browser-worker/post-message', function() {
     worker = TestAgent.factory.browserWorker();
     subject = new TestAgent.BrowserWorker.PostMessage();
 
-    subject.window = window;
+    subject.window = win;
     subject.targetWindow = targetWindow;
 
     subject.enhance(worker);
@@ -79,7 +79,10 @@ describe('test-agent/browser-worker/post-message', function() {
 
     it('should send message', function() {
       expect(messages).to.eql([
-        ['worker start']
+        ['worker start', {
+          type: 'post-message',
+          domain: window.location.href
+        }]
       ]);
     });
 
