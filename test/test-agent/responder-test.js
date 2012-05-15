@@ -105,7 +105,7 @@ describe('test-agent/responder', function() {
     describe('initialization', function() {
 
       it('should set events to a blank object', function() {
-        expect(subject.events).to.eql({});
+        expect(subject._$events).to.eql({});
       });
 
       describe('when given an object', function() {
@@ -171,8 +171,8 @@ describe('test-agent/responder', function() {
         });
 
         it('should add event for each key(event),value(callback) pair', function() {
-          expect(subject.events['client new'][0]).to.be(cb1);
-          expect(subject.events['test all'][0]).to.be(cb2);
+          expect(subject._$events['client new'][0]).to.be(cb1);
+          expect(subject._$events['test all'][0]).to.be(cb2);
         });
 
       });
@@ -186,11 +186,11 @@ describe('test-agent/responder', function() {
 
           subject.addEventListener('test', cb1);
           subject.addEventListener('test', cb2);
-          events = subject.events;
+          events = subject._$events;
         });
 
         it('should create an array for events.test', function() {
-          expect(subject.events.test).to.be.a(Array);
+          expect(subject._$events.test).to.be.a(Array);
         });
 
         it('should add callback1 to test events.test', function() {
@@ -236,7 +236,7 @@ describe('test-agent/responder', function() {
       });
 
       it('should remove event after firing', function() {
-        expect(subject.events.onceEvent.length).to.be(0);
+        expect(subject._$events.onceEvent.length).to.be(0);
       });
 
     });
@@ -294,7 +294,7 @@ describe('test-agent/responder', function() {
 
     describe('.removeEventListener', function() {
       it('should have no events', function() {
-        expect(subject.events.test).to.be(undefined);
+        expect(subject._$events.test).to.be(undefined);
       });
 
       describe('when there are no listeners to remove', function() {
@@ -312,7 +312,7 @@ describe('test-agent/responder', function() {
         });
 
         it('should not remove any other event', function() {
-          expect(subject.events.test.length).to.be(1);
+          expect(subject._$events.test.length).to.be(1);
         });
 
       });
@@ -327,7 +327,7 @@ describe('test-agent/responder', function() {
           subject.addEventListener('test', cb1);
           subject.addEventListener('test', cb2);
 
-          expect(subject.events.test.length).to.be(3);
+          expect(subject._$events.test.length).to.be(3);
 
           subject.removeEventListener('test', cb1);
         });
@@ -335,11 +335,11 @@ describe('test-agent/responder', function() {
 
         //this is how it works in node anyway
         it('should have removed one instance of removed callback', function() {
-          expect(subject.events.test.length).to.be(2);
+          expect(subject._$events.test.length).to.be(2);
 
           //will have new index order
-          expect(subject.events.test[0]).to.be(cb1);
-          expect(subject.events.test[1]).to.be(cb2);
+          expect(subject._$events.test[0]).to.be(cb1);
+          expect(subject._$events.test[1]).to.be(cb2);
         });
 
       });
@@ -356,7 +356,7 @@ describe('test-agent/responder', function() {
         });
 
         it('should have no events', function() {
-          expect(subject.events.test.length).to.be(0);
+          expect(subject._$events.test.length).to.be(0);
         });
       });
 
