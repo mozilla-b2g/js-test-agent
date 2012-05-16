@@ -1,6 +1,6 @@
 var Mocha = require_lib('node/server/mocha-test-events'),
     AppResponder = require_lib('node/server/responder'),
-    Reporter = require_lib('node/mocha/reporter'),
+    Reporter = require_lib('test-agent/mocha/reporter'),
     Responder = require_lib('test-agent/responder'),
     //does nothing
     MochaReporter = function() {};

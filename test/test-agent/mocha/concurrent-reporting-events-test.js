@@ -1,11 +1,31 @@
-var ReportingEvents = requireLib('node/mocha/concurrent-reporting-events'),
-    Responder = requireLib('test-agent/responder').TestAgent.Responder,
-    Proxy = requireLib('node/mocha/runner-stream-proxy');
-
 describe('node/mocha/concurrent-reporting-events', function() {
 
   var subject,
-      eventStack = [];
+      eventStack = [],
+      ReportingEvents,
+      Responder,
+      Proxy;
+
+  cross.require(
+    'test-agent/responder',
+    'TestAgent.Responder', function(obj) {
+      Responder = obj;
+    }
+  );
+
+  cross.require(
+    'test-agent/mocha/concurrent-reporting-events',
+    'TestAgent.Mocha.ConcurrentReportingEvents', function(obj) {
+      ReportingEvents = obj;
+    }
+  );
+
+  cross.require(
+    'test-agent/mocha/runner-stream-proxy',
+    'TestAgent.Mocha.RunnerStreamProxy', function(obj) {
+      Proxy = obj;
+    }
+  );
 
   function emit(event, id) {
     var data = { testAgentEnvId: id };

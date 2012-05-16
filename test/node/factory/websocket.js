@@ -1,4 +1,4 @@
-var Responder = require('../../../lib/test-agent/responder').TestAgent.Responder,
+var Responder = require('../../../lib/test-agent/responder'),
     WebSocket = require('./event-object');
 
 module.exports = exports = {

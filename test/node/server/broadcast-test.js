@@ -1,5 +1,5 @@
 var Broadcast = require('../../../lib/node/server/broadcast'),
-    Responder = require('../../../lib/test-agent/responder').TestAgent.Responder;
+    Responder = require('../../../lib/test-agent/responder');
 
 describe('node/server/broadcast', function() {
 

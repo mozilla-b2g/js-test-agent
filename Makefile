@@ -46,8 +46,9 @@ test-browser:
 
 test-node :
 	@./node_modules/mocha/bin/mocha --reporter $(REPORTER) \
-		test/helper.js test/node/mocha/*.js \
+		test/helper.js \
 		test/node/*-test.js  \
+		test/test-agent/mocha/*-test.js  \
 		test/test-agent/responder-test.js \
 		test/test-agent/websocket-client-test.js
 

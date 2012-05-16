@@ -1,5 +1,5 @@
 var Server = require('../../lib/node/websocket-server'),
-    Responder = require('../../lib/test-agent/responder').TestAgent.Responder,
+    Responder = require('../../lib/test-agent/responder'),
     fsPath = require('path');
 
 describe('node/websocket-server', function() {

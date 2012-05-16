@@ -1,4 +1,4 @@
-var Responder = require('../../../lib/test-agent/responder').TestAgent.Responder,
+var Responder = require('../../../lib/test-agent/responder'),
     EventObject;
 
 EventObject = function(attrs) {

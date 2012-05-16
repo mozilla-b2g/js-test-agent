@@ -465,11 +465,15 @@
   };
 
 }(this));
-(function(exports) {
+(function() {
   'use strict';
 
-  if (typeof(exports.TestAgent) === 'undefined') {
-    exports.TestAgent = {};
+  var isNode = typeof(window) === 'undefined';
+
+  if (!isNode) {
+    if (typeof(window.TestAgent) === 'undefined') {
+      window.TestAgent = {};
+    }
   }
 
   /**
@@ -477,8 +481,8 @@
    *
    * @param {Object} list of events to add onto responder.
    */
-  var Responder = exports.TestAgent.Responder = function Responder(events) {
-    this.events = {};
+  function Responder(events) {
+    this._$events = {};
 
     if (typeof(events) !== 'undefined') {
       this.addEventListener(events);
@@ -523,7 +527,7 @@
      *
      * @type Object
      */
-    events: null,
+    _$events: null,
 
     /**
      * Recieves json string event and dispatches an event.
@@ -568,11 +572,11 @@
         return this;
       }
 
-      if (!(type in this.events)) {
-        this.events[type] = [];
+      if (!(type in this._$events)) {
+        this._$events[type] = [];
       }
 
-      this.events[type].push(callback);
+      this._$events[type].push(callback);
 
       return this;
     },
@@ -612,8 +616,8 @@
           eventList,
           self = this;
 
-      if (event in this.events) {
-        eventList = this.events[event];
+      if (event in this._$events) {
+        eventList = this._$events[event];
 
         eventList.forEach(function(callback) {
           callback.apply(self, args);
@@ -630,9 +634,9 @@
      * @param {String} event event type to remove.
      */
     removeAllEventListeners: function removeAllEventListeners(name) {
-      if (name in this.events) {
+      if (name in this._$events) {
         //reuse array
-        this.events[name].length = 0;
+        this._$events[name].length = 0;
       }
 
       return this;
@@ -649,11 +653,11 @@
     removeEventListener: function removeEventListener(name, callback) {
       var i, length, events;
 
-      if (!(name in this.events)) {
+      if (!(name in this._$events)) {
         return false;
       }
 
-      events = this.events[name];
+      events = this._$events[name];
 
       for (i = 0, length = events.length; i < length; i++) {
         if (events[i] && events[i] === callback) {
@@ -669,9 +673,13 @@
 
   Responder.prototype.on = Responder.prototype.addEventListener;
 
-}(
-  (typeof(window) === 'undefined') ? module.exports : window
-));
+  if (isNode) {
+    module.exports = Responder;
+  } else {
+    window.TestAgent.Responder = Responder;
+  }
+
+}());
 
 (function(window) {
 
@@ -1035,24 +1043,24 @@
 }(this));
 
 //depends on TestAgent.Responder
-(function(exports) {
+(function() {
   'use strict';
 
-  if (typeof(exports.TestAgent) === 'undefined') {
-    exports.TestAgent = {};
-  }
+  var isNode = typeof(window) === 'undefined',
+      Native,
+      Responder;
 
-  var Native, Responder, TestAgent;
+  if (!isNode) {
+    if (typeof(window.TestAgent) === 'undefined') {
+      window.TestAgent = {};
+    }
 
-  //Hack Arounds for node
-  if (typeof(window) === 'undefined') {
+    Native = (Native || WebSocket || MozWebSocket);
+    Responder = TestAgent.Responder;
+  } else {
     Native = require('ws');
-    Responder = require('./responder').TestAgent.Responder;
+    Responder = require('./responder');
   }
-
-  TestAgent = exports.TestAgent;
-  Responder = Responder || TestAgent.Responder;
-  Native = (Native || WebSocket || MozWebSocket);
 
   //end
 
@@ -1072,7 +1080,7 @@
    * @param {Numeric} option.retryTimeout \
    * ( Time between retries 3000ms by default).
    */
-  var Client = TestAgent.WebsocketClient = function WebsocketClient(options) {
+  function Client(options) {
     var key;
     for (key in options) {
       if (options.hasOwnProperty(key)) {
@@ -1161,9 +1169,13 @@
     this.emit.apply(this, arguments);
   };
 
-}(
-  (typeof(window) === 'undefined') ? module.exports : window
-));
+  if (isNode) {
+    module.exports = Client;
+  } else {
+    window.TestAgent.WebsocketClient = Client;
+  }
+
+}());
 /*(The MIT License)
 
 Copyright (c) 20011-2012 TJ Holowaychuk <tj@vision-media.ca>

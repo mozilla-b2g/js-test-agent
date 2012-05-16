@@ -1,22 +1,37 @@
-var Responder = require('../../../lib/test-agent/responder').TestAgent.Responder,
-    RunnerProxy = require('../../../lib/node/mocha/runner-stream-proxy');
-
 describe('node/mocha/runner-stream-proxy', function() {
   var subject, runner, event, test,
-      eventsFired, factory = {};
+      eventsFired, factory = {},
+      Responder,
+      RunnerProxy;
 
-  factory.test = testSupport.factory({
-    fullTitle: 'Parent: Foo Bar',
-    title: 'Foo bar',
-    state: 'passed',
-    testAgentEnvId: null
-  }, RunnerProxy.Test);
+  cross.require(
+    'test-agent/responder',
+    'TestAgent.Responder', function(obj) {
+      Responder = obj;
+    }
+  );
 
-  factory.suite = testSupport.factory({
-    title: 'title',
-    fullTitle: 'full',
-    testAgentEnvId: null
-  }, RunnerProxy.Suite);
+  cross.require(
+    'test-agent/mocha/runner-stream-proxy',
+    'TestAgent.Mocha.RunnerStreamProxy', function(obj) {
+      RunnerProxy = obj;
+    }
+  );
+
+  before(function() {
+    factory.test = testSupport.factory({
+      fullTitle: 'Parent: Foo Bar',
+      title: 'Foo bar',
+      state: 'passed',
+      testAgentEnvId: null
+    }, RunnerProxy.Test);
+
+    factory.suite = testSupport.factory({
+      title: 'title',
+      fullTitle: 'full',
+      testAgentEnvId: null
+    }, RunnerProxy.Suite);
+  });
 
   function lastEvent() {
     if (eventsFired.length === 0) {
@@ -302,3 +317,4 @@ describe('node/mocha/runner-stream-proxy', function() {
 
 
 });
+

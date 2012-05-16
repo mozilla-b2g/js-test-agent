@@ -1,5 +1,5 @@
 var WebSocketServer = require_lib('node/websocket-server'),
-    Responder = require_lib('test-agent/responder').TestAgent.Responder,
+    Responder = require_lib('test-agent/responder'),
     websocket = require('./websocket').websocket,
     Server;
 

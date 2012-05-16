@@ -73,10 +73,10 @@ afterEach(function() {
         path += '.js';
       }
 
-      path = '../lib/' + path;
+      path = '/lib/' + path;
 
       if (isNode) {
-        cb(this.nsFind(require(path), component));
+        cb(require('..' + path));
       } else {
         exports.require(path, function() {
           cb(this.nsFind(exports, component));

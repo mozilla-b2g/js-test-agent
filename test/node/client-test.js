@@ -1,8 +1,5 @@
-var Responder = requireLib('test-agent/responder'),
-    WebsocketClient = requireLib('test-agent/websocket-client'),
+var WebsocketClient = requireLib('test-agent/websocket-client'),
     Client = requireLib('node/client');
-
-WebsocketClient = WebsocketClient.TestAgent.WebsocketClient;
 
 describe('test-agent/websocket-common', function() {
 

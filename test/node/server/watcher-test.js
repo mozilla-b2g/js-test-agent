@@ -1,6 +1,6 @@
 var Watcher = require('../../../lib/node/server/watcher'),
     Suite = require('../../../lib/node/suite'),
-    Responder = require('../../../lib/test-agent/responder').TestAgent.Responder,
+    Responder = require('../../../lib/test-agent/responder'),
     fs = require('fs'),
     fsPath = require('path');
 

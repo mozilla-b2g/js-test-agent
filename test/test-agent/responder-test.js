@@ -1,15 +1,14 @@
-var result = require_lib('test-agent/responder.js');
-
-if (result) {
-  var TestAgent = result.TestAgent;
-}
-
 describe('test-agent/responder', function() {
-  var Responder, subject, eventName = 'test';
+  var Responder,
+      subject,
+      eventName = 'test';
 
-  before(function() {
-    Responder = TestAgent.Responder;
-  });
+  cross.require(
+    'test-agent/responder',
+    'TestAgent.Responder', function(obj) {
+      Responder = obj;
+    }
+  );
 
   describe('Static Methods', function() {
 
@@ -19,7 +18,7 @@ describe('test-agent/responder', function() {
 
 
     beforeEach(function() {
-      subject = TestAgent.Responder;
+      subject = Responder;
       commandString = JSON.stringify([eventName, data]);
     });
 

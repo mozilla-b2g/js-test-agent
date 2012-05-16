@@ -69,7 +69,6 @@ describe('TestAgent.Sandbox', function() {
         readyCalled = false;
 
     beforeEach(function(done) {
-      this.timeout(100000000);
       destroyCaled = false;
       readyCalled = null;
 
@@ -130,12 +129,12 @@ describe('TestAgent.Sandbox', function() {
     }
 
     beforeEach(function(done) {
-      this.timeout(4000);
+      this.timeout(10000);
       var pending = stack(2, done);
       context = null;
       errors.length = 0;
 
-      subject.url = '/test/fixtures/iframe-error.html';
+      subject.url = '/test/fixtures/iframe-error.html?1';
       subject.run(function() {
         context = this;
         pending.pop();

@@ -1,16 +1,22 @@
-var Responder = require_lib('test-agent/responder.js'),
-    WebsocketClient = require_lib('test-agent/websocket-client.js');
-
-if (WebsocketClient) {
-  var WebsocketClient = WebsocketClient.TestAgent.WebsocketClient;
-}
-
-if (Responder) {
-  Responder = Responder.TestAgent.Responder;
-}
-
 describe('test-agent/websocket-common', function() {
-  var subject, url = 'ws://fake', Native;
+  var subject, url = 'ws://fake',
+      Native,
+      Responder,
+      WebsocketClient;
+
+  cross.require(
+    'test-agent/responder.js',
+    'TestAgent.Responder', function(obj) {
+      Responder = obj;
+    }
+  );
+
+  cross.require(
+    'test-agent/websocket-client.js',
+    'TestAgent.WebsocketClient', function(obj) {
+      WebsocketClient = obj;
+    }
+  );
 
   function mockNative() {
     beforeEach(function() {
@@ -207,7 +213,7 @@ describe('test-agent/websocket-common', function() {
       });
     });
 
-    describe('when there are retries but connection eventually opens', function() {
+    describe('there are retries but connection eventually opens', function() {
       beforeEach(function() {
         subject.retries = 10;
         subject.emit('open');

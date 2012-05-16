@@ -1,18 +1,55 @@
-var Responder = requireLib('test-agent/responder').TestAgent.Responder,
-    Reporter = requireLib('node/mocha/reporter'),
-    Handler = requireLib('node/mocha/concurrent-reporting-events'),
-    Proxy = requireLib('node/mocha/runner-stream-proxy');
-
 describe('node/mocha/reporter', function() {
 
-  var subject,
+  var Responder,
+      Reporter,
+      Handler,
+      Proxy,
+      subject,
       report,
+      Mocha,
       mochaReporter;
 
+  cross.require(
+    'test-agent/responder',
+    'TestAgent.Responder', function(obj) {
+      Responder = obj;
+    }
+  );
+
+  cross.require(
+    'test-agent/mocha/runner-stream-proxy',
+    'TestAgent.Mocha.RunnerStreamProxy', function(obj) {
+      Proxy = obj;
+    }
+  );
+
+  cross.require(
+    'test-agent/mocha/concurrent-reporting-events',
+    'TestAgent.Mocha.ConcurrentReportingEvents', function(obj) {
+      Handler = obj;
+    }
+  );
+
+  cross.require(
+    'test-agent/mocha/reporter',
+    'TestAgent.Mocha.Reporter', function(obj) {
+      Reporter = obj;
+    }
+  );
+
   beforeEach(function() {
+    if (typeof(window) === 'undefined') {
+      Mocha = require('mocha');
+    } else {
+      Mocha = mocha;
+    }
     report = Responder;
-    subject = new Reporter();
-    mochaReporter = require('mocha').reporters[subject.defaultMochaReporter];
+    subject = new Reporter({
+      reporterClass: function(runner){
+        this.runner = runner;
+      }
+    });
+    mochaReporter = Mocha.reporters[subject.defaultMochaReporter];
   });
 
   it('should use .Spec as default reporter', function() {
@@ -24,6 +61,9 @@ describe('node/mocha/reporter', function() {
   });
 
   describe('initialization', function() {
+    beforeEach(function() {
+      subject = new Reporter();
+    });
 
     it('should not have a .proxy', function() {
       expect(subject.proxy).not.to.be.ok();
@@ -64,7 +104,7 @@ describe('node/mocha/reporter', function() {
   describe('.getMochaReporter', function() {
     it('should return reporter', function() {
       subject.createRunner();
-      expect(subject.getMochaReporter()).to.be.a(mochaReporter);
+      expect(subject.getMochaReporter()).to.be.a(subject.reporterClass);
     });
   });
 
@@ -93,7 +133,7 @@ describe('node/mocha/reporter', function() {
     });
 
     it('should create the .reporter', function() {
-      expect(subject.reporter).to.be.a(mochaReporter);
+      expect(subject.reporter).to.be.a(subject.reporterClass);
       expect(subject.reporter.runner).to.be(subject.runner);
     });
   });
@@ -102,23 +142,26 @@ describe('node/mocha/reporter', function() {
 
     var calledWith = [],
         sentWith,
-        respond = Proxy.prototype.respond,
+        origRespond,
         sentStartEvent = false,
         endData = ['end', {}],
         startData = ['start', {total: 20}];
 
+    before(function() {
+      origRespond = Proxy.prototype.respond;
+    })
+
     afterEach(function() {
-      Proxy.prototype.respond = respond;
+      Proxy.prototype.respond = origRespond;
     });
 
     beforeEach(function() {
       var respond;
       sentWith = null;
       calledWith = [];
-      respond = Proxy.prototype.respond;
       Proxy.prototype.respond = function() {
         calledWith.push(Array.prototype.slice.call(arguments));
-        respond.apply(this, arguments);
+        origRespond.apply(this, arguments);
       };
     });
 
@@ -151,6 +194,7 @@ describe('node/mocha/reporter', function() {
 
       beforeEach(function() {
         sentStartEvent = false;
+        subject.reporterClass = function(){};
 
         subject.on('start', function(runner) {
           sentStartEvent = true;
@@ -192,3 +236,4 @@ describe('node/mocha/reporter', function() {
   });
 
 });
+

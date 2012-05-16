@@ -1,7 +1,7 @@
 var EventMirror = require_lib('node/server/event-mirror'),
     AppResponder = require_lib('node/server/responder'),
     WebsockeServer = require_lib('node/websocket-server'),
-    Reporter = require_lib('node/mocha/reporter'),
+    Reporter = require_lib('test-agent/mocha/reporter'),
     Responder = require_lib('test-agent/responder');
 
 describe('node/server/event-mirror', function() {
