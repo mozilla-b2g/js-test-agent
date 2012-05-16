@@ -1,3 +1,11 @@
+# 0.4.0
+  - Ported all node/mocha/ scripts to test-agent/mocha/ they will now
+    run in both the browser and server
+
+  - Adding support for running tests across different domains via
+    iframes. This will eventually lead to multi worker support between
+    browsers.
+
 # 0.3.1
   - Add missing WebsocketClient.close method
 
