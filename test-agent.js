@@ -592,8 +592,8 @@
     once: function once(type, callback) {
       var self = this;
       function onceCb() {
-        callback.apply(this, arguments);
         self.removeEventListener(type, onceCb);
+        callback.apply(this, arguments);
       }
 
       this.addEventListener(type, onceCb);
@@ -1367,7 +1367,15 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
     });
 
     runner.on('start', function onStart() {
-      MochaReporter.send(JSON.stringify(['start', { total: total }]));
+      var obj = {
+        total: total
+      };
+
+      if (MochaReporter.testAgentEnvId) {
+        obj.testAgentEnvId = MochaReporter.testAgentEnvId;
+      }
+
+      MochaReporter.send(JSON.stringify(['start', obj]));
     });
 
     runner.on('pass', function onPass(test) {
@@ -1405,6 +1413,11 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
     exportKeys.forEach(function(key) {
       var value;
+
+      if(object.fn) {
+        result.fn = object.fn.toString();
+      }
+
       if (key in object) {
         value = object[key];
 
@@ -1436,6 +1449,735 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 }(this));
 
+(function() {
+  var isNode = typeof(window) === 'undefined',
+      Responder,
+      exports;
+
+  if(!isNode) {
+    if(typeof(TestAgent.Mocha) === 'undefined') {
+      TestAgent.Mocha = {};
+    }
+    Responder = TestAgent.Responder;
+  } else {
+    Responder = require('../responder');
+  }
+
+  function copy(values, exclude) {
+    var key;
+
+    if (!exclude) {
+      exclude = [];
+    }
+
+    for (key in values) {
+      if (values.hasOwnProperty(key)) {
+        if (exclude.indexOf(key) > -1) {
+          continue;
+        }
+        this[key] = values[key];
+      }
+    }
+  }
+
+  function wrapWithEnvId(data) {
+    var prefix;
+    if (data.testAgentEnvId) {
+      prefix = '[' + data.testAgentEnvId + '] ';
+      if (data.__test__.fullTitle !== '') {
+        data.__test__.fullTitle = prefix + data.__test__.fullTitle;
+      }
+
+      if (data.title !== '') {
+        data.title = prefix + data.title;
+      }
+    }
+  }
+
+  RunnerStreamProxy.Suite = function Suite(suite) {
+    this.__test__ = suite;
+    copy.call(this, suite, ['fullTitle']);
+    wrapWithEnvId(this);
+  };
+
+  RunnerStreamProxy.Suite.prototype.fullTitle = function() {
+    return this.__test__.fullTitle;
+  };
+
+  RunnerStreamProxy.Test = function Test(test) {
+    this.__test__ = test;
+    copy.call(this, test, ['fullTitle']);
+    wrapWithEnvId(this);
+  };
+
+  RunnerStreamProxy.Test.prototype.fullTitle = function() {
+    return this.__test__.fullTitle;
+  };
+
+  function RunnerStreamProxy(runner) {
+    var self = this;
+
+    Responder.apply(this, arguments);
+
+    this.runner = runner;
+
+    this.on({
+
+      'start': function onStart(data) {
+        runner.emit('start', data);
+      },
+
+      'log': function onLog(data) {
+        console.log.apply(console, data.messages);
+      },
+
+      'end': function onEnd(data) {
+        runner.emit('end', data);
+      },
+
+      'suite': function onSuite(data) {
+        this.parent = new RunnerStreamProxy.Suite(data);
+        runner.emit('suite', this.parent);
+      },
+
+      'suite end': function onSuiteEnd(data) {
+        runner.emit('suite end', new RunnerStreamProxy.Suite(data));
+        this.parent = null;
+      },
+
+      'test': function onTest(data) {
+        self.err = null;
+        runner.emit('test', this._createTest(data));
+      },
+
+      'test end': this._emitTest.bind(this, 'test end'),
+      'fail': this._emitTest.bind(this, 'fail'),
+      'pass': this._emitTest.bind(this, 'pass'),
+      'pending': this._emitTest.bind(this, 'pending')
+
+    });
+  }
+
+  RunnerStreamProxy.prototype = Object.create(Responder.prototype);
+
+  /**
+   * Emits a event on the runner intended to be used with bind
+   *
+   *    something.on('someEventName', this._emitTest.bind('someEventName'));
+   *
+   * @param {String} event
+   * @param {Object} data
+   */
+  RunnerStreamProxy.prototype._emitTest = function _emitTest(event, data) {
+    var err;
+    if (data.err) {
+      err = data.err;
+      this.err = err;
+    }
+    this.runner.emit(event, this._createTest(data), err);
+  };
+
+  /**
+   * Factory to create a test.
+   *
+   *
+   * @param {Object} data
+   * @return {RunnerStreamProxy.Test}
+   */
+  RunnerStreamProxy.prototype._createTest = function _createTest(data) {
+    var test = new RunnerStreamProxy.Test(data);
+
+    test.parent = this.parent;
+
+    if (this.err) {
+      test.err = this.err;
+    }
+
+    return test;
+  };
+
+
+  if (isNode) {
+    module.exports = RunnerStreamProxy;
+  } else {
+    TestAgent.Mocha.RunnerStreamProxy = RunnerStreamProxy;
+  }
+
+}());
+(function() {
+
+  var isNode = typeof(window) === 'undefined',
+      Responder;
+
+  if (!isNode) {
+    if (typeof(TestAgent.Mocha) === 'undefined') {
+      TestAgent.Mocha = {};
+    }
+    Responder = TestAgent.Responder;
+  } else {
+    Responder = require('../responder');
+  }
+
+  /**
+   * Removes a value from an array.
+   *
+   * @param {Array} array target to remove value from.
+   * @param {Object} value value to remove from array.
+   */
+  function removeIndex(array, value) {
+    var index = array.indexOf(value);
+
+    if (index !== -1) {
+      array.splice(index, 1);
+      return true;
+    }
+
+    return false;
+  }
+
+  /**
+   * Creates a thread manager able to
+   * accept test events from multiple sources.
+   *
+   *
+   * @param {Object} options config.
+   * @param {Array} options.envs object containing a list of
+   *                                     environments to keep track of.
+   * @constructor
+   */
+  function ConcurrentReportingEvents(options) {
+    var key;
+
+    if (typeof(options) === 'undefined') {
+      options = {};
+    }
+
+    for (key in options) {
+      if (options.hasOwnProperty(key)) {
+        this[key] = options[key];
+      }
+    }
+
+    this.envOrder = [];
+    this.envQueue = {};
+    //clone
+    this.total = 0;
+    this.startQueue = this.envs.concat([]);
+    this.timeoutId = null;
+    this.currentEnv = null;
+
+    Responder.call(this);
+  }
+
+  var proto = ConcurrentReportingEvents.prototype = Object.create(
+    Responder.prototype
+  );
+
+  /**
+   * Name of start event
+   *
+   * @type String
+   */
+  proto.START = 'start';
+
+  /**
+   * Name of end event
+   *
+   * @type String
+   */
+  proto.END = 'end';
+
+  /**
+   * Time between events before
+   * throwing an error.
+   *
+   * @type Numeric
+   */
+  proto.envTimeout = 10000;
+
+  var emit = proto.emit;
+
+  /**
+   * Emits queued events for envId.
+   *
+   * @this
+   * @param {String} envId id of env to emit.
+   */
+  proto._emitQueuedEvents = function(envId) {
+    var queue = this.envQueue[envId],
+        event;
+
+    while ((event = queue.shift())) {
+      this.emit.apply(this, event);
+    }
+  };
+
+  /**
+   * Emits runner error.
+   * @this
+   * @param {Object} self context to emit event from.
+   */
+  proto._emitRunnerError = function _emitRunnerError(self) {
+    var context = self || this;
+    context.emit('runner error', new Error('timeout'));
+  };
+
+  /**
+   * Clears and resets the event timer.
+   * If no events occur within the .envTimeout
+   * period the 'runner error' event will be sent.
+   * @this
+   */
+  proto._setTimeout = function _setTimeout() {
+    this._clearTimeout();
+    this.timeoutId = setTimeout(
+      this._emitRunnerError,
+      this.envTimeout,
+      this
+    );
+  };
+
+
+  /**
+   * Clears timeout.
+   * @this
+   */
+  proto._clearTimeout = function _clearTimeout() {
+    clearTimeout(this.timeoutId);
+  };
+
+  /**
+   * Checks if current report is complete.
+   *
+   * @this
+   * @return {Boolean} true when all envs are done.
+   */
+  proto.isComplete = function() {
+    return this.envs.length === 0;
+  };
+
+  /**
+   * Triggers the start event.
+   */
+  proto.emitStart = function() {
+    emit.call(this, 'start', { total: this.total });
+  };
+
+  /**
+   * Emits an event on this object.
+   * Events will be emitted in groups
+   * based on the testAgentEnvId value in
+   * data. If one is not present this
+   * will act as a normal emit function.
+   *
+   * @this
+   * @param {String} event events name.
+   * @param {Object} data data to emit.
+   * @return {Object} self.
+   */
+  proto.emit = function(event, data) {
+    var envId,
+        currentEnv;
+
+    if (typeof(data) !== 'object' || !('testAgentEnvId' in data)) {
+      //act like a normal responder
+      return emit.apply(this, arguments);
+    }
+
+    envId = data.testAgentEnvId;
+    currentEnv = this.currentEnv;
+
+    this._setTimeout();
+
+    //when another env sends the start event queue
+    //it to be next in line.
+    if (event === this.START) {
+      this.total = this.total + data.total;
+
+      this.envOrder.push(envId);
+
+      //create env queue if it does not exist
+      if (!(envId in this.envQueue)) {
+        this.envQueue[envId] = [];
+      }
+
+      removeIndex(this.startQueue, envId);
+
+      if (this.startQueue.length === 0) {
+        this.emitStart();
+        this.currentEnv = this.envOrder.shift();
+        this._emitQueuedEvents(this.currentEnv);
+      }
+
+      return this;
+    }
+
+    //if this event is for a different group
+    //queue the event until the current group
+    //emits an 'end' event
+    if (envId !== currentEnv) {
+      this.envQueue[envId].push(arguments);
+      return this;
+    }
+
+    //when the end event fires
+    //on the current group
+    if (event === this.END) {
+      removeIndex(this.envs, currentEnv);
+
+      this.currentEnv = this.envOrder.shift();
+      //emit the next groups events
+      if (this.currentEnv) {
+        this._emitQueuedEvents(this.currentEnv);
+        //and suppress this 'end' event
+        return this;
+      }
+
+      if (!this.isComplete()) {
+        //don't emit end until all envs are complete
+        return this;
+      }
+
+      this._clearTimeout();
+      //if this is the last
+      //env send the end event.
+    }
+
+    emit.apply(this, arguments);
+
+    return this;
+  };
+
+  if (isNode) {
+    module.exports = ConcurrentReportingEvents;
+  } else {
+    TestAgent.Mocha.ConcurrentReportingEvents = ConcurrentReportingEvents;
+  }
+
+}());
+(function() {
+
+  var isNode = typeof(window) === 'undefined',
+      Responder,
+      Proxy,
+      ReportingEvents,
+      Mocha;
+
+  if (!isNode) {
+    if (typeof(TestAgent.Mocha) === 'undefined') {
+      TestAgent.Mocha = {};
+    }
+
+    Responder = TestAgent.Responder;
+    Proxy = TestAgent.Mocha.RunnerStreamProxy;
+    ReportingEvents = TestAgent.Mocha.ConcurrentReportingEvents;
+  } else {
+    Responder = require('../responder');
+    Proxy = require('./runner-stream-proxy');
+    ReportingEvents = require('./concurrent-reporting-events');
+  }
+
+  /**
+   * @param {Object} options configuration options.
+   * @constructor
+   */
+  function Reporter(options) {
+    var key;
+
+    Responder.call(this);
+
+    for (key in options) {
+      if (options.hasOwnProperty(key)) {
+        this[key] = options[key];
+      }
+    }
+
+    if (isNode) {
+      Mocha = require('mocha');
+    } else {
+      Mocha = window.mocha;
+    }
+
+    this.envs = [];
+    if (!this.reporterClass) {
+      this.reporterClass = Mocha.reporters[this.defaultMochaReporter];
+    }
+  }
+
+  Reporter.prototype = Object.create(Responder.prototype);
+
+  /**
+   * Adds env to next test run.
+   *
+   * @param {String|String[]} env a single env or an array of envs.
+   */
+  Reporter.prototype.addEnv = function addEnv(env) {
+    if (env instanceof Array) {
+      this.envs = this.envs.concat(env);
+    } else {
+      this.envs.push(env);
+    }
+  };
+
+  /**
+   * Default mocha reporter defaults to 'Spec'
+   *
+   * @type String
+   */
+  Reporter.prototype.defaultMochaReporter = 'Spec';
+
+  /**
+   * Creates a runner instance.
+   */
+  Reporter.prototype.createRunner = function createRunner() {
+    var self = this;
+    this.runner = new ReportingEvents({
+      envs: this.envs
+    });
+
+    this.proxy = new Proxy(this.runner);
+    this.envs = [];
+
+    this.runner.once('start', function() {
+      self.reporter = new self.reporterClass(self.runner);
+      self.emit('start', self);
+      self.runner.emitStart();
+    });
+
+    this.runner.on('end', function() {
+      self.emit('end', self);
+      self.runner = null;
+      self.reporter = null;
+      self.proxy = null;
+    });
+  };
+
+
+  /**
+   * Returns the mocha reporter used in the proxy.
+   *
+   *
+   * @return {Object} mocha reporter.
+   */
+  Reporter.prototype.getMochaReporter = function getMochaReporter() {
+    return this.reporter;
+  };
+
+  /**
+   * Reponds to a an event in the form of a json string or an array.
+   * This is passed through to the proxy which will format the results
+   * and emit an event to the runner which will then communicate to the
+   * reporter.
+   *
+   * Creates reporter, proxy and runner when receiving the start event.
+   *
+   * @param {Array | String} line event line.
+   * @return {Object} proxy object.
+   */
+  Reporter.prototype.respond = function respond(line) {
+    var data = Responder.parse(line);
+    if (data.event === 'start' && !this.proxy) {
+      this.createRunner();
+    }
+    return this.proxy.respond([data.event, data.data]);
+  };
+
+  if (isNode) {
+    module.exports = Reporter;
+  } else {
+    TestAgent.Mocha.Reporter = Reporter;
+  }
+
+}());
+(function() {
+
+  var isNode = typeof(window) === 'undefined',
+      Reporter;
+
+  if (isNode) {
+    Reporter = require('../mocha/reporter');
+  } else {
+    if (typeof(TestAgent.Common) === 'undefined') {
+      TestAgent.Common = {};
+    }
+    Reporter = TestAgent.Mocha.Reporter;
+  }
+
+  /**
+   * The usual merge function.
+   * Takes multiple objects and merges
+   * them in order into a new object.
+   *
+   * If I need this elsewhere should probably be a utility.
+   *
+   * @param {...Object} args any number of objects to merge.
+   * @return {Object} result of merges.
+   */
+  function merge() {
+    var args = Array.prototype.slice.call(arguments),
+        result = {};
+
+    args.forEach(function(object) {
+      var key;
+      for (key in object) {
+        if (object.hasOwnProperty(key)) {
+          result[key] = object[key];
+        }
+      }
+    });
+
+    return result;
+  }
+
+  /**
+   * REQUIRES: responder
+   *
+   * Provides a listener for test data events
+   * to stream reports to the servers console.
+   *
+   * @constructor
+   * @param {Object} options see mocha/reporter for options.
+   */
+  function Mocha(options) {
+
+    if(options.mochaSelector) {
+      this.mochaSelector = options.mochaSelector;
+      delete options.mochaSelector;
+    }
+
+    this.reporter = new Reporter(options);
+    this.isRunning = false;
+  }
+
+  Mocha.prototype = {
+
+    /**
+     * Used to clear previous mocha element
+     * for HTML reporting.
+     * Obviously only used when window is present.
+     *
+     * @type String
+     */
+    mochaSelector: '#mocha',
+
+    /**
+     * Title for simulated syntax error test failures.
+     *
+     * @this
+     * @type String
+     */
+    syntaxErrorTitle: 'Syntax Error',
+
+    enhance: function enhance(server) {
+      server.on('test data', this._onTestData.bind(this));
+      server.on('error', this._onError.bind(this));
+      server.on('add test env', this._onAddTestEnv.bind(this));
+      this.reporter.on('start', this._onRunnerStart.bind(this, server));
+      this.reporter.on('end', this._onRunnerEnd.bind(this, server));
+    },
+
+    _onAddTestEnv: function _onAddTestEnv(env) {
+      this.reporter.addEnv(env);
+    },
+
+    _onError: function _onError(data) {
+      if (this.isRunning) {
+        this.emitSyntaxError(data);
+      } else {
+        this.savedError = data;
+      }
+    },
+
+    _onTestData: function _onTestData(data, socket) {
+      this.reporter.respond(data);
+    },
+
+    /**
+     * Emits a fake test event for a syntax error.
+     *
+     * @this
+     * @param {Object} error error object.
+     * @param {String} error.message error message.
+     * @param {String} error.filename file error occurred in.
+     * @param {String} error.lineno line number of error.
+     */
+    emitSyntaxError: function emitError(error) {
+      var baseEvent,
+          errorMessage,
+          errObject;
+
+      baseEvent = {
+        title: this.syntaxErrorTitle,
+        fullTitle: this.syntaxErrorTitle
+      };
+
+      errorMessage = [
+        error.message,
+        'in file',
+        error.filename + '#' + error.lineno
+      ].join(' ');
+
+      errObject = {
+        message: errorMessage,
+        stack: errorMessage,
+        //best guess
+        type: 'syntax error',
+        //make mocha reporters happy
+        expected: null,
+        actual: null
+      };
+
+      this.reporter.respond(['suite', baseEvent]);
+      this.reporter.respond(['test', baseEvent]);
+      this.reporter.respond(['fail', merge(baseEvent, {
+        err: errObject,
+        state: 'failed'
+      })]);
+      this.reporter.respond(['test end', merge(baseEvent, {
+        state: 'failed'
+      })]);
+      this.reporter.respond(['suite end', baseEvent]);
+    },
+
+    _onRunnerEnd: function _onRunnerEnd(server, runner) {
+      var endArgs = Array.prototype.slice.call(arguments).slice(1);
+      endArgs.unshift('test runner end');
+
+      this.isRunning = false;
+      this.savedError = undefined;
+      server.emit.apply(server, endArgs);
+    },
+
+    _onRunnerStart: function _onRunnerStart(server, runner) {
+      server.emit('test runner', runner);
+
+      if (typeof(window) !== 'undefined') {
+        this._startBrowser();
+      }
+
+      this.isRunning = true;
+      if (this.savedError) {
+        this.emitSyntaxError(this.savedError);
+        this.savedError = undefined;
+      }
+    },
+
+    _startBrowser: function() {
+      var el = document.querySelector(this.mochaSelector);
+      if (el) {
+        el.innerHTML = '';
+      }
+    }
+
+  };
+
+  if (isNode) {
+    module.exports = Mocha;
+  } else {
+    TestAgent.Common.MochaTestEvents = Mocha;
+  }
+
+}());
 (function(window) {
   'use strict';
 
@@ -1923,8 +2665,11 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
      * @param {Array} tests list of tests to run.
      */
     runTests: function(tests) {
+      var envs;
       this._createTestGroups(tests);
-      this.worker.send('add test env', Object.keys(this.testEnvs));
+      envs = Object.keys(this.testEnvs);
+      this.worker.emit('add test env', envs);
+      this.worker.send('add test env', envs);
       this._loadNextDomain();
     }
 
