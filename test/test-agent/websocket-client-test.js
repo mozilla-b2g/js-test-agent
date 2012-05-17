@@ -2,7 +2,8 @@ describe('test-agent/websocket-common', function() {
   var subject, url = 'ws://fake',
       Native,
       Responder,
-      WebsocketClient;
+      WebsocketClient,
+      sockets = [];
 
   cross.require(
     'test-agent/responder.js',
@@ -20,13 +21,22 @@ describe('test-agent/websocket-common', function() {
 
   function mockNative() {
     beforeEach(function() {
+      sockets.length = 0;
 
       Native = function(url) {
+        this.closed = false;
         this.url = url;
+
         Responder.call(this);
+        sockets.push(this);
       };
 
       Native.prototype = Object.create(Responder.prototype);
+
+      Native.prototype.close = function() {
+        this.closed = true;
+      }
+
       subject.Native = Native;
     });
   }
@@ -88,6 +98,20 @@ describe('test-agent/websocket-common', function() {
       expect(subject.socket.url).to.be(url);
     });
 
+    it('should store a copy of all event handlers for socket', function() {
+      expect(Object.keys(subject._proxiedEvents).sort()).to.eql([
+        'close',
+        'message',
+        'open'
+      ]);
+    });
+
+    it('should add events to socket', function() {
+      expect(subject.socket._$events['open'].length).to.be(1);
+      expect(subject.socket._$events['close'].length).to.be(1);
+      expect(subject.socket._$events['message'].length).to.be(1);
+    });
+
   });
 
   describe('event proxies', function() {
@@ -135,6 +159,12 @@ describe('test-agent/websocket-common', function() {
       };
 
       subject.close();
+    });
+
+    it('should remove all events from socket', function() {
+      expect(subject.socket._$events['open'].length).to.be(0);
+      expect(subject.socket._$events['close'].length).to.be(0);
+      expect(subject.socket._$events['message'].length).to.be(0);
     });
 
     it('should close socket', function() {
@@ -208,6 +238,8 @@ describe('test-agent/websocket-common', function() {
         subject.emit('close');
 
         subject.on('start', function() {
+          expect(sockets[0].closed).to.be(true);
+          expect(sockets.length).to.be(2);
           done();
         });
       });

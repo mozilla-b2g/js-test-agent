@@ -6,6 +6,9 @@
     iframes. This will eventually lead to multi worker support between
     browsers.
 
+  - Fixed issue where websocket retry would not close the previous
+    socket cleanly causing events to occasionally fire twice.
+
 # 0.3.1
   - Add missing WebsocketClient.close method
 
