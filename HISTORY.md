@@ -2,6 +2,10 @@
   - Ported all node/mocha/ scripts to test-agent/mocha/ they will now
     run in both the browser and server
 
+  - Removed support for syntax error handling.
+    It has some bugs which made it unstable.
+    New test data based error handling will be introducted in v0.5
+
   - Adding support for running tests across different domains via
     iframes. This will eventually lead to multi worker support between
     browsers.
