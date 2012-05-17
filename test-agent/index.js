@@ -2,9 +2,7 @@
 
   var worker;
 
-  worker = new TestAgent.BrowserWorker({
-    sandbox: '/test-agent/sandbox.html'
-  });
+  worker = new TestAgent.BrowserWorker();
 
   worker.use(TestAgent.BrowserWorker.Websocket);
 
@@ -12,15 +10,30 @@
     url: '/test-agent/config.json'
   });
 
-  worker.use(TestAgent.BrowserWorker.MochaDriver, {
-    mochaUrl: '/mocha/mocha.js',
-    testHelperUrl: '/test/helper.js'
+  worker.use(TestAgent.BrowserWorker.MultiDomainDriver, {
+    groupTestsByDomain: function(test) {
+      var result =  {
+        domain: './proxy.html',
+        test: test,
+        env: 'TA'
+      };
+
+
+      return result;
+    }
   });
 
   worker.use(TestAgent.BrowserWorker.TestUi);
   worker.use(TestAgent.BrowserWorker.ErrorReporting);
 
+  worker.use(TestAgent.Common.MochaTestEvents, {
+    defaultMochaReporter: 'HTML'
+  });
+
   worker.on({
+
+    'run tests': function() {
+    },
 
     'sandbox': function() {
       worker.loader.require('/vendor/expect.js');

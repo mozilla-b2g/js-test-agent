@@ -1090,6 +1090,7 @@
     Responder.call(this);
 
     this.proxyEvents = ['open', 'close', 'message'];
+    this._proxiedEvents = {};
 
     this.on('close', this._incrementRetry.bind(this));
     this.on('message', this._processMessage.bind(this));
@@ -1112,7 +1113,7 @@
   Client.prototype.retryTimeout = 3000;
 
   Client.prototype.start = function start() {
-    var i, event;
+    var i, event, fn;
 
     if (this.retry && this.retries >= this.retryLimit) {
       throw new Client.RetryError(
@@ -1120,11 +1121,16 @@
       );
     }
 
+    if (this.socket) {
+      this.close();
+    }
+
     this.socket = new this.Native(this.url);
 
     for (i = 0; i < this.proxyEvents.length; i++) {
       event = this.proxyEvents[i];
-      this.socket.addEventListener(event, this._proxyEvent.bind(this, event));
+      fn = this._proxiedEvents[event] = this._proxyEvent.bind(this, event);
+      this.socket.addEventListener(event, fn, false);
     }
 
     this.emit('start', this);
@@ -1144,6 +1150,12 @@
    * Closes connection to the server
    */
   Client.prototype.close = function close(event, data) {
+    var event;
+
+    for (event in this._proxiedEvents) {
+      this.socket.removeEventListener(event, this._proxiedEvents[event], false);
+    }
+
     this.socket.close();
   };
 
@@ -1938,20 +1950,33 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
     this.proxy = new Proxy(this.runner);
     this.envs = [];
 
-    this.runner.once('start', function() {
-      self.reporter = new self.reporterClass(self.runner);
-      self.emit('start', self);
-      self.runner.emitStart();
-    });
-
-    this.runner.on('end', function() {
-      self.emit('end', self);
-      self.runner = null;
-      self.reporter = null;
-      self.proxy = null;
-    });
+    this.runner.once('start', this._onStart.bind(this));
   };
 
+  /**
+   * Triggered when runner starts.
+   * Emits start event creates the reporter
+   * class and sets up the 'end' listener.
+   */
+  Reporter.prototype._onStart = function _onStart() {
+    this.emit('start', this);
+    this.reporter = new this.reporterClass(this.runner);
+    this.runner.emitStart();
+
+    this.runner.on('end', this._onEnd.bind(this));
+  };
+
+  /**
+   * Triggered when runner is finished.
+   * Emits the end event then
+   * cleans up the runner, reporter and proxy
+   */
+  Reporter.prototype._onEnd = function _onEnd() {
+    this.emit('end', this);
+    this.runner = null;
+    this.reporter = null;
+    this.proxy = null;
+  };
 
   /**
    * Returns the mocha reporter used in the proxy.
@@ -2039,6 +2064,9 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
    * @param {Object} options see mocha/reporter for options.
    */
   function Mocha(options) {
+    if (typeof(options) === 'undefined') {
+      options = {};
+    }
 
     if(options.mochaSelector) {
       this.mochaSelector = options.mochaSelector;
@@ -2070,7 +2098,6 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
     enhance: function enhance(server) {
       server.on('test data', this._onTestData.bind(this));
-      server.on('error', this._onError.bind(this));
       server.on('add test env', this._onAddTestEnv.bind(this));
       this.reporter.on('start', this._onRunnerStart.bind(this, server));
       this.reporter.on('end', this._onRunnerEnd.bind(this, server));
@@ -2080,63 +2107,8 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
       this.reporter.addEnv(env);
     },
 
-    _onError: function _onError(data) {
-      if (this.isRunning) {
-        this.emitSyntaxError(data);
-      } else {
-        this.savedError = data;
-      }
-    },
-
     _onTestData: function _onTestData(data, socket) {
       this.reporter.respond(data);
-    },
-
-    /**
-     * Emits a fake test event for a syntax error.
-     *
-     * @this
-     * @param {Object} error error object.
-     * @param {String} error.message error message.
-     * @param {String} error.filename file error occurred in.
-     * @param {String} error.lineno line number of error.
-     */
-    emitSyntaxError: function emitError(error) {
-      var baseEvent,
-          errorMessage,
-          errObject;
-
-      baseEvent = {
-        title: this.syntaxErrorTitle,
-        fullTitle: this.syntaxErrorTitle
-      };
-
-      errorMessage = [
-        error.message,
-        'in file',
-        error.filename + '#' + error.lineno
-      ].join(' ');
-
-      errObject = {
-        message: errorMessage,
-        stack: errorMessage,
-        //best guess
-        type: 'syntax error',
-        //make mocha reporters happy
-        expected: null,
-        actual: null
-      };
-
-      this.reporter.respond(['suite', baseEvent]);
-      this.reporter.respond(['test', baseEvent]);
-      this.reporter.respond(['fail', merge(baseEvent, {
-        err: errObject,
-        state: 'failed'
-      })]);
-      this.reporter.respond(['test end', merge(baseEvent, {
-        state: 'failed'
-      })]);
-      this.reporter.respond(['suite end', baseEvent]);
     },
 
     _onRunnerEnd: function _onRunnerEnd(server, runner) {
@@ -2149,17 +2121,14 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
     },
 
     _onRunnerStart: function _onRunnerStart(server, runner) {
-      server.emit('test runner', runner);
 
       if (typeof(window) !== 'undefined') {
         this._startBrowser();
       }
 
+      server.emit('test runner', runner);
+
       this.isRunning = true;
-      if (this.savedError) {
-        this.emitSyntaxError(this.savedError);
-        this.savedError = undefined;
-      }
     },
 
     _startBrowser: function() {
@@ -2168,7 +2137,6 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         el.innerHTML = '';
       }
     }
-
   };
 
   if (isNode) {
@@ -2529,6 +2497,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
     onMessage: function(worker, event) {
       var eventType, data = event.data;
+
       if (data) {
         if (typeof(data) === 'string') {
           data = JSON.parse(event.data);

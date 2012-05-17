@@ -10,6 +10,7 @@
     "/test/test-agent/browser-worker/test-ui-test.js",
     "/test/test-agent/browser-worker/websocket-test.js",
     "/test/test-agent/browser-worker-test.js",
+    "/test/test-agent/common/mocha-test-events-test.js",
     "/test/test-agent/config-test.js",
     "/test/test-agent/export-error-test.js",
     "/test/test-agent/inspect-test.js",
