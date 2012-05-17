@@ -37,6 +37,15 @@ describe('test-agent/browser-worker/multi-domain-driver', function() {
     return 'http://' + split[0] + '.com/test/index.html';
   }
 
+  after(function() {
+    var iframes = document.querySelector('iframe'),
+        i = 0;
+
+    for (i; i < iframes.length; i++) {
+      iframes[i].parentNode.removeChild(iframes[i]);
+    }
+  });
+
   beforeEach(function() {
     win = new TestAgent.Responder();
     posted.length = 0;
