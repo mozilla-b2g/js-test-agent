@@ -1,3 +1,7 @@
+# 0.4.1
+  - Removed add test env in favor of set test env.
+  - Fixed bugs related to add test env by removing it with set test env.
+
 # 0.4.0
   - Ported all node/mocha/ scripts to test-agent/mocha/ they will now
     run in both the browser and server
