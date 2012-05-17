@@ -45,7 +45,7 @@ describe('node/mocha/reporter', function() {
     }
     report = Responder;
     subject = new Reporter({
-      reporterClass: function(runner){
+      reporterClass: function(runner) {
         this.runner = runner;
       }
     });
@@ -104,6 +104,7 @@ describe('node/mocha/reporter', function() {
   describe('.getMochaReporter', function() {
     it('should return reporter', function() {
       subject.createRunner();
+      subject.runner.emitStart();
       expect(subject.getMochaReporter()).to.be.a(subject.reporterClass);
     });
   });
@@ -132,7 +133,12 @@ describe('node/mocha/reporter', function() {
       expect(subject.proxy.runner).to.be(subject.runner);
     });
 
+    it('should have no .repoter until emit start', function() {
+      expect(subject.repoter).not.to.be.ok();
+    });
+
     it('should create the .reporter', function() {
+      subject.runner.emitStart();
       expect(subject.reporter).to.be.a(subject.reporterClass);
       expect(subject.reporter.runner).to.be(subject.runner);
     });

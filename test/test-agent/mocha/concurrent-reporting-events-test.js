@@ -1,4 +1,4 @@
-describe('node/mocha/concurrent-reporting-events', function() {
+describe('test-agent/mocha/concurrent-reporting-events', function() {
 
   var subject,
       eventStack = [],
@@ -33,7 +33,10 @@ describe('node/mocha/concurrent-reporting-events', function() {
   }
 
   function emitStart(id) {
-    emit('start', id);
+    subject.emit('start', {
+      testAgentEnvId: id,
+      total: 1
+    });
   }
 
   function emitTest(id) {
@@ -46,9 +49,8 @@ describe('node/mocha/concurrent-reporting-events', function() {
 
   function shouldEmit(index, event, id) {
     var stack = eventStack[index];
-    expect(stack).to.eql([event, {
-      testAgentEnvId: id
-    }]);
+    expect(stack[0]).to.eql(event);
+    expect(stack[1].testAgentEnvId).to.eql(id);
   }
 
   beforeEach(function() {
@@ -67,6 +69,20 @@ describe('node/mocha/concurrent-reporting-events', function() {
         eventStack.push(args);
       });
     });
+  });
+
+  describe('.emitStart', function() {
+
+    it('should emit start with total', function(done) {
+      subject.total = 5;
+      subject.on('start', function(data) {
+        expect(data.total).to.eql(5);
+        done();
+      });
+
+      subject.emitStart();
+    });
+
   });
 
   describe('.emit', function() {
@@ -90,18 +106,73 @@ describe('node/mocha/concurrent-reporting-events', function() {
       expect(subject.envQueue).to.eql({});
     });
 
+    it('should have start queue', function() {
+      expect(subject.startQueue).to.eql(['a', 'b']);
+    });
+
     it('should not have a current env', function() {
       expect(subject.currentEnv).to.not.be.ok();
     });
   });
 
+  describe('starting', function() {
+
+    describe('when second emit start never occurs', function() {
+      it('should trigger an error', function(done) {
+        this.timeout(500);
+        subject.envTimeout = 250;
+
+        subject.on('runner error', function() {
+          expect(arguments[0]).to.be.a(Error);
+          done();
+        });
+
+        emitStart('a');
+      });
+    });
+
+    describe('when successfully starting', function() {
+      var calledWith;
+
+      beforeEach(function(done) {
+        calledWith = null;
+
+        subject.on('start', function() {
+          calledWith = arguments;
+          done();
+        });
+
+        emitStart('a');
+        emitStart('b');
+      });
+
+      it('should emit a start event with the sum total', function() {
+        expect(calledWith[0].total).to.eql(2);
+      });
+    });
+  });
 
   describe('starting and ending', function() {
-    it('should emit end only once', function() {
+
+    it('should emit start & endy once', function() {
+      expect(subject.startQueue).to.eql([
+        'a',
+        'b'
+      ]);
+
       emitStart('a');
+
+      expect(subject.startQueue).to.eql(['b']);
+      expect(subject.currentEnv).not.to.be.ok();
+
       emitStart('b');
+
+      expect(subject.startQueue).to.eql([]);
+      expect(subject.currentEnv).be('a');
+
       emitEnd('b');
       emitEnd('a');
+
       expect(eventStack.length).to.be(2);
       shouldEmit(1, 'end', 'b');
     });
@@ -149,7 +220,7 @@ describe('node/mocha/concurrent-reporting-events', function() {
 
     it('should emit only a events', function() {
       expect(eventStack.length).to.be(3);
-      shouldEmit(0, 'start', 'a');
+      shouldEmit(0, 'start');
       shouldEmit(1, 'test', 'a');
       shouldEmit(2, 'test', 'a');
     });

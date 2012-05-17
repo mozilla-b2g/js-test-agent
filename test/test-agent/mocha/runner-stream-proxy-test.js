@@ -133,13 +133,7 @@ describe('node/mocha/runner-stream-proxy', function() {
     var data;
 
     beforeEach(function() {
-      data = {total: 20};
-
       subject.respond(['start', data]);
-    });
-
-    it('should set .total on runner to 20', function() {
-      expect(runner.total).to.be(data.total);
     });
 
     it('should emit an event on runner', function() {
