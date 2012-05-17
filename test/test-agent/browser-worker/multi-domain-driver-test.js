@@ -1,7 +1,7 @@
 requireLib('*test-agent/browser-worker');
 requireLib('test-agent/browser-worker/multi-domain-driver.js');
 
-describe('test-agent/browser-worker/mocha-driver', function() {
+describe('test-agent/browser-worker/multi-domain-driver', function() {
   var subject,
       worker,
       MultiDomainDriver,
@@ -357,17 +357,29 @@ describe('test-agent/browser-worker/mocha-driver', function() {
 
   });
 
-
   describe('.runTests', function() {
-    var sent = [];
+    var sent = [],
+        emitted = [];
 
     beforeEach(function() {
       sent.length = 0;
+      emitted.length = 0;
+
       subject.worker.send = function() {
         sent.push(arguments);
       }
 
+      worker.on('add test env', function() {
+        emitted.push(arguments);
+      });
+
       subject.runTests(files);
+    });
+
+    it('should emit add envs', function() {
+      expect(sent[0]).to.eql([
+        'add test env', ['a', 'b']
+      ]);
     });
 
     it('should send add envs', function() {

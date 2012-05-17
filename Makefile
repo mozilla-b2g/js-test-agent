@@ -17,6 +17,10 @@ package :
 	cat ./lib/test-agent/websocket-client.js >> $(DEV_FILE)
 	cat ./lib/test-agent/mocha/reporter-base.js >> $(DEV_FILE)
 	cat ./lib/test-agent/mocha/json-stream-reporter.js >> $(DEV_FILE)
+	cat ./lib/test-agent/mocha/runner-stream-proxy.js >> $(DEV_FILE)
+	cat ./lib/test-agent/mocha/concurrent-reporting-events.js >> $(DEV_FILE)
+	cat ./lib/test-agent/mocha/reporter.js >> $(DEV_FILE)
+	cat ./lib/test-agent/common/mocha-test-events.js >> $(DEV_FILE)
 	cat ./lib/test-agent/browser-worker.js >> $(DEV_FILE)
 	cat ./lib/test-agent/browser-worker/websocket.js >> $(DEV_FILE)
 	cat ./lib/test-agent/browser-worker/post-message.js >> $(DEV_FILE)
@@ -49,6 +53,7 @@ test-node :
 		test/helper.js \
 		test/node/*-test.js  \
 		test/test-agent/mocha/*-test.js  \
+		test/test-agent/common/*-test.js  \
 		test/test-agent/responder-test.js \
 		test/test-agent/websocket-client-test.js
 
