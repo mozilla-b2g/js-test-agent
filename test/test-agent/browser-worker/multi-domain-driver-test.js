@@ -378,7 +378,7 @@ describe('test-agent/browser-worker/multi-domain-driver', function() {
         sent.push(arguments);
       }
 
-      worker.on('add test env', function() {
+      worker.on('set test envs', function() {
         emitted.push(arguments);
       });
 
@@ -387,13 +387,13 @@ describe('test-agent/browser-worker/multi-domain-driver', function() {
 
     it('should emit add envs', function() {
       expect(sent[0]).to.eql([
-        'add test env', ['a', 'b']
+        'set test envs', ['a', 'b']
       ]);
     });
 
     it('should send add envs', function() {
       expect(sent[0]).to.eql([
-        'add test env', ['a', 'b']
+        'set test envs', ['a', 'b']
       ]);
     });
 

@@ -72,14 +72,15 @@ describe('mocha/common/mocha-test-events', function() {
     });
   });
 
-  describe('event: add test env', function() {
+  describe('event: set test envs', function() {
+
     beforeEach(function() {
-      server.emit('add test env', ['one']);
-      server.emit('add test env', ['two']);
+      server.emit('set test envs', ['one']);
+      server.emit('set test envs', ['two']);
     });
 
-    it('should add env to reporter', function() {
-      expect(subject.reporter.envs).to.eql(['one', 'two']);
+    it('should set env on reporter', function() {
+      expect(subject.reporter.envs).to.eql(['two']);
     });
   });
 
@@ -118,7 +119,6 @@ describe('mocha/common/mocha-test-events', function() {
       beforeEach(function() {
         calledWith = null;
         firedEnd = false;
-        subject.savedError = 'foo';
         server.on('test runner end', function() {
           firedEnd = true;
           calledWith = arguments;
@@ -129,10 +129,6 @@ describe('mocha/common/mocha-test-events', function() {
       it('should fire test runner end', function() {
         expect(firedEnd).to.be(true);
         expect(calledWith).to.eql(['foo', 'bar']);
-      });
-
-      it('should clear savedError', function() {
-        expect(subject.savedError).to.be(undefined);
       });
 
       it('should not be running', function() {

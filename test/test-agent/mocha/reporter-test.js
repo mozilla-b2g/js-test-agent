@@ -90,14 +90,12 @@ describe('node/mocha/reporter', function() {
 
   });
 
-  describe('.addEnv', function() {
-    beforeEach(function() {
-      subject.addEnv('one');
-      subject.addEnv(['two', 'three']);
-    });
-
-    it('should have envs for one, two and three', function() {
-      expect(subject.envs).to.eql(['one', 'two', 'three']);
+  describe('.setEnvs', function() {
+    it('should set envs and expand strings', function() {
+      subject.setEnvs(['two', 'three']);
+      expect(subject.envs).to.eql(['two', 'three']);
+      subject.setEnvs('one');
+      expect(subject.envs).to.eql(['one']);
     });
   });
 
@@ -111,9 +109,9 @@ describe('node/mocha/reporter', function() {
 
   describe('.createRunner', function() {
     beforeEach(function() {
-      subject.addEnv('current');
+      subject.setEnvs('current');
       subject.createRunner();
-      subject.addEnv('next');
+      subject.setEnvs('next');
     });
 
     it('should create .runner', function() {

@@ -1919,15 +1919,15 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
   Reporter.prototype = Object.create(Responder.prototype);
 
   /**
-   * Adds env to next test run.
+   * Set envs for next test run.
    *
    * @param {String|String[]} env a single env or an array of envs.
    */
-  Reporter.prototype.addEnv = function addEnv(env) {
+  Reporter.prototype.setEnvs = function setEnvs(env) {
     if (env instanceof Array) {
-      this.envs = this.envs.concat(env);
+      this.envs = env;
     } else {
-      this.envs.push(env);
+      this.envs = [env];
     }
   };
 
@@ -2098,13 +2098,13 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
     enhance: function enhance(server) {
       server.on('test data', this._onTestData.bind(this));
-      server.on('add test env', this._onAddTestEnv.bind(this));
+      server.on('set test envs', this._onSetTestEnvs.bind(this));
       this.reporter.on('start', this._onRunnerStart.bind(this, server));
       this.reporter.on('end', this._onRunnerEnd.bind(this, server));
     },
 
-    _onAddTestEnv: function _onAddTestEnv(env) {
-      this.reporter.addEnv(env);
+    _onSetTestEnvs: function _onSetTestEnvs(env) {
+      this.reporter.setEnvs(env);
     },
 
     _onTestData: function _onTestData(data, socket) {
@@ -2116,7 +2116,6 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
       endArgs.unshift('test runner end');
 
       this.isRunning = false;
-      this.savedError = undefined;
       server.emit.apply(server, endArgs);
     },
 
@@ -2469,7 +2468,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
     window: window,
 
-    forwardEvents: ['test data', 'error', 'add test env'],
+    forwardEvents: ['test data', 'error', 'set test envs'],
 
     listenToWorker: 'post-message',
 
@@ -2637,8 +2636,8 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
       var envs;
       this._createTestGroups(tests);
       envs = Object.keys(this.testEnvs);
-      this.worker.emit('add test env', envs);
-      this.worker.send('add test env', envs);
+      this.worker.emit('set test envs', envs);
+      this.worker.send('set test envs', envs);
       this._loadNextDomain();
     }
 
