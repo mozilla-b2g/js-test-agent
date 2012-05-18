@@ -72,7 +72,7 @@ describe('test-agent/browser-worker/mocha-driver', function() {
       beforeEach(function() {
         worker.env = 'chrome';
         result = subject.getReporter({
-          console: function(){},
+          console: function() {},
           mocha: {
             reporters: {
               HTML: function() {}
@@ -83,6 +83,20 @@ describe('test-agent/browser-worker/mocha-driver', function() {
 
       it('should set testAgentEnvId on JsonStreamReporter', function() {
         expect(TestAgent.Mocha.JsonStreamReporter.testAgentEnvId).to.be('chrome');
+      });
+    });
+
+    describe('when reporter is null', function() {
+      var result;
+      beforeEach(function() {
+        subject.reporter = null;
+        result = subject.getReporter({
+          console: function() {}
+        });
+      });
+
+      it('should return only json stream reporter', function() {
+        expect(result).to.be(TestAgent.Mocha.JsonStreamReporter);
       });
 
     });
