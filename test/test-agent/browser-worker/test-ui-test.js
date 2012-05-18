@@ -10,6 +10,12 @@ describe('test-agent/browser-worker/test-ui', function() {
         'tests': ['one', 'two']
       };
 
+  function triggerEvent(element, eventName) {
+    var event = document.createEvent('HTMLEvents');
+    event.initEvent(eventName, true, true);
+    element.dispatchEvent(event);
+  }
+
   beforeEach(function() {
     worker = TestAgent.factory.browserWorker();
     document.getElementById('test').innerHTML = '<div id="test-ui-test"></div>';
@@ -90,15 +96,113 @@ describe('test-agent/browser-worker/test-ui', function() {
     });
   });
 
+  describe('after config', function() {
+
+    beforeEach(function() {
+      worker.emit('config', data);
+    });
+
+    describe('.execButton', function() {
+
+      it('should return button', function() {
+        expect(subject.element.querySelector(
+          'button'
+        )).to.be(subject.execButton);
+      });
+
+    });
+
+
+    describe('worker event: test runner', function() {
+      var btn;
+
+      beforeEach(function() {
+        btn = subject.execButton;
+
+        expect(btn.textContent).to.eql(
+          subject.EXECUTE
+        );
+
+        worker.emit('test runner');
+      });
+
+      it('should mark ui as running', function() {
+        expect(subject.isRunning).to.be(true);
+      });
+
+      it('should add working class to button', function() {
+        var className = btn.className,
+            text = btn.textContent;
+
+        expect(className).to.match(new RegExp(subject.WORKING));
+        expect(text).to.match(new RegExp(subject.WORKING));
+      });
+
+      describe('when button is clicked', function() {
+        var calledWith;
+
+        beforeEach(function() {
+          calledWith = false;
+          worker.on('run tests', function() {
+            calledWith = arguments;
+          });
+
+          triggerEvent(btn, 'click');
+        });
+
+
+        it('should not fire run tests', function() {
+          expect(calledWith).to.be(false);
+        });
+
+      });
+
+      describe('worker event: test runner end', function() {
+
+        beforeEach(function() {
+          worker.emit('test runner end');
+        });
+
+        it('should mark ui as not running', function() {
+          expect(subject.isRunning).to.be(false);
+        });
+
+        it('should remove working class from button', function() {
+          var className = btn.className,
+              text = btn.textContent;
+
+          expect(className).not.to.match(new RegExp(subject.WORKING));
+          expect(text).not.to.match(new RegExp(subject.WORKING));
+        });
+
+        describe('when button is clicked', function() {
+          var calledWith;
+
+          beforeEach(function() {
+            calledWith = false;
+            worker.on('run tests', function() {
+              calledWith = arguments;
+            });
+
+            triggerEvent(btn, 'click');
+          });
+
+
+          it('should fire run tests', function() {
+            expect(calledWith).to.be.ok();
+          });
+
+        });
+
+      });
+
+    });
+
+  });
+
   describe('.initDomEvents', function() {
 
     var runEvent;
-
-    function triggerEvent(element, eventName) {
-      var event = document.createEvent('HTMLEvents');
-      event.initEvent(eventName, true, true);
-      element.dispatchEvent(event);
-    }
 
     function triggerTestElement(isActive, element) {
       var url = element.getAttribute('data-url');
