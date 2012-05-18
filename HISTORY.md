@@ -1,3 +1,11 @@
+# 0.5.0
+  - Test UI button will now show busy when tests are running.
+    Clicking on the button will no longer cause tests to run when
+    in this state.
+
+  - Added option to turn off/change reporter for mocha driver.
+    Use the reporter option when using the enhancement.
+
 # 0.4.1
   - Removed add test env in favor of set test env.
   - Fixed bugs related to add test env by removing it with set test env.
