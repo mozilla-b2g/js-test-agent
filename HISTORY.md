@@ -1,3 +1,8 @@
+# 0.5.1
+  - Added option to specify websocket server in test-agent test
+  - Fixed issue where websocket client would try to send when connection
+    is closed.
+
 # 0.5.0
   - Test UI button will now show busy when tests are running.
     Clicking on the button will no longer cause tests to run when
