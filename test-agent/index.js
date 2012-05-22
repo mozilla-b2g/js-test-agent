@@ -4,7 +4,9 @@
 
   worker = new TestAgent.BrowserWorker();
 
-  worker.use(TestAgent.BrowserWorker.Websocket);
+  worker.use(TestAgent.BrowserWorker.Websocket, {
+    url: 'ws://' + window.location.host
+  });
 
   worker.use(TestAgent.BrowserWorker.Config, {
     url: '/test-agent/config.json'
