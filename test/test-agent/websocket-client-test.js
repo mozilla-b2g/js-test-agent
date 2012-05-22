@@ -146,6 +146,39 @@ describe('test-agent/websocket-common', function() {
     proxysEvent('message');
   });
 
+  describe('opening and closing a connection', function() {
+    mockNative();
+
+    beforeEach(function() {
+      subject.start();
+    });
+
+    it('should be closed by default', function() {
+      expect(subject.connectionOpen).to.be(false);
+    });
+
+    it('should mark connection as open', function() {
+      subject.emit('open');
+      expect(subject.connectionOpen).to.be(true);
+    });
+
+    it('should mark connection as closed after close event', function() {
+      subject.emit('open');
+      subject.emit('close');
+      expect(subject.connectionOpen).to.be(false);
+    });
+
+
+    it('should handle open/close/open', function() {
+      subject.emit('open');
+      subject.emit('close');
+      subject.emit('open');
+
+      expect(subject.connectionOpen).to.be(true);
+    });
+
+  });
+
   describe('.close', function() {
     var closed = false;
 
@@ -176,21 +209,38 @@ describe('test-agent/websocket-common', function() {
     var sent, eventData, data = ['client event', {data: 1}];
     mockNative();
 
-    beforeEach(function() {
+    function sendData(withOpen) {
+      beforeEach(function() {
+        eventData = Responder.stringify(data[0], data[1]);
 
-      eventData = Responder.stringify(data[0], data[1]);
+        sent = null;
+        subject.start();
+        subject.socket.send = function(data) {
+          sent = data;
+        };
 
-      sent = null;
-      subject.start();
-      subject.socket.send = function(data) {
-        sent = data;
-      };
+        if(withOpen) {
+          subject.emit('open');
+        }
 
-      subject.send(data[0], data[1]);
+        subject.send(data[0], data[1]);
+      });
+    }
+
+    describe('when connection is open', function() {
+      sendData(true);
+
+      it('should send stringified event to socket', function() {
+        expect(sent).to.equal(eventData);
+      });
     });
 
-    it('should send stringified event to socket', function() {
-      expect(sent).to.equal(eventData);
+    describe('when connection is closed', function() {
+      sendData(false);
+
+      it('should send stringified event to socket', function() {
+        expect(sent).to.be(null);
+      });
     });
 
   });
