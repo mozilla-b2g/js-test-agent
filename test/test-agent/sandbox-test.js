@@ -69,6 +69,8 @@ describe('TestAgent.Sandbox', function() {
         readyCalled = false;
 
     beforeEach(function(done) {
+      this.timeout(4000);
+
       destroyCaled = false;
       readyCalled = null;
 

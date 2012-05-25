@@ -47,20 +47,45 @@ describe('test-agent/export-error', function() {
 
     var result, err;
 
-    beforeEach(function() {
-      err = createError('firefox');
-      result = TestAgent.exportError(err);
+    describe('when given an object', function() {
+
+      beforeEach(function() {
+        err = createError('firefox');
+        result = TestAgent.exportError(err);
+      });
+
+      it('should create object from an error', function() {
+        expect(result).to.eql({
+          message: err.message,
+          type: err.type,
+          constructorName: err.constructor.name,
+          expected: err.expected,
+          actual: err.actual,
+          stack: TestAgent.formatStack(err)
+        });
+      });
+
+
     });
 
-    it('should create object from an error', function() {
-      expect(result).to.eql({
-        message: err.message,
-        type: err.type,
-        constructorName: err.constructor.name,
-        expected: err.expected,
-        actual: err.actual,
-        stack: TestAgent.formatStack(err)
+    describe('when given a string', function() {
+
+      beforeEach(function() {
+        result = TestAgent.exportError('wtf');
       });
+
+      it('should create object from an error', function() {
+        expect(result).to.eql({
+          message: 'wtf',
+          type: 'Error',
+          constructorName: 'String',
+          expected: '',
+          actual: '',
+          stack: ''
+        });
+      });
+
+
     });
 
   });
