@@ -9,7 +9,7 @@
   worker.use(TestAgent.BrowserWorker.PostMessage);
 
   worker.use(TestAgent.BrowserWorker.MochaDriver, {
-    mochaUrl: '/mocha/mocha.js',
+    mochaUrl: '/vendor/mocha/mocha.js',
     testHelperUrl: '/test/helper.js',
     //don't need a reporter for proxy
     reporter: null

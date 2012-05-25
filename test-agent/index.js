@@ -14,7 +14,7 @@
 
   worker.use(TestAgent.BrowserWorker.MultiDomainDriver, {
     groupTestsByDomain: function(test) {
-      var result =  {
+      var result = {
         domain: './proxy.html',
         test: test,
         env: 'TA'
