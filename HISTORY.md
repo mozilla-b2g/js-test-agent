@@ -1,3 +1,8 @@
+# 0.5.2
+  - export-error can now handle strings correctly for
+    cases like window.onerror when a string is given instead of an
+    Error instance.
+
 # 0.5.1
   - Added option to specify websocket server in test-agent test
   - Fixed issue where websocket client would try to send when connection
