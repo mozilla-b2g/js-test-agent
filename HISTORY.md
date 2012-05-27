@@ -1,3 +1,6 @@
+# 0.5.3
+  - Moved Websocket lookups into the constructor of WebsocketClient
+
 # 0.5.2
   - export-error can now handle strings correctly for
     cases like window.onerror when a string is given instead of an
