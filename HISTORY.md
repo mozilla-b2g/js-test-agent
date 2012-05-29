@@ -1,3 +1,6 @@
+# 0.5.4
+  - Fixed ws constructor bug introduced by 0.5.3
+
 # 0.5.3
   - Moved Websocket lookups into the constructor of WebsocketClient
 
