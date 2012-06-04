@@ -1,3 +1,6 @@
+# 0.6.1
+  - Added wait-for-event option to js-test-agent test
+
 # 0.6.0
   - Added new option and enhancement to server that will
     timeout if a specific event is not fired within a fixed amount of time.
