@@ -1,3 +1,7 @@
+# 0.6.0
+  - Added new option and enhancement to server that will
+    timeout if a specific event is not fired within a fixed amount of time.
+
 # 0.5.4
   - Fixed ws constructor bug introduced by 0.5.3
 
