@@ -1,3 +1,8 @@
+# 0.6.2
+  - Fixed issues where errors thrown from setup/beforeEach would
+    not be formatted correctly, due to a missing test.type /
+    err.uncaught options
+
 # 0.6.1
   - Added wait-for-event option to js-test-agent test
 
