@@ -39,6 +39,7 @@ describe('test-agent/export-error', function() {
     err.expected = 'expected';
     err.actual = 'actual';
     err.stack = stacks[type];
+    err.uncaught = true;
 
     return err;
   }
@@ -61,7 +62,8 @@ describe('test-agent/export-error', function() {
           constructorName: err.constructor.name,
           expected: err.expected,
           actual: err.actual,
-          stack: TestAgent.formatStack(err)
+          stack: TestAgent.formatStack(err),
+          uncaught: true
         });
       });
 
@@ -79,8 +81,8 @@ describe('test-agent/export-error', function() {
           message: 'wtf',
           type: 'Error',
           constructorName: 'String',
-          expected: '',
-          actual: '',
+          expected: null,
+          actual: null,
           stack: ''
         });
       });
