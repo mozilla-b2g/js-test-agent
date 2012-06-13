@@ -72,10 +72,6 @@ describe('TestAgent.Loader', function() {
       expect(subject.doneCallbacks).to.eql([]);
     });
 
-    it('should set .pending to 0', function() {
-      expect(subject.pending).to.be(0);
-    });
-
     it('should set ._cached to {}', function() {
       expect(subject._cached).to.be.a(Object);
     });
@@ -122,7 +118,6 @@ describe('TestAgent.Loader', function() {
     });
 
     beforeEach(function() {
-      subject.pending = 10;
       subject.done(fn);
     });
 
@@ -136,58 +131,12 @@ describe('TestAgent.Loader', function() {
 
   });
 
-  describe('._decrementPending', function() {
-    beforeEach(function() {
-      subject.pending = 2;
-      subject._decrementPending();
-    });
-
-    describe('when there are remaning pending items', function() {
-      it('should decrement pending', function() {
-        expect(subject.pending).to.be(1);
-      });
-    });
-
-    describe('when trying to decrease pending zero', function() {
-      it('should not go into negative numbers', function() {
-        subject._decrementPending();
-        subject._decrementPending();
-        subject._decrementPending();
-
-        expect(subject.pending).to.be(0);
-      });
-    });
-
-    describe('when there are no more pending items', function() {
-      var doneCalled;
-
-      beforeEach(function() {
-        doneCalled = false;
-        subject.done(function() {
-          doneCalled = true;
-        });
-        expect(doneCalled).to.be(false);
-        subject._decrementPending();
-      });
-
-      it('should fire done callbacks', function() {
-        expect(doneCalled).to.be(true);
-      });
-
-      it('should remove callbacks as it fires them', function() {
-        expect(subject.doneCallbacks.length).to.be(0);
-      });
-    });
-
-  });
-
   describe('.require', function() {
     createIframe();
+    mockTime();
 
     var url = '/test/file.js',
         requireCallbacksFired = [];
-
-    mockTime();
 
     function loadIframe() {
       var urls = Array.prototype.slice.call(arguments);
@@ -201,14 +150,52 @@ describe('TestAgent.Loader', function() {
           });
         });
 
-        //should increment pending
-        expect(subject.pending).to.be(1);
-
         subject.done(function() {
           done();
         });
       });
     }
+
+    describe('nested requires /w cached files', function() {
+      var order = [],
+          cacheUrl = '/test/file.js',
+          url = '/test/fixtures/tests/one-test.js';
+
+      beforeEach(function(done) {
+        order.length = 0;
+
+        subject.done(function() {
+          order.push('done');
+          done();
+        });
+
+        subject.require(cacheUrl, function() {
+          order.push('require');
+        });
+
+        subject.require(cacheUrl, function() {
+          order.push('cache');
+          subject.require(url, function() {
+            order.push('nested require');
+          });
+        });
+      });
+
+      it('should load files in the correct order.', function() {
+        var scripts;
+        expect(order).to.eql([
+          'require', 'cache', 'nested require', 'done'
+        ]);
+
+        scripts = iframeContext.document.getElementsByTagName('script');
+
+        expect(scripts.length).to.be(2);
+
+        expect(scripts[0].src).to.contain(cacheUrl);
+        expect(scripts[1].src).to.contain(url);
+      });
+
+    });
 
     describe('cross domain require', function() {
       var url = 'https://raw.github.com/LearnBoost/expect.js/master/expect.js';
@@ -228,70 +215,47 @@ describe('TestAgent.Loader', function() {
 
     });
 
-    //intentionally twice
-    loadIframe(url, url);
+    describe('basic functionality', function() {
 
-    describe('when require(ing) a cached file', function() {
-      describe('when there are pending items', function() {
-        var cb = function(){};
+      //intentionally twice
+      loadIframe(url, url);
 
-        beforeEach(function() {
-          subject.pending = 1;
-          subject.require(url, cb);
-        });
-
-        it('should add callback as a done callback', function() {
-          expect(subject.doneCallbacks[0]).to.be(cb);
-        });
-
+      it('should fire both require callbacks', function() {
+        expect(requireCallbacksFired.length).to.be(2);
       });
 
-      describe('when there are no pending items', function() {
-        it('should fire callback', function(done) {
-          subject.require(url, function(){
-            done();
-          });
-        });
+      it('should have marked /test/file.js as cached', function() {
+        expect(subject._cached[url]).to.be(true);
       });
-    });
 
-    it('should fire both require callbacks', function() {
-      expect(requireCallbacksFired.length).to.be(2);
-    });
+      it('should have only been included once', function() {
+        var doc = iframeContext.document;
+        var scripts = doc.querySelectorAll('script[src^="' + url + '"]');
+        expect(scripts.length).to.be(1);
+      });
 
-    it('should have decremented pending', function() {
-      expect(subject.pending).to.be(0);
-    });
+      it('should have added script to dom', function() {
+        var script = getScript();
+        expect(script.src).to.contain(url);
+        expect(script.async).to.be(false);
+        expect(script.type).to.be(subject.type);
+      });
 
-    it('should have marked /test/file.js as cached', function() {
-      expect(subject._cached[url]).to.be(true);
-    });
-
-    it('should have only been included once', function() {
-      var scripts = iframeContext.document.querySelectorAll('script[src^="' + url + '"]');
-      expect(scripts.length).to.be(1);
-    });
-
-    it('should have added script to dom', function() {
-      var script = getScript();
-      expect(script.src).to.contain(url);
-      expect(script.async).to.be(false);
-      expect(script.type).to.be(subject.type);
-    });
-
-    it('should include cache bust query string', function() {
-      var script = getScript();
-      expect(script.src).to.contain('?time=' + String(this.currentTime));
-    });
+      it('should include cache bust query string', function() {
+        var script = getScript();
+        expect(script.src).to.contain('?time=' + String(this.currentTime));
+      });
 
 
-    it('should execute script in the context of the iframe', function() {
-      expect(iframeContext.TEST_FILE_WAS_LOADED).to.be(true);
-    });
+      it('should execute script in the context of the iframe', function() {
+        expect(iframeContext.TEST_FILE_WAS_LOADED).to.be(true);
+      });
 
-    it('should be using iframe window context (in this test)', function() {
-      //unsual case where we need to use '===' over the to.be matcher
-      expect(subject.targetWindow === targetIframe.contentWindow).to.be(true);
+      it('should be using iframe window context (in this test)', function() {
+        //unsual case where we need to use '===' over the to.be matcher
+        expect(subject.targetWindow === targetIframe.contentWindow).to.be(true);
+      });
+
     });
 
   });
