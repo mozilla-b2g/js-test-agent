@@ -1,3 +1,7 @@
+# 0.6.3
+  - Fix #22 by implementing require queues.
+    Now nested requires should work as expected.
+
 # 0.6.2
   - Fixed issues where errors thrown from setup/beforeEach would
     not be formatted correctly, due to a missing test.type /
