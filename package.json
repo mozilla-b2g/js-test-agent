@@ -1,6 +1,6 @@
 {
   "name": "test-agent",
-  "version": "0.6.3",
+  "version": "0.6.4",
   "author": "James Lal",
   "description": "execute client side tests from browser report back to cli",
   "main": "lib/node/index.js",
@@ -25,7 +25,7 @@
     "mocha": "~1.0",
     "growl": "*",
     "optimist": "~0.3",
-    "ws": "~0.4",
+    "ws": "0.4.8",
     "debug": "~0.6",
     "match-files": "~0.1.1",
     "node-static": "~0.5"

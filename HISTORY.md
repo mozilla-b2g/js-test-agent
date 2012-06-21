@@ -1,3 +1,6 @@
+# 0.6.4
+  - Workaround ws breaking changes.
+
 # 0.6.3
   - Fix #22 by implementing require queues.
     Now nested requires should work as expected.
