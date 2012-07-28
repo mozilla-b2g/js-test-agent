@@ -103,21 +103,45 @@ describe('test-agent/browser-worker/multi-domain-driver', function() {
 
 
   describe('.createIframe', function() {
+
     var result;
 
-    beforeEach(function() {
-      result = subject.createIframe(iframeUrl);
+    describe('without iframeAttrs', function() {
+
+      beforeEach(function() {
+        result = subject.createIframe(iframeUrl);
+      });
+
+      afterEach(function() {
+        result.parentNode.removeChild(result);
+      });
+
+      it('should append iframe', function() {
+        var el = document.querySelector('iframe:last-child');
+        expect(el.src).to.contain(iframeUrl);
+        expect(result.contentWindow).to.be.ok();
+      });
+
     });
 
-    afterEach(function() {
-      result.parentNode.removeChild(result);
+    describe('with iframeAttrs', function() {
+      beforeEach(function() {
+        subject.iframeAttrs = {
+          mozFoo: 'foo'
+        };
+
+        result = subject.createIframe(iframeUrl);
+      });
+
+      it('should append iframe with attrs', function() {
+        var el = document.querySelector('iframe:last-child');
+        expect(el.src).to.contain(iframeUrl);
+        expect(el.getAttribute('mozFoo')).to.equal('foo');
+      });
     });
 
-    it('should append iframe', function() {
-      var el = document.querySelector('iframe:last-child');
-      expect(el.src).to.contain(iframeUrl);
-      expect(result.contentWindow).to.be.ok();
-    });
+
+
   });
 
   describe('.removeIframe', function() {

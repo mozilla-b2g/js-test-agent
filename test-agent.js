@@ -2533,6 +2533,8 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
     listenToWorker: 'post-message',
 
+    iframeAttrs: null,
+
     enhance: function(worker) {
       var self = this,
           onMessage;
@@ -2595,6 +2597,19 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
     createIframe: function(src) {
       var iframe = document.createElement('iframe');
       iframe.src = src + '?time' + String(Date.now());
+
+      if (this.iframeAttrs) {
+        var key;
+        for (key in this.iframeAttrs) {
+          if (this.iframeAttrs.hasOwnProperty(key)) {
+            iframe.setAttribute(
+              key,
+              this.iframeAttrs[key]
+            );
+          }
+        }
+      }
+
       document.body.appendChild(iframe);
 
       return iframe;
