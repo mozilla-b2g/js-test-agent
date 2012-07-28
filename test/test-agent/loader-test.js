@@ -65,7 +65,7 @@ describe('TestAgent.Loader', function() {
     });
 
     it('should have set the targetWindow to the global window by default', function() {
-      expect(subject.targetWindow).to.be(window);
+      expect(subject.targetWindow === window).to.be.ok();
     });
 
     it('should have .doneCallbacks', function() {
@@ -83,7 +83,7 @@ describe('TestAgent.Loader', function() {
     describe('getting', function() {
 
       it('should be window by default', function() {
-        expect(subject.targetWindow).to.be(window);
+        expect(subject.targetWindow === window).to.be.ok();
       });
 
     });

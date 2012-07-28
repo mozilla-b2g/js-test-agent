@@ -1,4 +1,8 @@
 # 0.7.0
+  - safari 5 support.
+  - Fixed stack bug for safari when using wrapped console.log
+  - fixed general test assertion errors when running test-agent test
+    suite in safari
   - attribute options on iframes for multidomain driver
   - missing files will no longer cause the test runner to 
     be unresponsive until reload.

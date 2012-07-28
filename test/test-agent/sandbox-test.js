@@ -94,7 +94,7 @@ describe('TestAgent.Sandbox', function() {
     });
 
     it('should return the iframe window', function() {
-      expect(result).to.be(context);
+      expect(result === context).to.be.ok();
     });
 
     it('should be attached to the dom', function() {
@@ -106,7 +106,7 @@ describe('TestAgent.Sandbox', function() {
     });
 
     it('should emit ready event with iframe as first argument', function() {
-      expect(readyCalled).to.be(context);
+      expect(readyCalled === context).to.be.ok();
     });
 
     it('should be ready', function() {

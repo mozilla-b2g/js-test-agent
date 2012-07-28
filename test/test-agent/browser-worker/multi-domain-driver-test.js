@@ -119,7 +119,8 @@ describe('test-agent/browser-worker/multi-domain-driver', function() {
       it('should append iframe', function() {
         var el = document.querySelector('iframe:last-child');
         expect(el.src).to.contain(iframeUrl);
-        expect(result.contentWindow).to.be.ok();
+        // !! for safari compat
+        expect(!!result.contentWindow).to.be.ok();
       });
 
     });

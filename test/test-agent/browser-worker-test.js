@@ -187,7 +187,7 @@ describe('test-agent/browser-worker', function() {
       });
 
       it('should pass loader as second argument', function() {
-        expect(sandboxEvent[1]).to.be(subject.loader);
+        expect(sandboxEvent[1] === subject.loader).to.be.ok();
       });
     });
 
@@ -199,7 +199,7 @@ describe('test-agent/browser-worker', function() {
       });
 
       it('should pass loader as first argument', function() {
-        expect(callbackData.args[0]).to.be(subject.loader);
+        expect(callbackData.args[0] === subject.loader).to.be.ok();
       });
 
       it('should inject require into sandbox', function() {
