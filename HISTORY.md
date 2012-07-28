@@ -1,3 +1,8 @@
+# 0.7.0
+  - attribute options on iframes for multidomain driver
+  - missing files will no longer cause the test runner to 
+    be unresponsive until reload.
+
 # 0.6.4
   - Workaround ws breaking changes.
 

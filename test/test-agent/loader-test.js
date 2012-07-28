@@ -215,6 +215,18 @@ describe('TestAgent.Loader', function() {
 
     });
 
+    describe('missing file', function() {
+      var url = 'https://localhost:7711/iamnotfoundfoobar.js';
+
+      it('should still fire done', function(done) {
+        subject.require(url);
+
+        subject.done(function() {
+          done();
+        });
+      });
+    });
+
     describe('basic functionality', function() {
 
       //intentionally twice
