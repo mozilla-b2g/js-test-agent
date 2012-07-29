@@ -3,6 +3,7 @@ TEST_DIR=$(PWD)/test/test-agent/
 TEST_CONFIG=$(RUNNER_DIR)/config.json
 DEV_FILE=./test-agent.js
 REPORTER=Spec
+SHELL=/bin/bash
 
 package :
 	rm -f $(DEV_FILE)
@@ -45,11 +46,15 @@ test-server:
 
 test : test-browser test-node
 
+.PHONY: ci
+ci: package
+	./tools/ci.sh
+
 test-browser:
 	./bin/js-test-agent test --reporter $(REPORTER)
 
 test-node :
-	@./node_modules/mocha/bin/mocha --reporter $(REPORTER) \
+	@./node_modules/mocha/bin/mocha \
 		test/helper.js \
 		test/node/*-test.js  \
 		test/test-agent/mocha/*-test.js  \

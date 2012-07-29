@@ -6,7 +6,6 @@ describe('TestAgent.Sandbox', function() {
       url = '/test/fixtures/iframe.html',
       iframeCount = 0;
 
-
   beforeEach(function() {
     iframeCount = document.getElementsByTagName('iframe').length;
     expect(iframeCount).to.be(0);
@@ -116,41 +115,34 @@ describe('TestAgent.Sandbox', function() {
   });
 
   describe('event: error', function() {
-
     var context, errors = [];
-
-    function stack(pending, done) {
-      return {
-        pop: function pop() {
-          pending--;
-          if (pending === 0) {
-            done();
-          }
-        }
-      };
-    }
+    var i = 0;
 
     beforeEach(function(done) {
-      this.timeout(10000);
-      var pending = stack(2, done);
+
+      subject.debug = true;
       context = null;
       errors.length = 0;
 
-      subject.url = '/test/fixtures/iframe-error.html?1';
-      subject.run(function() {
-        context = this;
-        pending.pop();
-      });
+      subject.url = '/test/fixtures/iframe-error.html';
 
       subject.on('error', function(e) {
         context = this;
         errors.push(e);
-        pending.pop();
       });
+
+      subject.run(function() {
+        context = this;
+        if (errors.length) {
+          done();
+        } else {
+          done(new Error('error events never fired'));
+        }
+      });
+
     });
 
     it('should emit iframe errors', function() {
-      var stack;
       expect(errors.length).to.be(1);
       expect(errors[0].filename).not.to.contain('?time');
       expect(errors[0].message).to.be.ok();
@@ -174,13 +166,11 @@ describe('TestAgent.Sandbox', function() {
   });
 
   describe('.destroy', function() {
-
     describe('when element is attached to the dom', function() {
 
       var el;
 
       beforeEach(function(done) {
-        this.timeout(4000);
         subject.run(function() {
           el = subject.getElement();
           subject.destroy();

@@ -19,6 +19,8 @@ afterEach(function() {
 
   if (isNode) {
     exports.expect = require('expect.js');
+  } else {
+    window.navigator;
   }
 
   exports.requireBundles = {
