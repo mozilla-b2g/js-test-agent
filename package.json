@@ -13,6 +13,10 @@
     "js-test-agent": "bin/js-test-agent"
   },
 
+  "scripts": {
+    "test": "make test-node REPORTER=dot"
+  },
+
   "keywords": [
     "test",
     "client",
