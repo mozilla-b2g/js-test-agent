@@ -2,7 +2,7 @@ RUNNER_DIR=$(PWD)/test-agent
 TEST_DIR=$(PWD)/test/test-agent/
 TEST_CONFIG=$(RUNNER_DIR)/config.json
 DEV_FILE=./test-agent.js
-REPORTER=Spec
+REPORTER=Dot
 SHELL=/bin/bash
 
 package :
