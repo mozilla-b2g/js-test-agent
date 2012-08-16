@@ -1,3 +1,7 @@
+# 0.7.1
+  - Fix console.log in firefox where in some cases array items where
+    cast as undefined instead of their true value.
+
 # 0.7.0
   - safari 5 support.
   - Fixed stack bug for safari when using wrapped console.log
