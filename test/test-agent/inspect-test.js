@@ -15,6 +15,7 @@ describe('test-agent/inspect', function() {
   };
 
   describe('.inspect', function() {
+
     describe('without color', function() {
       it('should return formatted string', function() {
         var result = TestAgent.inspect(object);
