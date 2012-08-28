@@ -1442,8 +1442,15 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
       }
 
       //this is temp
+      var logDetails = {messages: [message], stack: stack };
+
+
+      if (MochaReporter.testAgentEnvId) {
+        logDetails.testAgentEnvId = MochaReporter.testAgentEnvId;
+      }
+
       MochaReporter.send(
-        JSON.stringify(['log', {messages: [message], stack: stack}])
+        JSON.stringify(['log', logDetails])
       );
     };
 

@@ -1,3 +1,7 @@
+# 0.7.2
+  - console.log will now be grouped with its environment when available.
+  - debug option for displaying raw websocket data (DEBUG=test-agent:websocket-raw).
+
 # 0.7.1
   - Fix console.log in firefox where in some cases array items where
     cast as undefined instead of their true value.
