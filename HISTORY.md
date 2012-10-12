@@ -1,3 +1,7 @@
+# 0.7.3
+  - fixed a bug where numerious extra sockets where opened.
+  - added python client hack v1
+
 # 0.7.2
   - console.log will now be grouped with its environment when available.
   - debug option for displaying raw websocket data (DEBUG=test-agent:websocket-raw).

@@ -4,8 +4,21 @@
 
   worker = new TestAgent.BrowserWorker();
 
+  var config = {
+    host: window.location.hostname,
+    port: window.location.port
+  };
+
+  var queryString = window.location.search.slice(1);
+  queryString.split('&').forEach(function(pair) {
+    var data = pair.split('=');
+    var key = data[0];
+    var value = data[1];
+    config[key] = value;
+  });
+
   worker.use(TestAgent.BrowserWorker.Websocket, {
-    url: 'ws://' + window.location.host
+    url: 'ws://' + config.host + ':' + config.port
   });
 
   worker.use(TestAgent.BrowserWorker.Config, {
