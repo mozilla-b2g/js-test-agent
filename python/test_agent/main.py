@@ -51,30 +51,30 @@ class TestAgentServer(WebSocketServerProtocol):
             # copy of the mocha reporter data with the addition
             # of the 'testAgentEnvId' which is used to group
             # the results of different test runs.
-            (testEvent, testData) = json.loads(data[0]);
+            (test_event, test_data) = json.loads(data[0]);
 
             # gaia & test agent both use environment ids because
             # they nest test runners. This is a very special case
             # most test agent runners will not do this so add a
             # fallback environment name to make this simpler.
-            if ('testAgentEnvId' in testData):
-                testEnv = testData['testAgentEnvId'];
+            if ('testAgentEnvId' in test_data):
+                test_env = test_data['testAgentEnvId'];
             else:
-                testEnv = 'global';
+                test_env = 'global';
 
             # add to pending
-            if (testEvent == 'start'):
-                self.envs[testEnv] = reporters.Spec(stream = False);
+            if (test_event == 'start'):
+                self.envs[test_env] = reporters.Spec(stream = False);
 
             # don't process out of order commands
-            if not (testEnv in self.envs):
+            if not (test_env in self.envs):
                 return;
 
-            self.envs[testEnv].handle_event(testEvent, testData);
+            self.envs[test_env].handle_event(test_event, test_data);
 
             # remove from pending and trigger test complete check.
-            if (testEvent == 'end'):
-                idx = self.pending_envs.index(testEnv);
+            if (test_event == 'end'):
+                idx = self.pending_envs.index(test_env);
                 del self.pending_envs[idx];
 
                 # now that envs are totally complete show results.

@@ -27,6 +27,9 @@ class Base:
         self.suites = 0
 
     def formatError(self, data):
+        if not ('err' in data):
+            return '';
+
         err = data['err'];
 
         out = data['fullTitle']
@@ -35,8 +38,8 @@ class Base:
         def indent(item):
             return '    ' + item
 
-
-        out += '\n'.join(map(indent, err['stack'].split('\n')))
+        if ('stack' in err):
+            out += '\n'.join(map(indent, err['stack'].split('\n')))
 
         return out;
 
