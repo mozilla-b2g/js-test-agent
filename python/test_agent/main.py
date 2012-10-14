@@ -1,6 +1,7 @@
 import pprint
 import json
 import sys
+import os
 
 import reporters
 from twisted.internet import reactor
@@ -19,16 +20,29 @@ class TestAgentServer(WebSocketServerProtocol):
         command = (event, data);
         self.sendMessage(json.dumps(command));
 
-    def onEnvsComplete(self):
+    def on_envs_complete(self):
         names = [];
+        exitCode = 0;
 
         for env in self.envs:
+            if (self.envs[env].failures > 0):
+                exitCode = 1;
+
             print self.envs[env].output
             print 'env: (' + env + ')'
             print '\n'.join(self.envs[env].output)
 
+        # XXX: this is really horrible in some ways but
+        #      it gives the impression of a simple test runner.
+        reactor.stop()
 
-    def handleEvent(self, event, data):
+        # This seems a bit weird to me is the right way?
+        try:
+            sys.exit(exitCode)
+        except(SystemExit):
+            pass
+
+    def handle_event(self, event, data):
         if event == 'test data':
             # the 'test data' event is a nested event
             # inside of the main event body. It is a direct
@@ -64,15 +78,15 @@ class TestAgentServer(WebSocketServerProtocol):
 
                 # now that envs are totally complete show results.
                 if (len(self.pending_envs) == 0):
-                    self.onEnvsComplete();
+                    self.on_envs_complete();
 
 
     def onOpen(self):
         self.increment = self.increment + 1;
         tests = sys.argv[1:len(sys.argv)];
-        self.sendTestRun(tests);
+        self.run_tests(tests);
 
-    def sendTestRun(self, tests):
+    def run_tests(self, tests):
         def format(value):
             if (value[0] != '/'):
                 value = '/' + value
@@ -84,7 +98,7 @@ class TestAgentServer(WebSocketServerProtocol):
     def onMessage(self, data, binary):
         command = json.loads(data)
         # test agent protocol always uses the [event, data] format.
-        self.handleEvent(command[0], [command[1]])
+        self.handle_event(command[0], [command[1]])
 
 
 if __name__ == '__main__':
