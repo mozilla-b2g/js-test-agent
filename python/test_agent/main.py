@@ -28,8 +28,7 @@ class TestAgentServer(WebSocketServerProtocol):
             if (self.envs[env].failures > 0):
                 exitCode = 1;
 
-            print self.envs[env].output
-            print 'env: (' + env + ')'
+            print '\ntest report: (' + env + ')'
             print '\n'.join(self.envs[env].output)
 
         # XXX: this is really horrible in some ways but
@@ -43,6 +42,9 @@ class TestAgentServer(WebSocketServerProtocol):
             pass
 
     def handle_event(self, event, data):
+        if event == 'set test envs':
+            self.pending_envs = data[0];
+
         if event == 'test data':
             # the 'test data' event is a nested event
             # inside of the main event body. It is a direct
@@ -62,7 +64,6 @@ class TestAgentServer(WebSocketServerProtocol):
 
             # add to pending
             if (testEvent == 'start'):
-                self.pending_envs.append(testEnv);
                 self.envs[testEnv] = reporters.Spec(stream = False);
 
             # don't process out of order commands
