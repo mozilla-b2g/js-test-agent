@@ -16,6 +16,13 @@ describe('test-agent/browser-worker/test-ui', function() {
     element.dispatchEvent(event);
   }
 
+  after(function() {
+    var iframes = document.querySelectorAll('iframe');
+    Array.slice(iframes).forEach(function(item) {
+      item.parentNode.removeChild(item);
+    });
+  });
+
   beforeEach(function() {
     worker = TestAgent.factory.browserWorker();
     document.getElementById('test').innerHTML = '<div id="test-ui-test"></div>';

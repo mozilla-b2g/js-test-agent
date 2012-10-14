@@ -38,7 +38,7 @@ describe('test-agent/browser-worker/multi-domain-driver', function() {
   }
 
   after(function() {
-    var iframes = document.querySelector('iframe'),
+    var iframes = document.querySelectorAll('iframe'),
         i = 0;
 
     for (i; i < iframes.length; i++) {
