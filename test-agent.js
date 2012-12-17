@@ -2845,6 +2845,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         TestAgent.Mocha.JsonStreamReporter.testAgentEnvId = this.worker.env;
       }
 
+
       if(this.reporter) {
         return MochaDriver.createMutliReporter(
           TestAgent.Mocha.JsonStreamReporter,
@@ -2853,6 +2854,8 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
       } else {
         return TestAgent.Mocha.JsonStreamReporter;
       }
+
+      return result;
     },
 
     _testRunner: function _testRunner(worker, tests, done) {
@@ -2864,6 +2867,15 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
       });
 
       box.require(this.mochaUrl, function onRequireMocha() {
+        if (!box.process) {
+          box.process = {
+            stdout: {
+              write: console.log
+            },
+            write: console.log
+          };
+        }
+
         //setup mocha
         box.mocha.setup({
           ui: self.ui,
