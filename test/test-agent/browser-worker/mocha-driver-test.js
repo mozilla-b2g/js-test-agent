@@ -25,7 +25,7 @@ describe('test-agent/browser-worker/mocha-driver', function() {
   beforeEach(function() {
     MochaDriver = TestAgent.BrowserWorker.MochaDriver;
     subject = new TestAgent.BrowserWorker.MochaDriver({
-      mochaUrl: '/vendor/mocha/mocha.js',
+      mochaUrl: '/node_modules/mocha/mocha.js',
       testHelperUrl: baseUrl + 'test-helper.js'
     });
 
@@ -74,6 +74,9 @@ describe('test-agent/browser-worker/mocha-driver', function() {
         result = subject.getReporter({
           console: function() {},
           mocha: {
+            setup: function() {}
+          },
+          Mocha: {
             reporters: {
               HTML: function() {}
             }
@@ -112,10 +115,9 @@ describe('test-agent/browser-worker/mocha-driver', function() {
       getReporterCalled = false;
       sent.length = 0;
 
-      //mock out reporter to default
       subject.getReporter = function() {
         getReporterCalled = true;
-        return null;
+        return function() {};
       };
 
       worker.on('sandbox', function() {

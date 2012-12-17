@@ -51,7 +51,7 @@
     },
 
     'sandbox': function() {
-      worker.loader.require('/vendor/expect.js');
+      worker.loader.require('/node_modules/expect.js/expect.js');
     },
 
     'open': function() {

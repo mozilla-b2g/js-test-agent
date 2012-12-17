@@ -3,16 +3,16 @@
 <head>
   <meta http-equiv="content-type" content="text/html; charset=utf-8" />
   <title>Tests</title>
-  <script src="/vendor/expect.js" type="text/javascript" charset="utf-8"></script>
-  <script src="/vendor/mocha/mocha.js" type="text/javascript" charset="utf-8"></script>
+  <script src="/node_modules/expect.js/expect.js" type="text/javascript" charset="utf-8"></script>
+  <script src="/node_modules/mocha/mocha.js" type="text/javascript" charset="utf-8"></script>
   <script type="text/javascript" charset="utf-8">
     //Hack for FF to ignore global leaks;
     var navigator, console, getInterface;
     mocha.setup({ui: 'bdd'});
   </script>
-  <link rel="stylesheet" type="text/css" href="/vendor/mocha/mocha.css" />
-	<script type="text/javascript" charset="utf-8">
-	</script>
+  <link rel="stylesheet" type="text/css" href="/node_modules/mocha/mocha.css" />
+  <script type="text/javascript" charset="utf-8">
+  </script>
 </head>
 
 <body onload="mocha.run();">

@@ -9,7 +9,7 @@
   worker.use(TestAgent.BrowserWorker.PostMessage);
 
   worker.use(TestAgent.BrowserWorker.MochaDriver, {
-    mochaUrl: '/vendor/mocha/mocha.js',
+    mochaUrl: '/node_modules/mocha/mocha.js',
     testHelperUrl: '/test/helper.js',
     //don't need a reporter for proxy
     reporter: null
@@ -20,7 +20,7 @@
   worker.on({
 
     'sandbox': function() {
-      worker.loader.require('/vendor/expect.js');
+      worker.loader.require('/node_modules/expect.js/expect.js');
     },
 
     'open': function() {

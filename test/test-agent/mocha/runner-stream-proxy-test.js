@@ -76,6 +76,13 @@ describe('node/mocha/runner-stream-proxy', function() {
       expect(subject.fullTitle()).to.equal(title);
     });
 
+    it('should add a function .slow which wrapps the .slow value', function() {
+      var slow = 75;
+      var subject = factory.test({ slow: slow });
+
+      expect(subject.slow()).to.equal(slow);
+    });
+
     prependsTestAgentEnv('test');
 
   });

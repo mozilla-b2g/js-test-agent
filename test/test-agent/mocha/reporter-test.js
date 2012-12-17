@@ -41,7 +41,7 @@ describe('node/mocha/reporter', function() {
     if (typeof(window) === 'undefined') {
       Mocha = require('mocha');
     } else {
-      Mocha = mocha;
+      Mocha = window.Mocha;
     }
     report = Responder;
     subject = new Reporter({

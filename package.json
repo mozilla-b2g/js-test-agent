@@ -26,7 +26,6 @@
 
   "dependencies" : {
     "websocket.io": "~0.1.0",
-    "mocha": "~1.0",
     "growl": "*",
     "optimist": "~0.3",
     "ws": "0.4.8",
@@ -35,7 +34,8 @@
     "node-static": "~0.5"
   },
   "devDependencies": {
-    "expect.js": "~0.1"
+    "expect.js": "~0.1",
+    "mocha": "~1.7"
   },
 
   "license": "MIT",

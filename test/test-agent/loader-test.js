@@ -29,7 +29,7 @@ describe('TestAgent.Loader', function() {
   function createIframe() {
 
     beforeEach(function(done) {
-      this.timeout(10000);
+      this.timeout(100000);
       var iframe = document.createElement('iframe');
 
       iframe.src = '/test/fixtures/iframe.html?time=' + String(Date.now());
