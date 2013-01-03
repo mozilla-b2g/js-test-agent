@@ -1,3 +1,9 @@
+# 0.9.0
+ - MochaDriver now allows multiple test helpers.
+
+# 0.8.0
+  - added support for mocha 1.7x
+
 # 0.7.3
   - fixed a bug where numerious extra sockets where opened.
   - added python client hack v1

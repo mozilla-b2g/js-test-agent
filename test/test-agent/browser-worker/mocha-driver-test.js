@@ -26,7 +26,10 @@ describe('test-agent/browser-worker/mocha-driver', function() {
     MochaDriver = TestAgent.BrowserWorker.MochaDriver;
     subject = new TestAgent.BrowserWorker.MochaDriver({
       mochaUrl: '/node_modules/mocha/mocha.js',
-      testHelperUrl: baseUrl + 'test-helper.js'
+      testHelperUrl: [
+        baseUrl + 'test-helper1.js',
+        baseUrl + 'test-helper2.js'
+      ]
     });
 
     worker = TestAgent.factory.browserWorker();
@@ -125,7 +128,8 @@ describe('test-agent/browser-worker/mocha-driver', function() {
 
         box.document.body.innerHTML = '<div id="mocha"></div>';
         box.testWasCalled = false;
-        box.testHelperWasCalled = false;
+        box.testHelperWasOneCalled = false;
+        box.testHelperWasTwoCalled = false;
       });
 
       worker.on('run tests complete', function() {
@@ -143,7 +147,8 @@ describe('test-agent/browser-worker/mocha-driver', function() {
       expect(getReporterCalled).to.be(true);
 
       //test helper worked
-      expect(context.testHelperWasCalled).to.be(true);
+      expect(context.testHelperOneWasCalled).to.be(true);
+      expect(context.testHelperTwoWasCalled).to.be(true);
 
       //test executed fine
       expect(context.testWasCalled).to.be(true);
