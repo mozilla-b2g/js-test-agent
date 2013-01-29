@@ -978,7 +978,11 @@
         });
       };
 
-      iframeWindow.addEventListener('DOMContentLoaded', function() {
+      iframeWindow.addEventListener('DOMContentLoaded',
+                                    function contentLoaded() {
+
+        iframeWindow.removeEventListener('DOMContentLoaded', contentLoaded);
+
         self.ready = true;
         self.emit('ready', this);
         callback.call(this);
