@@ -1,5 +1,8 @@
+# 0.9.2
+ - Remove dom content loaded listener when its fired.
+
 # 0.9.1
- - browser build was missed ....
+ - browser build was missed ..
 
 # 0.9.0
  - MochaDriver now allows multiple test helpers.
