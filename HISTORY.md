@@ -1,3 +1,6 @@
+# 0.9.3
+  - Add edge case handling.
+
 # 0.9.2
  - Remove dom content loaded listener when its fired.
 
