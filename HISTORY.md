@@ -1,3 +1,6 @@
+# 0.10.0
+  - compat with node v0.10.X
+
 # 0.9.3
   - Add edge case handling.
 
