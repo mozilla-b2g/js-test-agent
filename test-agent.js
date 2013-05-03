@@ -1949,7 +1949,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
       if (!this.envQueue[envId]) {
         return console.log(
           'Attempting to log an test event for the environment: "' + envId +
-          '" but it does not exist. stack: \n' + (new Error()).stack
+          '" but it does not exist. \nevent:', event, '\ndata:', data
         );
       }
       this.envQueue[envId].push(arguments);
