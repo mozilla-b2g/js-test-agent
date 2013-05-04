@@ -1,3 +1,8 @@
+# 0.11.0
+  - environments are now grouped by envId instead of domains so we can
+    run multiple test runs inside of the same domain (but in different
+sandboxes).
+
 # 0.10.0
   - compat with node v0.10.X
 
