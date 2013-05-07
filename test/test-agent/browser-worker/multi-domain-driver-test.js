@@ -176,8 +176,8 @@ describe('test-agent/browser-worker/multi-domain-driver', function() {
       }
     });
 
-    function loadNext(domain) {
-      var url = getDomain(domain);
+    function loadNext(env) {
+      var url = getDomain(env);
 
       beforeEach(function() {
         createdFor = null;
@@ -190,12 +190,12 @@ describe('test-agent/browser-worker/multi-domain-driver', function() {
         subject._loadNextDomain();
       });
 
-      it('should not remove reference to current domain', function() {
-        expect(subject.testGroups[url]).to.be.ok();
+      it('should not remove reference to current environment', function() {
+        expect(subject.testGroups[env]).to.be.ok();
       });
 
       it('should save reference to iframe', function() {
-        expect(subject.domains[url]).to.be(iframe);
+        expect(subject.sandboxes[env]).to.be(iframe);
       });
 
       it('should load iframe', function() {
@@ -203,8 +203,8 @@ describe('test-agent/browser-worker/multi-domain-driver', function() {
         expect(createdFor).to.be(url);
       });
 
-      it('should set .currentDomain', function() {
-        expect(subject.currentDomain).to.be(url);
+      it('should set .currentEnv', function() {
+        expect(subject.currentEnv).to.be(env);
       });
     }
 
@@ -227,12 +227,13 @@ describe('test-agent/browser-worker/multi-domain-driver', function() {
 
   describe('._startDomainTests', function() {
     var iframe,
-        domain = getDomain('a');
+        env = 'a',
+        domain = getDomain(env);
 
     beforeEach(function() {
-      subject.domains[domain] = iframe = mockIframe();
+      subject.sandboxes[env] = iframe = mockIframe();
       subject._createTestGroups(files);
-      subject._startDomainTests(domain);
+      subject._startDomainTests(env);
     });
 
 
@@ -265,21 +266,17 @@ describe('test-agent/browser-worker/multi-domain-driver', function() {
 
       expected = {};
 
-      expected[getDomain('a')] = {
+      expected['a'] = {
         env: 'a',
-        tests: ['1.js', '2.js']
+        tests: ['1.js', '2.js'],
+        domain: getDomain('a')
       };
 
-      expected[getDomain('b')] = {
+      expected['b'] = {
         env: 'b',
-        tests: ['file.js']
+        tests: ['file.js'],
+        domain: getDomain('b')
       };
-    });
-
-    it('should set testEnvs', function() {
-      expect(subject.testEnvs).to.eql(
-        {a: true, b: true}
-      );
     });
 
     it('should remove old results', function() {
@@ -355,7 +352,8 @@ describe('test-agent/browser-worker/multi-domain-driver', function() {
   });
 
   describe('event: worker start', function() {
-    var domain = getDomain('a'),
+    var env = 'a',
+        domain = getDomain(env),
         starting = [];
 
     beforeEach(function() {
@@ -365,7 +363,7 @@ describe('test-agent/browser-worker/multi-domain-driver', function() {
       }
 
       subject.createIframe = mockIframe();
-      subject.currentDomain = domain;
+      subject.currentEnv = env;
       subject._createTestGroups(files);
     });
 
@@ -385,7 +383,7 @@ describe('test-agent/browser-worker/multi-domain-driver', function() {
       });
 
       it('should start tests for current domain', function() {
-        expect(starting[0]).to.be(domain);
+        expect(starting[0]).to.be(env);
       });
     });
 
