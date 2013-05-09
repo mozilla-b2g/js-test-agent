@@ -2431,6 +2431,16 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
     this.emit('worker start');
   };
 
+  /**
+   * Signals when the worker is ready to start running tests
+   */
+  proto.ready = function ready() {
+    this.emit('worker ready');
+    if (this.send) {
+      this.send('worker ready');
+    }
+  };
+
 }(this));
 (function(window) {
   /**

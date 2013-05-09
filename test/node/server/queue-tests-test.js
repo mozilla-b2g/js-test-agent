@@ -17,6 +17,7 @@ describe('node/server/queue-tests', function() {
     server = factory.websocketServer();
     server.suite = suite;
 
+    subject._onWorkerReady();
     subject.enhance(server);
 
     server.broadcast = function(json) {

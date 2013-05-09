@@ -6,10 +6,9 @@ XVFB_PROCESS=$!
 make test-server &
 SERVER_PROCESS=$!
 
-DISPLAY=:99 firefox http://localhost:8789/test-agent/ &
+DISPLAY=:99 firefox http://localhost:8789/test-agent/ 2>/dev/null &
 FIREFOX_PROCESS=$!
 
-sleep 3
 echo "Running tests..."
 echo "  - Firefox $FIREFOX_PROCESS";
 echo "  - Xvfb $XVFB_PROCESS";
