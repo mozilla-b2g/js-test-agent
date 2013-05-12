@@ -7,17 +7,17 @@ describe('node/server/queue-tests', function() {
   var server,
       subject,
       suite,
+      allTests,
       testsToRun = [],
       factory = require('../factory/websocket-server'),
       onBroadcast;
 
-  beforeEach(function() {
+  beforeEach(function(done) {
     suite = new Suite({path: __dirname + '/../fixtures/'});
     subject = new Enhance();
     server = factory.websocketServer();
     server.suite = suite;
 
-    subject._onWorkerReady();
     subject.enhance(server);
 
     server.broadcast = function(json) {
@@ -27,27 +27,73 @@ describe('node/server/queue-tests', function() {
       }
       onBroadcast();
     };
+
+    if (!allTests) {
+      suite.findTestFiles(function(err, files) {
+        allTests = files.map(function(file) {
+          return suite.testFromPath(file).testUrl;
+        });
+        done();
+      });
+    } else {
+      done();
+    }
+  });
+
+  it('should have fixture files to test against', function() {
+    expect(allTests.length > 0).to.be.ok();
+  });
+
+  describe('run all tests before worker has connected', function() {
+
+    beforeEach(function(done) {
+      onBroadcast = function() {
+        done();
+      };
+
+      server.emit('queue tests');
+
+      setTimeout(function() {
+        subject._onWorkerReady(server);
+      }, 0);
+    });
+
+    it('should send run tests with all available tests', function() {
+      expect(testsToRun.sort()).to.eql(allTests.sort());
+    });
+
   });
 
 
-  describe('event: start tests', function() {
-    var allTests = null;
+  describe('run a specified list of tests before worker connected', function() {
+    var file;
 
     beforeEach(function(done) {
-      if (!allTests) {
-        suite.findTestFiles(function(err, files) {
-          allTests = files.map(function(file) {
-            return suite.testFromPath(file).testUrl;
-          });
-          done();
-        });
-      } else {
+      var sendFileName;
+
+      file = allTests[0];
+      sendFileName = fsPath.join(suite.path, file);
+
+      onBroadcast = function() {
         done();
-      }
+      };
+
+      server.emit('queue tests', {files: [sendFileName]});
+      setTimeout(function() {
+        subject._onWorkerReady(server);
+      }, 0);
     });
 
-    it('should have fixture files to test against', function() {
-      expect(allTests.length > 0).to.be.ok();
+    it('should send run tests with the speified list', function() {
+      expect(testsToRun).to.eql([file]);
+    });
+
+  });
+
+  describe('event: start tests after worker connected', function() {
+
+    beforeEach(function() {
+      subject._onWorkerReady(server);
     });
 
     describe('when not given list of tests to run', function() {
@@ -81,7 +127,7 @@ describe('node/server/queue-tests', function() {
         server.emit('queue tests', {files: [sendFileName]});
       });
 
-      it('should send run tests with the ', function() {
+      it('should send run tests with the specified list', function() {
         expect(testsToRun).to.eql([file]);
       });
 
