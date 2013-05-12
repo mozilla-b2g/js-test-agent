@@ -56,6 +56,11 @@
 
     'open': function() {
       console.log('socket open');
+
+      // yield to event loop before signaling worker
+      // is ready, this ensures all plugins have been 
+      // loaded properly before starting any tests
+      setTimeout(worker.ready.bind(worker), 0);
     },
 
     'close': function() {

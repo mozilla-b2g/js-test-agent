@@ -18,7 +18,7 @@ describe('test-agent/browser-worker/test-ui', function() {
 
   after(function() {
     var iframes = document.querySelectorAll('iframe');
-    Array.slice(iframes).forEach(function(item) {
+    Array.prototype.slice.call(iframes).forEach(function(item) {
       item.parentNode.removeChild(item);
     });
   });
