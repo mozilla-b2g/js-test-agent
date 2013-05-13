@@ -1,3 +1,7 @@
+# 0.12.0
+  - Server now waits for worker ready signal before broadcasting
+    the event to run any tests
+
 # 0.11.0
   - environments are now grouped by envId instead of domains so we can
     run multiple test runs inside of the same domain (but in different
