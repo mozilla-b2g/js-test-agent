@@ -2938,7 +2938,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
       });
 
       self._loadTestHelpers(box, function() {
-        tests.forEach(function(test) {
+        tests.sort().forEach(function(test) {
           box.require(test);
         });
       });
