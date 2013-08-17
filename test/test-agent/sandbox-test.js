@@ -119,6 +119,7 @@ describe('TestAgent.Sandbox', function() {
     var i = 0;
 
     beforeEach(function(done) {
+      this.timeout(10000);
 
       subject.debug = true;
       context = null;
