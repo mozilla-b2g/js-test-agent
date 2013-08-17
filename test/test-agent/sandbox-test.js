@@ -127,20 +127,26 @@ describe('TestAgent.Sandbox', function() {
 
       subject.url = '/test/fixtures/iframe-error.html';
 
+      var hasRun;
+      var hasError;
+
+      function isComplete() {
+        if (hasRun && hasError) {
+          done();
+        }
+      }
+
       subject.on('error', function(e) {
         context = this;
         errors.push(e);
+        hasError = true;
+        isComplete();
       });
 
       subject.run(function() {
-        context = this;
-        if (errors.length) {
-          done();
-        } else {
-          done(new Error('error events never fired'));
-        }
+        hasRun = true;
+        isComplete();
       });
-
     });
 
     it('should emit iframe errors', function() {
