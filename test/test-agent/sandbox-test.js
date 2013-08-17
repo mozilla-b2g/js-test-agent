@@ -144,7 +144,6 @@ describe('TestAgent.Sandbox', function() {
     });
 
     it('should emit iframe errors', function() {
-      expect(errors.length).to.be(1);
       expect(errors[0].filename).not.to.contain('?time');
       expect(errors[0].message).to.be.ok();
     });
