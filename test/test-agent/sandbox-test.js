@@ -137,6 +137,7 @@ describe('TestAgent.Sandbox', function() {
       }
 
       subject.on('error', function(e) {
+        console.log('!ERROR!');
         context = this;
         errors.push(e);
         hasError = true;
@@ -144,6 +145,7 @@ describe('TestAgent.Sandbox', function() {
       });
 
       subject.run(function() {
+        console.log('!RUN!');
         hasRun = true;
         isComplete();
       });
