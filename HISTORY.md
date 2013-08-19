@@ -1,3 +1,6 @@
+# 0.12.2
+  - sort files before sending them to test-agent.
+
 # 0.12.0
   - Server now waits for worker ready signal before broadcasting
     the event to run any tests
