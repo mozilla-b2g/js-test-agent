@@ -5,31 +5,35 @@ DEV_FILE=./test-agent.js
 REPORTER=Dot
 SHELL=/bin/bash
 
+DEV_FILES=./lib/test-agent/inspect.js \
+	./lib/test-agent/export-error.js \
+	./lib/test-agent/responder.js \
+	./lib/test-agent/loader.js \
+	./lib/test-agent/sandbox.js \
+	./lib/test-agent/config.js \
+	./lib/test-agent/websocket-client.js \
+	./lib/test-agent/mocha/reporter-base.js \
+	./lib/test-agent/mocha/json-stream-reporter.js \
+	./lib/test-agent/mocha/runner-stream-proxy.js \
+	./lib/test-agent/mocha/concurrent-reporting-events.js \
+	./lib/test-agent/mocha/reporter.js \
+	./lib/test-agent/common/mocha-test-events.js \
+	./lib/test-agent/browser-worker.js \
+	./lib/test-agent/browser-worker/websocket.js \
+	./lib/test-agent/browser-worker/post-message.js \
+	./lib/test-agent/browser-worker/multi-domain-driver.js \
+	./lib/test-agent/browser-worker/mocha-driver.js \
+	./lib/test-agent/browser-worker/error-reporting.js \
+	./lib/test-agent/browser-worker/config.js \
+	./lib/test-agent/browser-worker/test-ui.js
+
+
 package :
 	rm -f $(DEV_FILE)
 	touch $(DEV_FILE)
-
-	cat ./lib/test-agent/inspect.js >> $(DEV_FILE)
-	cat ./lib/test-agent/export-error.js >> $(DEV_FILE)
-	cat ./lib/test-agent/responder.js >> $(DEV_FILE)
-	cat ./lib/test-agent/loader.js >> $(DEV_FILE)
-	cat ./lib/test-agent/sandbox.js >> $(DEV_FILE)
-	cat ./lib/test-agent/config.js >> $(DEV_FILE)
-	cat ./lib/test-agent/websocket-client.js >> $(DEV_FILE)
-	cat ./lib/test-agent/mocha/reporter-base.js >> $(DEV_FILE)
-	cat ./lib/test-agent/mocha/json-stream-reporter.js >> $(DEV_FILE)
-	cat ./lib/test-agent/mocha/runner-stream-proxy.js >> $(DEV_FILE)
-	cat ./lib/test-agent/mocha/concurrent-reporting-events.js >> $(DEV_FILE)
-	cat ./lib/test-agent/mocha/reporter.js >> $(DEV_FILE)
-	cat ./lib/test-agent/common/mocha-test-events.js >> $(DEV_FILE)
-	cat ./lib/test-agent/browser-worker.js >> $(DEV_FILE)
-	cat ./lib/test-agent/browser-worker/websocket.js >> $(DEV_FILE)
-	cat ./lib/test-agent/browser-worker/post-message.js >> $(DEV_FILE)
-	cat ./lib/test-agent/browser-worker/multi-domain-driver.js >> $(DEV_FILE)
-	cat ./lib/test-agent/browser-worker/mocha-driver.js >> $(DEV_FILE)
-	cat ./lib/test-agent/browser-worker/error-reporting.js >> $(DEV_FILE)
-	cat ./lib/test-agent/browser-worker/config.js >> $(DEV_FILE)
-	cat ./lib/test-agent/browser-worker/test-ui.js >> $(DEV_FILE)
+	echo "/* This is a built file do not modify directly */" >> $(DEV_FILE)
+	echo >> $(DEV_FILE)
+	cat $(DEV_FILES) >> $(DEV_FILE)
 
 test-config:
 	sh ./tools/create-config.sh $(TEST_CONFIG) $(TEST_DIR) \*-test.js /test/test-agent
