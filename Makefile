@@ -18,11 +18,13 @@ DEV_FILES=./lib/test-agent/inspect.js \
 	./lib/test-agent/mocha/concurrent-reporting-events.js \
 	./lib/test-agent/mocha/reporter.js \
 	./lib/test-agent/common/mocha-test-events.js \
+	./lib/test-agent/common/blanket-cover-events.js \
 	./lib/test-agent/browser-worker.js \
 	./lib/test-agent/browser-worker/websocket.js \
 	./lib/test-agent/browser-worker/post-message.js \
 	./lib/test-agent/browser-worker/multi-domain-driver.js \
 	./lib/test-agent/browser-worker/mocha-driver.js \
+	./lib/test-agent/browser-worker/blanket-driver.js \
 	./lib/test-agent/browser-worker/error-reporting.js \
 	./lib/test-agent/browser-worker/config.js \
 	./lib/test-agent/browser-worker/test-ui.js
