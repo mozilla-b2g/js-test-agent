@@ -2323,7 +2323,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
           originColor = '\033[0m';
 
       // Print title
-      console.info('    ' + titleColor + '-- Blanket.js Test Coverage Result --' + originColor + '\n');
+      console.info('\n\n    ' + titleColor + '-- Blanket.js Test Coverage Result --' + originColor + '\n');
       console.info('    ' + fileNameColor + 'File Name' + originColor +
         ' - ' + stmtColor + 'Covered/Total Smts' + originColor +
         ' - ' + percentageColor + 'Coverage (\%)\n' + originColor);
@@ -2702,6 +2702,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
       onMessage = this.onMessage.bind(this, worker);
       this.worker = worker;
+      this.runCoverage = false;
 
       worker.on('worker start', function(data) {
         if (data && data.type == self.listenToWorker) {
@@ -2796,7 +2797,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
      * associated tests if a current domain
      * is set.
      */
-    _loadNextDomain: function(runCoverage) {
+    _loadNextDomain: function() {
       var iframe;
       //if we have a current domain
       //remove it it should be finished now.
@@ -2816,8 +2817,6 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
       } else {
         this.currentEnv = null;
       }
-
-      this.runCoverage = runCoverage;
     },
 
     /**
@@ -2877,11 +2876,12 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
      */
     runTests: function(tests, runCoverage) {
       var envs;
+      this.runCoverage = runCoverage;
       this._createTestGroups(tests);
       envs = Object.keys(this.testGroups);
       this.worker.emit('set test envs', envs);
       this.worker.send('set test envs', envs);
-      this._loadNextDomain(runCoverage);
+      this._loadNextDomain();
     }
 
   };
@@ -3121,17 +3121,14 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
           response;
 
       xhr.open('GET', this.configUrl, true);
-      xhr.onreadystatechange = function onReadyStateChange() {
-        if (xhr.readyState === 4) {
-          if (xhr.status === 200 || xhr.status === 0) {
-            response = self._parseResponse(xhr);
-          } else {
-            response = self._defaultConfig;
-          }
-
-          callback.call(this, response);
+      xhr.onload = function onload() {
+        if (xhr.status === 200 || xhr.status === 0) {
+          response = self._parseResponse(xhr);
         } else {
+          response = self._defaultConfig;
         }
+
+        callback.call(this, response);
       };
 
       xhr.send(null);
@@ -3140,7 +3137,8 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
   window.TestAgent.BrowserWorker.BlanketDriver = BlanketDriver;
 
-}(this));(function(window) {
+}(this));
+(function(window) {
   'use strict';
 
   var Worker = window.TestAgent.BrowserWorker;
