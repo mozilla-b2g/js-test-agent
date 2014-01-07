@@ -399,25 +399,58 @@ describe('test-agent/browser-worker/multi-domain-driver', function() {
 
       subject.worker.send = function() {
         sent.push(arguments);
-      }
+      };
 
-      worker.on('set test envs', function() {
-        emitted.push(arguments);
+      worker.on('set test envs', function(data) {
+        emitted.push(data);
       });
 
       subject.runTests(files);
     });
 
     it('should emit add envs', function() {
-      expect(sent[0]).to.eql([
-        'set test envs', ['a', 'b']
-      ]);
+      expect(emitted[0]).to.eql(['a', 'b']);
     });
 
     it('should send add envs', function() {
       expect(sent[0]).to.eql([
         'set test envs', ['a', 'b']
       ]);
+    });
+
+    describe('concurrent', function() {
+      beforeEach(function() {
+        emitted.length = 0;
+        sent.length = 0;
+
+        subject.runTests(files);
+      });
+
+      it('should not send/emit again right now', function() {
+        expect(sent).empty();
+        expect(emitted).empty();
+      });
+
+      it('should send emit again after a batch is finished', function() {
+        worker.emit('run tests complete'); // first file
+        worker.emit('run tests complete'); // second file
+        expect(emitted[0]).to.eql(['a', 'b']);
+        expect(sent[0]).to.eql([
+          'set test envs', ['a', 'b']
+        ]);
+      });
+
+      it('should not schedule twice the same batch', function() {
+        subject.runTests(files);
+        worker.emit('run tests complete'); // first batch: first file
+        worker.emit('run tests complete'); // first batch: second file
+        worker.emit('run tests complete'); // second batch: first file
+        worker.emit('run tests complete'); // second batch: second file
+
+        // only one emit
+        expect(emitted).length(1);
+        expect(sent).length(1);
+      });
     });
 
   });

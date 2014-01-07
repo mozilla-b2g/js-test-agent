@@ -34,8 +34,9 @@
     "node-static": "~0.5"
   },
   "devDependencies": {
-    "expect.js": "~0.1",
-    "mocha": "~1.7"
+    "expect.js": "~0.2",
+    "mocha": "~1.17",
+    "sinon": "~1.8"
   },
 
   "license": "MIT",

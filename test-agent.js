@@ -2137,6 +2137,12 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
     if (data.event === 'start' && !this.proxy) {
       this.createRunner();
     }
+
+    if (!this.proxy) {
+      // ignore events until next start
+      return null;
+    }
+
     return this.proxy.respond([data.event, data.data]);
   };
 
@@ -2359,6 +2365,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
     window.TestAgent = {};
   }
 
+  /* BrowserWorker is the Worker that runs inside an iframe */
   TestAgent.BrowserWorker = function BrowserWorker(options) {
     var self = this,
         dep = this.deps;
@@ -2667,6 +2674,10 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 }(this));
 (function(window) {
+  'use strict';
+
+  // This Driver is used in the main Test-Agent window, to manage the iframes
+  // sandboxes for each domain
 
   function Driver(options) {
     var key;
@@ -2676,6 +2687,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
     this.testGroups = {};
     this.sandboxes = {};
+    this._batches = [];
 
     for (key in options) {
       if (options.hasOwnProperty(key)) {
@@ -2710,9 +2722,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         }
       });
 
-      worker.on('run tests complete', function() {
-        self._loadNextDomain();
-      });
+      worker.on('run tests complete', this._next.bind(this));
 
       worker.runTests = this.runTests.bind(this);
 
@@ -2817,15 +2827,18 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
       } else {
         this.currentEnv = null;
       }
+
+      return (this.currentEnv !== null);
     },
 
     /**
      * Sends run tests event to domain.
+     * This send the "run tests" event to the iframe sandbox
      *
      * @param {String} env the enviroment to test against.
      */
     _startDomainTests: function(env) {
-      var iframe, tests, group;
+      var iframe, group;
 
       if (env in this.sandboxes) {
         iframe = this.sandboxes[env];
@@ -2869,21 +2882,67 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
       }
     },
 
+    _isBatchScheduled: function(newBatch) {
+      return this._batches.some(function(existingBatch) {
+        return (newBatch.runCoverage === existingBatch.runCoverage) &&
+          existingBatch.tests.every(function(test, i) {
+            return test === newBatch.tests[i];
+          });
+      });
+    },
+
     /**
      * Runs a group of tests.
      *
      * @param {Array} tests list of tests to run.
      */
     runTests: function(tests, runCoverage) {
+      var batch = {
+        tests: tests,
+        runCoverage: runCoverage
+      };
+
+      if (this._isBatchScheduled(batch)) {
+        return;
+      }
+
+      this._batches.push(batch);
+
+      if (!this._running) {
+        this._next();
+      }
+    },
+
+    _loadNextBatch: function() {
+      var batch = this._batches.shift();
+      if (!batch) {
+        return false;
+      }
+
       var envs;
-      this.runCoverage = runCoverage;
-      this._createTestGroups(tests);
+      this.runCoverage = batch.runCoverage;
+      this._createTestGroups(batch.tests);
       envs = Object.keys(this.testGroups);
+
+      // when the env is ready, we'll get a 'worker start' event to actually
+      // starts the tests
       this.worker.emit('set test envs', envs);
       this.worker.send('set test envs', envs);
-      this._loadNextDomain();
-    }
 
+      this._next();
+
+      return true;
+    },
+
+    // Runs the next domain, or the next batch if there is no any domain.
+    // This also resets the running flag if there is nothing left to run.
+    _next: function() {
+      this._running = true;
+
+      if (!this._loadNextDomain() && !this._loadNextBatch()) {
+        this._running = false;
+      }
+    }
   };
 
   window.TestAgent.BrowserWorker.MultiDomainDriver = Driver;
