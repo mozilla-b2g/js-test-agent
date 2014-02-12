@@ -3366,6 +3366,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
       this.element.appendChild(fragment(templates.testRun));
 
       this.initDomEvents();
+
       window.dispatchEvent(new CustomEvent('test-agent-list-done'));
     },
 
