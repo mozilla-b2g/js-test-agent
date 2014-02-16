@@ -106,10 +106,6 @@ describe('test-agent/mocha/concurrent-reporting-events', function() {
       expect(subject.envQueue).to.eql({});
     });
 
-    it('should have start queue', function() {
-      expect(subject.startQueue).to.eql(['a', 'b']);
-    });
-
     it('should not have a current env', function() {
       expect(subject.currentEnv).to.not.be.ok();
     });
@@ -131,49 +127,49 @@ describe('test-agent/mocha/concurrent-reporting-events', function() {
       });
     });
 
-    describe('when successfully starting', function() {
+    describe('"start" events', function() {
       var calledWith;
 
-      beforeEach(function(done) {
+      beforeEach(function() {
         calledWith = null;
 
         subject.on('start', function() {
           calledWith = arguments;
-          done();
         });
 
         emitStart('a');
-        emitStart('b');
       });
 
-      it('should emit a start event with the sum total', function() {
-        expect(calledWith[0].total).to.eql(2);
+      it('should be emitted at the first start', function() {
+        expect(calledWith).ok();
+      });
+
+      it('should be emitted only once', function() {
+        calledWith = null;
+        emitStart('b');
+        expect(calledWith).equal(null);
       });
     });
   });
 
   describe('starting and ending', function() {
 
-    it('should emit start & endy once', function() {
-      expect(subject.startQueue).to.eql([
-        'a',
-        'b'
-      ]);
-
+    it('should emit start & end once', function() {
       emitStart('a');
 
-      expect(subject.startQueue).to.eql(['b']);
-      expect(subject.currentEnv).not.to.be.ok();
+      expect(subject.currentEnv).be('a');
 
       emitStart('b');
 
-      expect(subject.startQueue).to.eql([]);
       expect(subject.currentEnv).be('a');
 
-      emitEnd('b');
       emitEnd('a');
 
-      expect(eventStack.length).to.be(2);
+      expect(subject.currentEnv).be('b');
+
+      emitEnd('b');
+
+      expect(eventStack).length(2);
       shouldEmit(1, 'end', 'b');
     });
   });
