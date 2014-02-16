@@ -1815,7 +1815,6 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
     this.envQueue = {};
     //clone
     this.total = 0;
-    this.startQueue = this.envs.concat([]);
     this.timeoutId = null;
     this.currentEnv = null;
 
@@ -1913,6 +1912,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
    * Triggers the start event.
    */
   proto.emitStart = function() {
+    // total will be wrong here
     emit.call(this, 'start', { total: this.total });
   };
 
@@ -1954,9 +1954,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         this.envQueue[envId] = [];
       }
 
-      removeIndex(this.startQueue, envId);
-
-      if (this.startQueue.length === 0) {
+      if (!this.currentEnv) {
         this.emitStart();
         this.currentEnv = this.envOrder.shift();
         this._emitQueuedEvents(this.currentEnv);
@@ -1984,6 +1982,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
     if (event === this.END) {
       removeIndex(this.envs, currentEnv);
 
+      // if we had a start before this end
       this.currentEnv = this.envOrder.shift();
       //emit the next groups events
       if (this.currentEnv) {
