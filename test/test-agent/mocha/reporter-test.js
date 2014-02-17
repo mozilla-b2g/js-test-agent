@@ -149,7 +149,8 @@ describe('node/mocha/reporter', function() {
         origRespond,
         sentStartEvent = false,
         endData = ['end', {}],
-        startData = ['start', {total: 20}];
+        startData = ['start', {total: 20}],
+        someData = ['test data', {}];
 
     before(function() {
       origRespond = Proxy.prototype.respond;
@@ -236,6 +237,14 @@ describe('node/mocha/reporter', function() {
         });
       });
 
+    });
+
+    describe('when receiving something before a start', function() {
+      // this can happens when we launch a test run while another run is running
+
+      it('should not choke', function() {
+        subject.respond(someData);
+      });
     });
   });
 
