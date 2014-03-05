@@ -61,8 +61,6 @@ describe('test-agent/browser-worker/test-ui', function() {
       for (; i < data.tests.length; i++) {
         expect(items[i].innerHTML).to.contain(data.tests[i]);
       }
-
-      expect(element.querySelector('button')).to.be.ok();
     });
   });
 
@@ -112,8 +110,8 @@ describe('test-agent/browser-worker/test-ui', function() {
     describe('.execButton', function() {
 
       it('should return button', function() {
-        expect(subject.element.querySelector(
-          'button'
+        expect(document.querySelector(
+          '#test-agent-execute-button'
         )).to.be(subject.execButton);
       });
 
@@ -131,6 +129,10 @@ describe('test-agent/browser-worker/test-ui', function() {
         );
 
         worker.emit('test runner');
+      });
+
+      afterEach(function() {
+        btn.textContent = subject.EXECUTE;
       });
 
       it('should mark ui as running', function() {
@@ -233,7 +235,7 @@ describe('test-agent/browser-worker/test-ui', function() {
     });
 
     it('should emit runTests event on worker when tests are selected', function() {
-      var button = element.querySelector('button'),
+      var button = document.querySelector('#test-agent-execute-button'),
           tests = element.querySelectorAll('li'),
           i = 0;
 

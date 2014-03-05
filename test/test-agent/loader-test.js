@@ -198,7 +198,7 @@ describe('TestAgent.Loader', function() {
     });
 
     describe('cross domain require', function() {
-      var url = 'https://raw.github.com/LearnBoost/expect.js/master/expect.js';
+      var url = 'https://raw.github.com/LearnBoost/expect.js/master/index.js';
 
       beforeEach(function(done) {
         //when your on a slow hotel connection :p
