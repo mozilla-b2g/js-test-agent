@@ -13,7 +13,7 @@ describe('node/server/queue-tests', function() {
       onBroadcast;
 
   beforeEach(function(done) {
-    suite = new Suite({path: __dirname + '/../fixtures/'});
+    suite = new Suite({paths: [__dirname + '/../fixtures/']});
     subject = new Enhance();
     server = factory.websocketServer();
     server.suite = suite;
@@ -72,7 +72,7 @@ describe('node/server/queue-tests', function() {
       var sendFileName;
 
       file = allTests[0];
-      sendFileName = fsPath.join(suite.path, file);
+      sendFileName = fsPath.join(suite.paths[0], file);
 
       onBroadcast = function() {
         done();
@@ -118,7 +118,7 @@ describe('node/server/queue-tests', function() {
         var sendFileName;
 
         file = allTests[0];
-        sendFileName = fsPath.join(suite.path, file);
+        sendFileName = fsPath.join(suite.paths[0], file);
 
         onBroadcast = function() {
           done();

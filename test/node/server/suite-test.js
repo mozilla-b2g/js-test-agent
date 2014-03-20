@@ -7,7 +7,7 @@ describe('node/server/suite', function() {
       factory = require('../factory/websocket-server');
 
   beforeEach(function() {
-    suite = new Suite({path: __dirname});
+    suite = new Suite({paths: [__dirname]});
     server = factory.websocketServer();
 
     server.use(Enhance, suite);

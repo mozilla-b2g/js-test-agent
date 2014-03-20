@@ -15,7 +15,7 @@ describe('node/server/watcher', function() {
 
   beforeEach(function() {
     suite = new Suite({
-      path: __dirname + '/../fixtures/'
+      paths: [__dirname + '/../fixtures/']
     });
 
     server = new Responder();

@@ -1,4 +1,3 @@
-
 describe('node/suite', function() {
 
   var Suite = require('../../lib/node/suite'),
@@ -13,10 +12,9 @@ describe('node/suite', function() {
   beforeEach(function() {
 
     subject = new Suite({
-      path: root
+      paths: [root]
     });
   });
-
 
   describe('initialize', function() {
 
@@ -24,16 +22,20 @@ describe('node/suite', function() {
 
       beforeEach(function() {
         subject = new Suite({
-          path: root
+          paths: [root]
         });
       });
 
-      it('should normalize .path', function() {
-        expect(subject.path).to.equal(fsPath.normalize(root) + '/');
+      it('should normalize .paths', function() {
+        subject.paths.forEach(function(path) {
+          expect(path).to.equal(fsPath.normalize(root) + '/');
+        });
       });
 
       it('should have set path and appended a slash', function() {
-        expect(subject.path).to.eql(normalizedRoot + '/');
+        subject.paths.forEach(function(path) {
+          expect(path).to.equal(normalizedRoot + '/');
+        });
       });
 
       it('should have set testDir', function() {
@@ -65,7 +67,7 @@ describe('node/suite', function() {
         libDir: val,
         testSuffix: val,
         libSuffix: val,
-        path: normalizedRoot + '/'
+        paths: [normalizedRoot + '/']
       }, key;
 
       beforeEach(function() {
@@ -284,7 +286,7 @@ describe('node/suite', function() {
 
       beforeEach(function() {
         subject = new Suite({
-          path: root,
+          paths: [root],
           strictMode: false
         });
 
@@ -329,5 +331,3 @@ describe('node/suite', function() {
   });
 
 });
-
-
