@@ -1,5 +1,6 @@
 var Enhance = require_lib('node/server/suite'),
-    Suite = require_lib('node/suite');
+    Suite = require_lib('node/suite'),
+    fsPath = require('path');
 
 describe('node/server/suite', function() {
   var suite,
@@ -7,7 +8,10 @@ describe('node/server/suite', function() {
       factory = require('../factory/websocket-server');
 
   beforeEach(function() {
-    suite = new Suite({paths: [__dirname]});
+    suite = new Suite({
+      path: __dirname,
+      configJSONPath: fsPath.resolve(__dirname + '/../../../test-agent-config.json')
+    });
     server = factory.websocketServer();
 
     server.use(Enhance, suite);

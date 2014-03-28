@@ -15,7 +15,8 @@ describe('node/server/watcher', function() {
 
   beforeEach(function() {
     suite = new Suite({
-      paths: [__dirname + '/../fixtures/']
+      path: __dirname + '/../fixtures/',
+      configJSONPath: fsPath.resolve(__dirname + '/../../../test-agent-config.json')
     });
 
     server = new Responder();

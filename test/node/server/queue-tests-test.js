@@ -13,7 +13,12 @@ describe('node/server/queue-tests', function() {
       onBroadcast;
 
   beforeEach(function(done) {
-    suite = new Suite({paths: [__dirname + '/../fixtures/']});
+    suite = new Suite({
+      path: fsPath.resolve(__dirname + '/../../'),
+      includeDirs: ['node/'],
+      configJSONPath: fsPath.resolve(__dirname + '/../../../test-agent-config.json'),
+      strictMode: false
+    });
     subject = new Enhance();
     server = factory.websocketServer();
     server.suite = suite;
@@ -64,28 +69,23 @@ describe('node/server/queue-tests', function() {
 
   });
 
-
-  describe('run a specified list of tests before worker connected', function() {
-    var file;
+  describe('run a specified app before worker connected', function() {
 
     beforeEach(function(done) {
-      var sendFileName;
-
-      file = allTests[0];
-      sendFileName = fsPath.join(suite.paths[0], file);
+      var appName = 'fixtures';
 
       onBroadcast = function() {
         done();
       };
 
-      server.emit('queue tests', {files: [sendFileName]});
+      server.emit('queue tests', {app: appName});
       setTimeout(function() {
         subject._onWorkerReady(server);
       }, 0);
     });
 
     it('should send run tests with the speified list', function() {
-      expect(testsToRun).to.eql([file]);
+      expect(testsToRun.sort()).to.eql(allTests.sort());
     });
 
   });
@@ -111,24 +111,20 @@ describe('node/server/queue-tests', function() {
 
     });
 
-    describe('when given list of tests to run', function() {
-      var file;
+    describe('when given list of tests for specified app to run', function() {
 
       beforeEach(function(done) {
-        var sendFileName;
-
-        file = allTests[0];
-        sendFileName = fsPath.join(suite.paths[0], file);
+        var appName = 'fixtures';
 
         onBroadcast = function() {
           done();
         };
 
-        server.emit('queue tests', {files: [sendFileName]});
+        server.emit('queue tests', {app: appName});
       });
 
-      it('should send run tests with the specified list', function() {
-        expect(testsToRun).to.eql([file]);
+      it('should send run tests with the specified app', function() {
+        expect(testsToRun.sort()).to.eql(allTests.sort());
       });
 
     });
