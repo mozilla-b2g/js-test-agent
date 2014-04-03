@@ -10,9 +10,8 @@ describe('node/suite', function() {
       testPath = 'test/foo-test.js';
 
   beforeEach(function() {
-
     subject = new Suite({
-      paths: [root]
+      path: root,
     });
   });
 
@@ -22,20 +21,16 @@ describe('node/suite', function() {
 
       beforeEach(function() {
         subject = new Suite({
-          paths: [root]
+          path: root,
         });
       });
 
       it('should normalize .paths', function() {
-        subject.paths.forEach(function(path) {
-          expect(path).to.equal(fsPath.normalize(root) + '/');
-        });
+        expect(subject.path).to.equal(fsPath.normalize(root) + '/');
       });
 
       it('should have set path and appended a slash', function() {
-        subject.paths.forEach(function(path) {
-          expect(path).to.equal(normalizedRoot + '/');
-        });
+        expect(subject.path).to.equal(normalizedRoot + '/');
       });
 
       it('should have set testDir', function() {
@@ -67,7 +62,7 @@ describe('node/suite', function() {
         libDir: val,
         testSuffix: val,
         libSuffix: val,
-        paths: [normalizedRoot + '/']
+        path: normalizedRoot + '/',
       }, key;
 
       beforeEach(function() {
@@ -195,6 +190,63 @@ describe('node/suite', function() {
 
   });
 
+  describe('.matchesDir', function() {
+
+    var matches = {
+      'myApp/lib/foo.js': true,
+      'myApp/lib/MyOtherFoo.js': true,
+      'otherApp/lib/MyFooTest.js': false,
+      'otherApp/test/foo-test.js': false,
+      'myApp/test/test-test.js': true,
+      'myApp/test/Other-test.js': true,
+      'myApp2/test/MyOtherFootest.js': false
+    }, path;
+
+    beforeEach(function() {
+      subject.includeDirs = ['myApp/'];
+    });
+
+    afterEach(function() {
+      subject.includeDirs = null;
+    });
+
+    it('should match for directory', function() {
+      for (path in matches) {
+        expect(subject.matchesDir(path)).to.be(matches[path]);
+      }
+    });
+
+  });
+
+  describe('.matchesSkip', function() {
+
+    var blacklist = {
+      'myApp/lib/foo.js': true,
+      'myApp/lib/MyOtherFoo.js': true,
+      'otherApp/lib/MyFooTest.js': true,
+      'otherApp/test/foo-test.js': false,
+      'myApp/test/test-test.js': false,
+      'myApp/test/Other-test.js': false,
+      'myApp2/test/MyOtherFootest.js': true
+    }, path;
+
+    beforeEach(function() {
+      subject.blacklist = [
+        'myApp/lib/foo.js',
+        'myApp/lib/MyOtherFoo.js',
+        'otherApp/lib/MyFooTest.js',
+        'myApp2/test/MyOtherFootest.js'
+      ];
+    });
+
+    it('should skip for specified blacklist', function() {
+      for (path in blacklist) {
+        expect(subject.matchesSkip(path)).to.be(blacklist[path]);
+      }
+    });
+
+  });
+
   describe('file operations', function() {
     var testFiles, libFiles;
 
@@ -286,7 +338,7 @@ describe('node/suite', function() {
 
       beforeEach(function() {
         subject = new Suite({
-          paths: [root],
+          path: root,
           strictMode: false
         });
 
