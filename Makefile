@@ -27,7 +27,8 @@ DEV_FILES=./lib/test-agent/inspect.js \
 	./lib/test-agent/browser-worker/blanket-driver.js \
 	./lib/test-agent/browser-worker/error-reporting.js \
 	./lib/test-agent/browser-worker/config.js \
-	./lib/test-agent/browser-worker/test-ui.js
+	./lib/test-agent/browser-worker/test-ui.js \
+	./lib/test-agent/blanket/blanket-reporter.js
 
 
 package :
