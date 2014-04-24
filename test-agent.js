@@ -2298,80 +2298,6 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
   }
 
 }());
-(function() {
-
-  var isNode = typeof(window) === 'undefined';
-
-  if (!isNode) {
-    if (typeof(TestAgent.Common) === 'undefined') {
-      TestAgent.Common = {};
-    }
-  }
-
-  function Blanket() {
-
-  }
-
-  Blanket.prototype = {
-
-    enhance: function enhance(server) {
-      server.on('coverage data', this._onCoverageData.bind(this));
-
-      if (typeof(window) !== 'undefined') {
-        window.addEventListener('message', function(event) {
-          var data = event.data;
-          if (/coverage info/.test(data)) {
-            server.send('coverage data', data);
-          }
-        });
-      }
-    },
-
-    _onCoverageData: function _onCoverageData(data) {
-      var data = JSON.parse(data);
-      data.shift();
-      this._printCoverageResult(data.shift());
-    },
-
-    _printCoverageResult: function _printCoverageResult(coverResults) {
-      var key,
-          titleColor = '\033[1;36m',
-          fileNameColor = '\033[0;37m',
-          stmtColor = '\033[0;33m',
-          percentageColor = '\033[0;36m',
-          originColor = '\033[0m';
-
-      // Print title
-      console.info('\n' + titleColor + '-- Blanket.js Test Coverage Result --' + originColor + '\n');
-      console.info(fileNameColor + 'File Name' + originColor +
-        ' - ' + stmtColor + 'Covered/Total Smts' + originColor +
-        ' - ' + percentageColor + 'Coverage (\%)\n' + originColor);
-
-      // Print coverage result for each file
-      coverResults.forEach(function(dataItem) {
-        var filename = dataItem.filename,
-            formatPrefix = (filename === "Global Total" ? "\n" : "  "),
-            seperator = ' - ';
-
-        filename = (filename === "Global Total" ? filename :
-          (filename.substr(0, filename.indexOf('?')) || filename));
-        outputFormat = formatPrefix;
-        outputFormat += fileNameColor + filename + originColor + seperator;
-        outputFormat += stmtColor + dataItem.stmts + originColor  + seperator;
-        outputFormat += percentageColor + dataItem.percentage + originColor;
-
-        console.info(outputFormat);
-      });
-    }
-  }
-
-  if (isNode) {
-    module.exports = Blanket;
-  } else {
-    TestAgent.Common.BlanketCoverEvents = Blanket;
-  }
-
-}());
 (function(window) {
   'use strict';
 
@@ -3493,7 +3419,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 (function() {
   'use strict';
 
-  function BlanketReporter(options) {
+  function BlanketReportCollector(options) {
     var key;
 
     options = options || {};
@@ -3505,11 +3431,12 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
     }
   }
 
-  BlanketReporter.prototype = {
+  BlanketReportCollector.prototype = {
 
-    enhance: function enhance(worker) {
+    enhance: function enhance(server) {
+      this.server = server;
       this._receiveCoverageData();
-      worker.on('test runner end', this._aggregateReport.bind(this));
+      server.on('test runner end', this._onTestRunnerEnd.bind(this));
     },
 
     _coverageResults: [],
@@ -3532,27 +3459,9 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
       }
     },
 
-    _splitReportByDomain: function(results) {
-      var multiDomainResults = [],
-          previousDomain,
-          currentDomain,
-          index = -1;
-
-      for (var file in results.files) {
-        currentDomain = new URL(file).hostname;
-
-        if (currentDomain !== previousDomain) {
-          previousDomain = currentDomain;
-          multiDomainResults.push(this._templateResult());
-          index++;
-        }
-
-        multiDomainResults[index].files[file] = results.files[file];
-      }
-
-      multiDomainResults.forEach(function(domainResult) {
-        window.blanket.defaultReporter(domainResult);
-      }, this);
+    _onTestRunnerEnd: function() {
+      this._aggregateReport();
+      this._coverageResults = [];
     },
 
     _aggregateReport: function() {
@@ -3586,6 +3495,33 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
       this._splitReportByDomain(aggregateResult);
     },
 
+    _splitReportByDomain: function(results) {
+      var multiDomainResults = [],
+          previousDomain,
+          currentDomain,
+          index = -1,
+          self = this;
+
+      for (var file in results.files) {
+        currentDomain = new URL(file).hostname;
+
+        if (currentDomain !== previousDomain) {
+          previousDomain = currentDomain;
+          multiDomainResults.push(this._templateResult());
+          index++;
+        }
+
+        multiDomainResults[index].files[file] = results.files[file];
+      }
+
+      // After aggregated every coverage result for each domain, we invoke
+      // blanket's default reporter
+      multiDomainResults.forEach(function(domainResult) {
+        window.blanket.defaultReporter(domainResult);
+        self.server.send('coverage report', domainResult);
+      }, this);
+    },
+
     _accumulateCoverageFile: function(aggregateFile, coverageFile) {
       for (var key in coverageFile) {
         if (coverageFile.hasOwnProperty(key) && key !== 'source') {
@@ -3616,6 +3552,6 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
   };
 
-  window.TestAgent.Common.BlanketReporter = BlanketReporter;
+  window.TestAgent.Common.BlanketReportCollector = BlanketReportCollector;
 
 })();

@@ -18,7 +18,6 @@ DEV_FILES=./lib/test-agent/inspect.js \
 	./lib/test-agent/mocha/concurrent-reporting-events.js \
 	./lib/test-agent/mocha/reporter.js \
 	./lib/test-agent/common/mocha-test-events.js \
-	./lib/test-agent/common/blanket-cover-events.js \
 	./lib/test-agent/browser-worker.js \
 	./lib/test-agent/browser-worker/websocket.js \
 	./lib/test-agent/browser-worker/post-message.js \
@@ -28,7 +27,7 @@ DEV_FILES=./lib/test-agent/inspect.js \
 	./lib/test-agent/browser-worker/error-reporting.js \
 	./lib/test-agent/browser-worker/config.js \
 	./lib/test-agent/browser-worker/test-ui.js \
-	./lib/test-agent/blanket/blanket-reporter.js
+	./lib/test-agent/blanket/blanket-report-collector.js
 
 
 package :
