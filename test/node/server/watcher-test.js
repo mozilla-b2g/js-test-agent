@@ -20,12 +20,12 @@ describe('node/server/watcher', function() {
 
     server = new Responder();
 
-    server.on('queue tests', function(message) {
-      queueTests.push(message);
-    });
-
     subject = new Watcher();
     queueTests = [];
+
+    server.on(subject.eventName, function(message) {
+      queueTests.push(message);
+    });
 
     //needs a suite to work
     server.suite = suite;
@@ -62,7 +62,7 @@ describe('node/server/watcher', function() {
       clock.restore();
     });
 
-    it('should emit queue-tests event on server after a timeout', function() {
+    it('should emit event on server after a timeout', function() {
       var data = {
         files: [files[0], files[1]].sort()
       };
