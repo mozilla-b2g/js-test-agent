@@ -115,6 +115,7 @@ describe('test-agent/browser-worker/mocha-driver', function() {
         sent = [];
 
     beforeEach(function(done) {
+      this.timeout('1s');
       getReporterCalled = false;
       sent.length = 0;
 
