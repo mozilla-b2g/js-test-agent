@@ -1,30 +1,28 @@
 {
   "name": "test-agent",
   "version": "0.23.11",
-  "author": "James Lal",
+  "author": {
+    "name": "James Lal"
+  },
   "description": "execute client side tests from browser report back to cli",
   "main": "lib/node/index.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/mozilla-b2g/js-test-agent.git"
   },
-
   "bin": {
     "js-test-agent": "bin/js-test-agent"
   },
-
   "scripts": {
     "test": "make test-node REPORTER=dot"
   },
-
   "keywords": [
     "test",
     "client",
     "browser",
     "mocha"
   ],
-
-  "dependencies" : {
+  "dependencies": {
     "websocket.io": "~0.2",
     "growl": "1.7.0",
     "optimist": "~0.3",
@@ -38,9 +36,20 @@
     "mocha": "~1.17",
     "sinon": "~1.8"
   },
-
   "license": "MIT",
   "engine": {
     "node": ">=0.4"
-  }
+  },
+  "readme": "# Test Agent\n\n[![Build Status](https://secure.travis-ci.org/mozilla-b2g/js-test-agent.png?branch=master)](http://travis-ci.org/mozilla-b2g/js-test-agent)\n\nTest Agent is a plugin based test environemnt for the modern browser javascript environment.\n\n## Compatibility:\n\nThis project is largely designed to help us test gaia (Firefox OS\nfrontend). Documentation will come soon but see the test-agent folder\nfor now.\n\nWorks with mocha ~1.7\n\nMore soon...\n",
+  "readmeFilename": "README.md",
+  "bugs": {
+    "url": "https://github.com/mozilla-b2g/js-test-agent/issues"
+  },
+  "homepage": "https://github.com/mozilla-b2g/js-test-agent",
+  "_id": "test-agent@0.23.11",
+  "dist": {
+    "shasum": "f38b8299d114dd022981f1014e088c034ea39bd2"
+  },
+  "_from": "test-agent@0.23.11",
+  "_resolved": "https://registry.npmjs.org/test-agent/-/test-agent-0.23.11.tgz"
 }
