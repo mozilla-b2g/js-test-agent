@@ -106,31 +106,6 @@ describe('TestAgent.Loader', function() {
     });
   });
 
-  describe('.done', function() {
-    var doneCalled = false,
-        fn = function() {
-          doneCalled = true;
-        };
-
-
-    beforeEach(function() {
-      doneCalled = false;
-    });
-
-    beforeEach(function() {
-      subject.done(fn);
-    });
-
-    it('should add callback to .doneCallbacks', function() {
-      expect(subject.doneCallbacks[0]).to.be(fn);
-    });
-
-    it('should not fire events', function() {
-      expect(doneCalled).to.be(false);
-    });
-
-  });
-
   describe('.require', function() {
     createIframe();
     mockTime();
@@ -142,17 +117,14 @@ describe('TestAgent.Loader', function() {
       var urls = Array.prototype.slice.call(arguments);
       requireCallbacksFired = [];
 
-      beforeEach(function(done) {
+      beforeEach(function() {
         this.timeout(10000);
         urls.forEach(function(url) {
-          subject.require(url, function() {
+          subject.require(url).then(function() {
             requireCallbacksFired.push(arguments);
           });
         });
-
-        subject.done(function() {
-          done();
-        });
+        return subject.done();
       });
     }
 
@@ -161,30 +133,35 @@ describe('TestAgent.Loader', function() {
           cacheUrl = '/test/file.js',
           url = '/test/fixtures/tests/one-test.js';
 
-      beforeEach(function(done) {
+      beforeEach(function() {
+        this.timeout('1s');
         order.length = 0;
 
-        subject.done(function() {
-          order.push('done');
-          done();
-        });
-
-        subject.require(cacheUrl, function() {
+        var one = subject.require(cacheUrl).then(function() {
           order.push('require');
         });
 
-        subject.require(cacheUrl, function() {
-          order.push('cache');
-          subject.require(url, function() {
-            order.push('nested require');
+        var two = new Promise((accept) => {
+          subject.require(cacheUrl).then(function() {
+            order.push('cache');
+            subject.require(url, function() {
+              order.push('nested require');
+              accept();
+            });
           });
         });
+
+        var three = subject.done().then(function() {
+          order.push('done');
+        });
+
+        return Promise.all([one, two, three]);
       });
 
       it('should load files in the correct order.', function() {
         var scripts;
         expect(order).to.eql([
-          'require', 'cache', 'nested require', 'done'
+          'require', 'cache', 'done', 'nested require'
         ]);
 
         scripts = iframeContext.document.getElementsByTagName('script');
@@ -200,13 +177,11 @@ describe('TestAgent.Loader', function() {
     describe('cross domain require', function() {
       var url = 'https://raw.github.com/LearnBoost/expect.js/master/index.js';
 
-      beforeEach(function(done) {
+      beforeEach(function() {
         //when your on a slow hotel connection :p
         this.timeout(10000);
         subject.require(url);
-        subject.done(function() {
-          done();
-        });
+        return subject.done();
       });
 
       it('should successfully require and fire callbacks', function() {
@@ -218,12 +193,10 @@ describe('TestAgent.Loader', function() {
     describe('missing file', function() {
       var url = 'https://localhost:7711/iamnotfoundfoobar.js';
 
-      it('should still fire done', function(done) {
+      it('should still fire done', function() {
         subject.require(url);
 
-        subject.done(function() {
-          done();
-        });
+        return subject.done();
       });
     });
 
@@ -237,7 +210,7 @@ describe('TestAgent.Loader', function() {
       });
 
       it('should have marked /test/file.js as cached', function() {
-        expect(subject._cached[url]).to.be(true);
+        expect(subject._cached).to.include.keys(url);
       });
 
       it('should have only been included once', function() {
@@ -257,7 +230,6 @@ describe('TestAgent.Loader', function() {
         var script = getScript();
         expect(script.src).to.contain('?time=' + String(this.currentTime));
       });
-
 
       it('should execute script in the context of the iframe', function() {
         expect(iframeContext.TEST_FILE_WAS_LOADED).to.be(true);
