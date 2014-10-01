@@ -25,7 +25,7 @@ describe('node/server/queue-tests', function() {
       if (data.event === 'run tests') {
         testsToRun = data.data.tests;
       }
-      onBroadcast();
+      onBroadcast(data);
     };
 
     if (!allTests) {
@@ -133,6 +133,97 @@ describe('node/server/queue-tests', function() {
 
     });
 
+    describe('when given list of chunks to run', function() {
+      var files = ['/1', '/2', '/3'];
+
+      it('should handle a single chunk length', function(done) {
+        onBroadcast = function(result) {
+          expect(result.data.tests).to.eql(files);
+          done();
+        };
+
+        server.emit(
+          'queue tests', { files: files, totalChunks: 1, thisChunk: 1 }
+        );
+      });
+
+      describe('even number of tests', function() {
+        var files = [
+          '/1',
+          '/2',
+          '/3',
+          '/4',
+          '/5',
+          '/6'
+        ];
+        it('should send chunk 1', function(done) {
+          onBroadcast = function(result) {
+            expect(result.data.tests).to.eql(files.slice(0, 3));
+            done();
+          };
+
+          server.emit(
+            'queue tests', { files: files, totalChunks: 2, thisChunk: 1 }
+          );
+        });
+
+        it('should send chunk 2', function(done) {
+          onBroadcast = function(result) {
+            expect(result.data.tests).to.eql(files.slice(3, 6));
+            done();
+          };
+
+          server.emit(
+            'queue tests', { files: files, totalChunks: 2, thisChunk: 2 }
+          );
+        });
+      });
+
+      describe('odd number of tests', function() {
+        var files = [
+          '/1',
+          '/2',
+          '/3',
+          '/4',
+          '/5',
+          '/6',
+          '/7'
+        ];
+        it('should send chunk 1', function(done) {
+          onBroadcast = function(result) {
+            expect(result.data.tests).to.eql(files.slice(0, 3));
+            done();
+          };
+
+          server.emit(
+            'queue tests', { files: files, totalChunks: 3, thisChunk: 1 }
+          );
+        });
+
+        it('should send chunk 2', function(done) {
+          onBroadcast = function(result) {
+            expect(result.data.tests).to.eql(files.slice(3, 6));
+            done();
+          };
+
+          server.emit(
+            'queue tests', { files: files, totalChunks: 3, thisChunk: 2 }
+          );
+        });
+
+        it('should send chunk 3', function(done) {
+          onBroadcast = function(result) {
+            expect(result.data.tests).to.eql(files.slice(6, 7));
+            done();
+          };
+
+          server.emit(
+            'queue tests', { files: files, totalChunks: 3, thisChunk: 3 }
+          );
+        });
+      });
+
+    });
   });
 
 });
