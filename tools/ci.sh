@@ -6,7 +6,10 @@ XVFB_PROCESS=$!
 make test-server &
 SERVER_PROCESS=$!
 
-DISPLAY=:99 firefox http://localhost:8789/test-agent/ 2>/dev/null &
+npm install -g mozilla-download
+mozilla-download --product firefox firefox
+
+DISPLAY=:99 ./firefox/firefox http://localhost:8789/test-agent/ 2>/dev/null &
 FIREFOX_PROCESS=$!
 
 echo "Running tests..."

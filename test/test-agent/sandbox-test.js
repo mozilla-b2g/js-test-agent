@@ -122,6 +122,7 @@ describe('TestAgent.Sandbox', function() {
     var i = 0;
 
     beforeEach(function(done) {
+      this.timeout(10000);
 
       subject.debug = true;
       context = null;
@@ -129,24 +130,31 @@ describe('TestAgent.Sandbox', function() {
 
       subject.url = '/test/fixtures/iframe-error.html';
 
+      var hasRun;
+      var hasError;
+
+      function isComplete() {
+        if (hasRun && hasError) {
+          done();
+        }
+      }
+
       subject.on('error', function(e) {
+        console.log('!ERROR!');
         context = this;
         errors.push(e);
+        hasError = true;
+        isComplete();
       });
 
       subject.run(function() {
-        context = this;
-        if (errors.length) {
-          done();
-        } else {
-          done(new Error('error events never fired'));
-        }
+        console.log('!RUN!');
+        hasRun = true;
+        isComplete();
       });
-
     });
 
     it('should emit iframe errors', function() {
-      expect(errors.length).to.be(1);
       expect(errors[0].filename).not.to.contain('?time');
       expect(errors[0].message).to.be.ok();
     });
